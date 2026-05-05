@@ -1,0 +1,792 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Intervention, InterventionStatus, Section, SectionType } from "@/types/intervention";
+import {
+  Save,
+  Plus,
+  Trash2,
+  ChevronUp,
+  ChevronDown,
+  ChevronRight,
+  Type,
+  ListOrdered,
+  Video,
+  Image as ImageIcon,
+  FileText,
+  HelpCircle,
+  X,
+} from "lucide-react";
+
+interface Props {
+  intervention?: Intervention;
+  mode: "create" | "edit";
+}
+
+const SECTION_TYPE_META: Record<
+  SectionType,
+  { label: string; icon: React.ElementType; color: string }
+> = {
+  text: { label: "Texte", icon: Type, color: "bg-gray-100 text-gray-600" },
+  list: { label: "Liste", icon: ListOrdered, color: "bg-blue-100 text-blue-600" },
+  video: { label: "Vidéo", icon: Video, color: "bg-red-100 text-red-600" },
+  image: { label: "Image", icon: ImageIcon, color: "bg-green-100 text-green-600" },
+  document: { label: "Document", icon: FileText, color: "bg-amber-100 text-amber-600" },
+  faqs: { label: "FAQ", icon: HelpCircle, color: "bg-purple-100 text-purple-600" },
+};
+
+const SECTION_TYPE_ORDER: SectionType[] = [
+  "text",
+  "list",
+  "video",
+  "image",
+  "document",
+  "faqs",
+];
+
+function slugify(text: string): string {
+  return text
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+function newSection(type: SectionType): Section {
+  const base = { id: `s-${Date.now()}-${Math.random().toString(36).slice(2)}`, type, title: SECTION_TYPE_META[type].label };
+  switch (type) {
+    case "text": return { ...base, body: "" };
+    case "list": return { ...base, items: [""], ordered: true };
+    case "video": return { ...base, videoUrl: "", videoType: "youtube" };
+    case "image": return { ...base, imageUrl: "", imageAlt: "" };
+    case "document": return { ...base, documentUrl: "", isPublic: true };
+    case "faqs": return { ...base, faqs: [{ id: `faq-${Date.now()}`, question: "", answer: "" }] };
+  }
+}
+
+function moveItem<T>(arr: T[], index: number, dir: "up" | "down"): T[] {
+  const next = [...arr];
+  const target = dir === "up" ? index - 1 : index + 1;
+  if (target < 0 || target >= next.length) return arr;
+  [next[index], next[target]] = [next[target], next[index]];
+  return next;
+}
+
+function makeTemplateSection(type: SectionType, title: string, extra: Partial<Section> = {}): Section {
+  return {
+    id: `t-${type}-${Math.random().toString(36).slice(2)}`,
+    type,
+    title,
+    ...extra,
+  };
+}
+
+const BASE_TEMPLATE: Section[] = [
+  makeTemplateSection("text", "Vue d'ensemble", { body: "" }),
+  makeTemplateSection("text", "Pourquoi cette procédure ?", { body: "" }),
+  makeTemplateSection("list", "Comment se préparer", {
+    ordered: true,
+    items: ["", "", ""],
+  }),
+  makeTemplateSection("text", "Pendant l'intervention", { body: "" }),
+  makeTemplateSection("text", "Après l'intervention", { body: "" }),
+  makeTemplateSection("list", "Risques", {
+    ordered: false,
+    items: ["", ""],
+  }),
+  makeTemplateSection("text", "Informations pratiques", { body: "" }),
+  makeTemplateSection("faqs", "Questions fréquentes", {
+    faqs: [
+      { id: "tfaq-1", question: "", answer: "" },
+      { id: "tfaq-2", question: "", answer: "" },
+    ],
+  }),
+];
+
+export default function InterventionForm({ intervention, mode }: Props) {
+  const router = useRouter();
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  const [title, setTitle] = useState(intervention?.title || "");
+  const [slug, setSlug] = useState(intervention?.slug || "");
+  const [subtitle, setSubtitle] = useState(intervention?.subtitle || "");
+  const [status, setStatus] = useState<InterventionStatus>(
+    intervention?.status || "draft"
+  );
+  const [sections, setSections] = useState<Section[]>(
+    intervention?.sections || []
+  );
+
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+  const [showPicker, setShowPicker] = useState(false);
+  const [confirmTemplate, setConfirmTemplate] = useState(false);
+
+  function loadTemplate() {
+    setSections(BASE_TEMPLATE.map((s) => ({ ...s, id: `t-${Date.now()}-${Math.random().toString(36).slice(2)}` })));
+    setConfirmTemplate(false);
+  }
+
+  function toggleCollapse(id: string) {
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function handleTitleChange(value: string) {
+    setTitle(value);
+    if (mode === "create") setSlug(slugify(value));
+  }
+
+  function addSection(type: SectionType) {
+    setSections((prev) => [...prev, newSection(type)]);
+    setShowPicker(false);
+  }
+
+  function removeSection(id: string) {
+    setSections((prev) => prev.filter((s) => s.id !== id));
+  }
+
+  function moveSection(index: number, dir: "up" | "down") {
+    setSections((prev) => moveItem(prev, index, dir));
+  }
+
+  function updateSection(id: string, patch: Partial<Section>) {
+    setSections((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, ...patch } : s))
+    );
+  }
+
+  // List item helpers
+  function addListItem(sectionId: string) {
+    setSections((prev) =>
+      prev.map((s) =>
+        s.id === sectionId ? { ...s, items: [...(s.items || []), ""] } : s
+      )
+    );
+  }
+  function updateListItem(sectionId: string, index: number, value: string) {
+    setSections((prev) =>
+      prev.map((s) => {
+        if (s.id !== sectionId) return s;
+        const items = [...(s.items || [])];
+        items[index] = value;
+        return { ...s, items };
+      })
+    );
+  }
+  function removeListItem(sectionId: string, index: number) {
+    setSections((prev) =>
+      prev.map((s) =>
+        s.id === sectionId
+          ? { ...s, items: (s.items || []).filter((_, i) => i !== index) }
+          : s
+      )
+    );
+  }
+  function moveListItem(sectionId: string, index: number, dir: "up" | "down") {
+    setSections((prev) =>
+      prev.map((s) =>
+        s.id === sectionId
+          ? { ...s, items: moveItem(s.items || [], index, dir) }
+          : s
+      )
+    );
+  }
+
+  // FAQ helpers
+  function addFaq(sectionId: string) {
+    setSections((prev) =>
+      prev.map((s) =>
+        s.id === sectionId
+          ? {
+              ...s,
+              faqs: [
+                ...(s.faqs || []),
+                { id: `faq-${Date.now()}`, question: "", answer: "" },
+              ],
+            }
+          : s
+      )
+    );
+  }
+  function updateFaq(
+    sectionId: string,
+    faqIndex: number,
+    field: "question" | "answer",
+    value: string
+  ) {
+    setSections((prev) =>
+      prev.map((s) => {
+        if (s.id !== sectionId) return s;
+        const faqs = [...(s.faqs || [])];
+        faqs[faqIndex] = { ...faqs[faqIndex], [field]: value };
+        return { ...s, faqs };
+      })
+    );
+  }
+  function removeFaq(sectionId: string, faqIndex: number) {
+    setSections((prev) =>
+      prev.map((s) =>
+        s.id === sectionId
+          ? { ...s, faqs: (s.faqs || []).filter((_, i) => i !== faqIndex) }
+          : s
+      )
+    );
+  }
+  function moveFaq(sectionId: string, index: number, dir: "up" | "down") {
+    setSections((prev) =>
+      prev.map((s) =>
+        s.id === sectionId
+          ? { ...s, faqs: moveItem(s.faqs || [], index, dir) }
+          : s
+      )
+    );
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setSaving(true);
+    const body = { title, slug, subtitle, status, sections };
+    try {
+      const url =
+        mode === "create"
+          ? "/api/admin/interventions"
+          : `/api/admin/interventions/${intervention!.id}`;
+      const method = mode === "create" ? "POST" : "PUT";
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error || "Échec de l'enregistrement");
+        return;
+      }
+      router.push("/admin/interventions");
+      router.refresh();
+    } catch {
+      setError("Une erreur est survenue pendant l'enregistrement.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const inputClass =
+    "w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary-light focus:border-primary-light outline-none transition-colors bg-white text-sm";
+  const textareaClass = `${inputClass} min-h-[120px] resize-y`;
+  const labelClass = "block text-xs font-medium text-muted mb-1 uppercase tracking-wide";
+
+  function renderSectionEditor(section: Section, index: number) {
+    const isCollapsed = collapsed.has(section.id);
+    const meta = SECTION_TYPE_META[section.type];
+    const Icon = meta.icon;
+
+    return (
+      <div
+        key={section.id}
+        className="bg-white rounded-xl border border-border overflow-hidden"
+      >
+        {/* Section header */}
+        <div className="flex items-center gap-2 px-3 py-2.5 bg-surface border-b border-border">
+          {/* Reorder buttons */}
+          <div className="flex flex-col shrink-0">
+            <button
+              type="button"
+              onClick={() => moveSection(index, "up")}
+              disabled={index === 0}
+              className="p-0.5 text-muted hover:text-foreground disabled:opacity-20 transition-colors"
+              title="Monter"
+            >
+              <ChevronUp className="w-3.5 h-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => moveSection(index, "down")}
+              disabled={index === sections.length - 1}
+              className="p-0.5 text-muted hover:text-foreground disabled:opacity-20 transition-colors"
+              title="Descendre"
+            >
+              <ChevronDown className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          {/* Type badge */}
+          <span className={`flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${meta.color}`}>
+            <Icon className="w-3 h-3" />
+            {meta.label}
+          </span>
+
+          {/* Editable title */}
+          <input
+            type="text"
+            value={section.title}
+            onChange={(e) => updateSection(section.id, { title: e.target.value })}
+            className="flex-1 min-w-0 text-sm font-semibold text-foreground bg-transparent border-none outline-none placeholder:text-muted"
+            placeholder="Titre de la section"
+          />
+
+          {/* Collapse + delete */}
+          <button
+            type="button"
+            onClick={() => toggleCollapse(section.id)}
+            className="p-1 text-muted hover:text-foreground transition-colors shrink-0"
+            title={isCollapsed ? "Développer" : "Réduire"}
+          >
+            <ChevronRight
+              className={`w-4 h-4 transition-transform ${isCollapsed ? "" : "rotate-90"}`}
+            />
+          </button>
+          <button
+            type="button"
+            onClick={() => removeSection(section.id)}
+            className="p-1 text-muted hover:text-danger transition-colors shrink-0"
+            title="Supprimer"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Section content */}
+        {!isCollapsed && (
+          <div className="p-4 space-y-3">
+            {section.type === "text" && (
+              <>
+                <label className={labelClass}>Contenu</label>
+                <textarea
+                  value={section.body || ""}
+                  onChange={(e) => updateSection(section.id, { body: e.target.value })}
+                  className={textareaClass}
+                  placeholder="Saisissez votre texte..."
+                />
+              </>
+            )}
+
+            {section.type === "list" && (
+              <>
+                <div className="flex items-center gap-3 mb-1">
+                  <label className={labelClass + " mb-0"}>Type de liste</label>
+                  <label className="flex items-center gap-1.5 text-sm text-foreground cursor-pointer">
+                    <input
+                      type="radio"
+                      checked={section.ordered !== false}
+                      onChange={() => updateSection(section.id, { ordered: true })}
+                    />
+                    Numérotée
+                  </label>
+                  <label className="flex items-center gap-1.5 text-sm text-foreground cursor-pointer">
+                    <input
+                      type="radio"
+                      checked={section.ordered === false}
+                      onChange={() => updateSection(section.id, { ordered: false })}
+                    />
+                    À puces
+                  </label>
+                </div>
+                <div className="space-y-2">
+                  {(section.items || []).map((item, i) => (
+                    <div key={i} className="flex gap-1.5 items-center">
+                      <div className="flex flex-col shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => moveListItem(section.id, i, "up")}
+                          disabled={i === 0}
+                          className="p-0.5 text-muted hover:text-foreground disabled:opacity-20 transition-colors"
+                        >
+                          <ChevronUp className="w-3 h-3" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveListItem(section.id, i, "down")}
+                          disabled={i === (section.items || []).length - 1}
+                          className="p-0.5 text-muted hover:text-foreground disabled:opacity-20 transition-colors"
+                        >
+                          <ChevronDown className="w-3 h-3" />
+                        </button>
+                      </div>
+                      <span className="text-xs text-muted w-5 text-right shrink-0">
+                        {section.ordered !== false ? `${i + 1}.` : "•"}
+                      </span>
+                      <input
+                        type="text"
+                        value={item}
+                        onChange={(e) => updateListItem(section.id, i, e.target.value)}
+                        className={`${inputClass} flex-1`}
+                        placeholder="Élément..."
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeListItem(section.id, i)}
+                        className="p-1 text-muted hover:text-danger transition-colors shrink-0"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => addListItem(section.id)}
+                    className="flex items-center gap-1 text-sm text-primary hover:text-primary-dark font-medium mt-1"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    Ajouter un élément
+                  </button>
+                </div>
+              </>
+            )}
+
+            {section.type === "video" && (
+              <>
+                <div>
+                  <label className={labelClass}>URL de la vidéo</label>
+                  <input
+                    type="text"
+                    value={section.videoUrl || ""}
+                    onChange={(e) => updateSection(section.id, { videoUrl: e.target.value })}
+                    className={inputClass}
+                    placeholder="https://www.youtube.com/watch?v=..."
+                  />
+                </div>
+                <div>
+                  <label className={labelClass}>Plateforme</label>
+                  <select
+                    value={section.videoType || "youtube"}
+                    onChange={(e) =>
+                      updateSection(section.id, {
+                        videoType: e.target.value as Section["videoType"],
+                      })
+                    }
+                    className={inputClass}
+                  >
+                    <option value="youtube">YouTube</option>
+                    <option value="vimeo">Vimeo</option>
+                    <option value="file">Fichier vidéo direct</option>
+                  </select>
+                </div>
+              </>
+            )}
+
+            {section.type === "image" && (
+              <>
+                <div>
+                  <label className={labelClass}>URL de l&apos;image</label>
+                  <input
+                    type="text"
+                    value={section.imageUrl || ""}
+                    onChange={(e) => updateSection(section.id, { imageUrl: e.target.value })}
+                    className={inputClass}
+                    placeholder="https://..."
+                  />
+                </div>
+                <div>
+                  <label className={labelClass}>Texte alternatif (accessibilité)</label>
+                  <input
+                    type="text"
+                    value={section.imageAlt || ""}
+                    onChange={(e) => updateSection(section.id, { imageAlt: e.target.value })}
+                    className={inputClass}
+                    placeholder="Description de l'image"
+                  />
+                </div>
+                {section.imageUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={section.imageUrl}
+                    alt={section.imageAlt || section.title}
+                    className="mt-2 rounded-lg border border-border max-h-48 object-cover w-full"
+                  />
+                )}
+              </>
+            )}
+
+            {section.type === "document" && (
+              <>
+                <div>
+                  <label className={labelClass}>URL du document</label>
+                  <input
+                    type="text"
+                    value={section.documentUrl || ""}
+                    onChange={(e) =>
+                      updateSection(section.id, { documentUrl: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="https://..."
+                  />
+                </div>
+                <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={section.isPublic !== false}
+                    onChange={(e) =>
+                      updateSection(section.id, { isPublic: e.target.checked })
+                    }
+                    className="w-4 h-4 rounded"
+                  />
+                  Visible par les patients
+                </label>
+              </>
+            )}
+
+            {section.type === "faqs" && (
+              <div className="space-y-3">
+                {(section.faqs || []).map((faq, i) => (
+                  <div
+                    key={faq.id}
+                    className="border border-border rounded-lg p-3 space-y-2 bg-surface"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <div className="flex flex-col shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => moveFaq(section.id, i, "up")}
+                          disabled={i === 0}
+                          className="p-0.5 text-muted hover:text-foreground disabled:opacity-20 transition-colors"
+                        >
+                          <ChevronUp className="w-3 h-3" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveFaq(section.id, i, "down")}
+                          disabled={i === (section.faqs || []).length - 1}
+                          className="p-0.5 text-muted hover:text-foreground disabled:opacity-20 transition-colors"
+                        >
+                          <ChevronDown className="w-3 h-3" />
+                        </button>
+                      </div>
+                      <span className="text-xs font-medium text-muted flex-1">
+                        Q{i + 1}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeFaq(section.id, i)}
+                        className="p-1 text-muted hover:text-danger transition-colors"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                    <input
+                      type="text"
+                      value={faq.question}
+                      onChange={(e) =>
+                        updateFaq(section.id, i, "question", e.target.value)
+                      }
+                      className={inputClass}
+                      placeholder="Question"
+                    />
+                    <textarea
+                      value={faq.answer}
+                      onChange={(e) =>
+                        updateFaq(section.id, i, "answer", e.target.value)
+                      }
+                      className={`${inputClass} min-h-[80px] resize-y`}
+                      placeholder="Réponse"
+                    />
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => addFaq(section.id)}
+                  className="flex items-center gap-1 text-sm text-primary hover:text-primary-dark font-medium"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Ajouter une question
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg p-3">
+          {error}
+        </div>
+      )}
+
+      {/* General info — fixed */}
+      <fieldset className="bg-white rounded-xl border border-border p-5 space-y-4">
+        <legend className="text-lg font-semibold text-foreground px-1">
+          Informations générales
+        </legend>
+
+        <div>
+          <label htmlFor="title" className={labelClass}>
+            Titre *
+          </label>
+          <input
+            id="title"
+            type="text"
+            value={title}
+            onChange={(e) => handleTitleChange(e.target.value)}
+            required
+            className={inputClass}
+            placeholder="ex. Coronarographie"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="slug" className={labelClass}>
+            Slug d&apos;URL *
+          </label>
+          <input
+            id="slug"
+            type="text"
+            value={slug}
+            onChange={(e) => setSlug(e.target.value)}
+            required
+            className={inputClass}
+            placeholder="ex. coronarographie"
+          />
+          <p className="text-xs text-muted mt-1">
+            URL : /interventions/{slug || "..."}
+          </p>
+        </div>
+
+        <div>
+          <label htmlFor="subtitle" className={labelClass}>
+            Sous-titre
+          </label>
+          <input
+            id="subtitle"
+            type="text"
+            value={subtitle}
+            onChange={(e) => setSubtitle(e.target.value)}
+            className={inputClass}
+            placeholder="Description courte affichée sur les cartes"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="status" className={labelClass}>
+            Statut
+          </label>
+          <select
+            id="status"
+            value={status}
+            onChange={(e) => setStatus(e.target.value as InterventionStatus)}
+            className={inputClass}
+          >
+            <option value="draft">Brouillon</option>
+            <option value="published">Publiée</option>
+          </select>
+        </div>
+      </fieldset>
+
+      {/* Content blocks */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between px-1">
+          <p className="text-xs font-medium text-muted uppercase tracking-wide">
+            Contenu — {sections.length} section{sections.length !== 1 ? "s" : ""}
+          </p>
+
+          {sections.length > 0 && (
+            confirmTemplate ? (
+              <span className="flex items-center gap-2 text-xs">
+                <span className="text-muted">Remplacer le contenu par le modèle ?</span>
+                <button type="button" onClick={loadTemplate} className="text-danger font-medium hover:underline">Oui</button>
+                <button type="button" onClick={() => setConfirmTemplate(false)} className="text-muted hover:underline">Non</button>
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setConfirmTemplate(true)}
+                className="text-xs text-muted hover:text-primary transition-colors"
+              >
+                Charger le modèle de base
+              </button>
+            )
+          )}
+        </div>
+
+        {sections.length === 0 && (
+          <div className="rounded-xl border-2 border-dashed border-border p-8 text-center space-y-4">
+            <p className="text-muted text-sm">Aucune section pour l&apos;instant.</p>
+            <div className="flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={loadTemplate}
+                className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors"
+              >
+                Charger le modèle de base
+              </button>
+              <span className="text-xs text-muted">ou ajoutez des sections manuellement ci-dessous</span>
+            </div>
+          </div>
+        )}
+
+        {sections.map((section, index) =>
+          renderSectionEditor(section, index)
+        )}
+
+        {/* Add section picker */}
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setShowPicker((v) => !v)}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-border text-sm text-muted hover:border-primary hover:text-primary transition-colors font-medium"
+          >
+            <Plus className="w-4 h-4" />
+            Ajouter une section
+          </button>
+
+          {showPicker && (
+            <div className="absolute left-0 right-0 top-full mt-1 z-10 bg-white rounded-xl border border-border shadow-lg p-3 grid grid-cols-3 gap-2">
+              {SECTION_TYPE_ORDER.map((type) => {
+                const meta = SECTION_TYPE_META[type];
+                const Icon = meta.icon;
+                return (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => addSection(type)}
+                    className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-surface-alt transition-colors text-center"
+                  >
+                    <span className={`w-10 h-10 flex items-center justify-center rounded-lg ${meta.color}`}>
+                      <Icon className="w-5 h-5" />
+                    </span>
+                    <span className="text-xs font-medium text-foreground">
+                      {meta.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="flex items-center gap-4 pt-2">
+        <button
+          type="submit"
+          disabled={saving}
+          className="flex items-center gap-2 bg-primary text-white px-6 py-2.5 rounded-lg hover:bg-primary-dark transition-colors font-medium disabled:opacity-50"
+        >
+          <Save className="w-4 h-4" />
+          {saving
+            ? "Enregistrement..."
+            : mode === "create"
+              ? "Créer l'intervention"
+              : "Enregistrer les modifications"}
+        </button>
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="px-6 py-2.5 rounded-lg border border-border text-muted hover:bg-surface-alt transition-colors font-medium"
+        >
+          Annuler
+        </button>
+      </div>
+    </form>
+  );
+}
