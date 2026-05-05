@@ -104,100 +104,100 @@ export default function InterventionSearch({ interventions }: Props) {
         </div>
       </div>
 
-      {/* ── Résultats ── */}
-      {showResults ? (
-        <div>
-          {results.length > 0 ? (
-            <ul className="divide-y divide-black/[0.04] max-h-72 overflow-y-auto">
-              {results.map((intervention) => (
-                <li key={intervention.id}>
-                  <Link
-                    href={`/interventions/${intervention.slug}`}
-                    className="group flex items-center justify-between px-7 py-4 transition-colors hover:bg-blue-50"
-                  >
-                    <div className="min-w-0 pr-4">
-                      <p
-                        className="text-[15px] font-semibold text-foreground group-hover:text-primary transition-colors leading-snug"
+      {/* ── Résultats / Suggestions — fixed height to prevent box jumping ── */}
+      <div className="h-72 overflow-y-auto">
+        {showResults ? (
+          <>
+            {results.length > 0 ? (
+              <ul className="divide-y divide-black/[0.04]">
+                {results.map((intervention) => (
+                  <li key={intervention.id}>
+                    <Link
+                      href={`/interventions/${intervention.slug}`}
+                      className="group flex items-center justify-between px-7 py-4 transition-colors hover:bg-blue-50"
+                    >
+                      <div className="min-w-0 pr-4">
+                        <p
+                          className="text-[15px] font-semibold text-foreground group-hover:text-primary transition-colors leading-snug"
+                          style={{ fontFamily: "var(--font-heading)" }}
+                        >
+                          {intervention.title}
+                        </p>
+                        {intervention.subtitle && (
+                          <p className="text-sm text-muted mt-0.5 truncate">
+                            {intervention.subtitle}
+                          </p>
+                        )}
+                      </div>
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-all group-hover:scale-110"
+                        style={{ background: "rgba(2,132,199,0.08)" }}
+                      >
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" style={{ color: "#0284C7" }} />
+                      </div>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full px-7 text-center">
+                <p className="text-sm font-medium text-foreground mb-1" style={{ fontFamily: "var(--font-heading)" }}>
+                  Aucun résultat
+                </p>
+                <p className="text-sm text-muted mb-4">
+                  Essayez un autre terme ou parcourez la liste complète.
+                </p>
+                <Link
+                  href="/#interventions"
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                  style={{ fontFamily: "var(--font-heading)" }}
+                >
+                  Voir toutes les interventions <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="px-7 py-6">
+            {suggestions.length > 0 && (
+              <>
+                <p
+                  className="text-xs font-semibold uppercase tracking-widest text-muted mb-4"
+                  style={{ fontFamily: "var(--font-heading)" }}
+                >
+                  Suggestions
+                </p>
+                <div className="flex flex-col gap-2">
+                  {suggestions.map((intervention) => (
+                    <Link
+                      key={intervention.id}
+                      href={`/interventions/${intervention.slug}`}
+                      className="group flex items-center justify-between px-4 py-3 rounded-xl border transition-all hover:border-blue-200 hover:bg-blue-50"
+                      style={{ borderColor: "rgba(0,0,0,0.07)", background: "rgba(248,250,255,0.6)" }}
+                    >
+                      <span
+                        className="text-sm font-medium text-foreground group-hover:text-primary transition-colors"
                         style={{ fontFamily: "var(--font-heading)" }}
                       >
                         {intervention.title}
-                      </p>
-                      {intervention.subtitle && (
-                        <p className="text-sm text-muted mt-0.5 truncate">
-                          {intervention.subtitle}
-                        </p>
-                      )}
-                    </div>
-                    <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-all group-hover:scale-110"
-                      style={{ background: "rgba(2,132,199,0.08)" }}
-                    >
-                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" style={{ color: "#0284C7" }} />
-                    </div>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div className="px-7 py-8 text-center">
-              <p className="text-sm font-medium text-foreground mb-1" style={{ fontFamily: "var(--font-heading)" }}>
-                Aucun résultat
-              </p>
-              <p className="text-sm text-muted mb-4">
-                Essayez un autre terme ou parcourez la liste complète.
-              </p>
-              <Link
-                href="/#interventions"
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
-                style={{ fontFamily: "var(--font-heading)" }}
-              >
-                Voir toutes les interventions <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-          )}
-        </div>
-      ) : (
-        /* ── État vide : suggestions rapides ── */
-        <div className="px-7 py-6">
-          {suggestions.length > 0 && (
-            <>
-              <p
-                className="text-xs font-semibold uppercase tracking-widest text-muted mb-4"
-                style={{ fontFamily: "var(--font-heading)" }}
-              >
-                Suggestions
-              </p>
-              <div className="flex flex-col gap-2">
-                {suggestions.map((intervention) => (
-                  <Link
-                    key={intervention.id}
-                    href={`/interventions/${intervention.slug}`}
-                    className="group flex items-center justify-between px-4 py-3 rounded-xl border transition-all hover:border-blue-200 hover:bg-blue-50"
-                    style={{ borderColor: "rgba(0,0,0,0.07)", background: "rgba(248,250,255,0.6)" }}
-                  >
-                    <span
-                      className="text-sm font-medium text-foreground group-hover:text-primary transition-colors"
-                      style={{ fontFamily: "var(--font-heading)" }}
-                    >
-                      {intervention.title}
-                    </span>
-                    <ArrowRight className="w-3.5 h-3.5 text-muted group-hover:text-primary group-hover:translate-x-0.5 transition-all flex-shrink-0" />
-                  </Link>
-                ))}
-              </div>
-            </>
-          )}
-
-          <Link
-            href="/#interventions"
-            className="mt-5 flex items-center justify-center gap-1.5 text-xs text-muted hover:text-primary transition-colors"
-            style={{ fontFamily: "var(--font-heading)" }}
-          >
-            <ArrowRight className="w-3 h-3" />
-            Voir toutes les fiches ({interventions.length})
-          </Link>
-        </div>
-      )}
+                      </span>
+                      <ArrowRight className="w-3.5 h-3.5 text-muted group-hover:text-primary group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                    </Link>
+                  ))}
+                </div>
+              </>
+            )}
+            <Link
+              href="/#interventions"
+              className="mt-5 flex items-center justify-center gap-1.5 text-xs text-muted hover:text-primary transition-colors"
+              style={{ fontFamily: "var(--font-heading)" }}
+            >
+              <ArrowRight className="w-3 h-3" />
+              Voir toutes les fiches ({interventions.length})
+            </Link>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

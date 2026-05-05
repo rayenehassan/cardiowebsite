@@ -667,20 +667,6 @@ export default function InterventionForm({ intervention, mode }: Props) {
           />
         </div>
 
-        <div>
-          <label htmlFor="status" className={labelClass}>
-            Statut
-          </label>
-          <select
-            id="status"
-            value={status}
-            onChange={(e) => setStatus(e.target.value as InterventionStatus)}
-            className={inputClass}
-          >
-            <option value="draft">Brouillon</option>
-            <option value="published">Publiée</option>
-          </select>
-        </div>
       </fieldset>
 
       {/* Content blocks */}
@@ -766,26 +752,51 @@ export default function InterventionForm({ intervention, mode }: Props) {
         </div>
       </div>
 
-      <div className="flex items-center gap-4 pt-2">
-        <button
-          type="submit"
-          disabled={saving}
-          className="flex items-center gap-2 bg-primary text-white px-6 py-2.5 rounded-lg hover:bg-primary-dark transition-colors font-medium disabled:opacity-50"
-        >
-          <Save className="w-4 h-4" />
-          {saving
-            ? "Enregistrement..."
-            : mode === "create"
-              ? "Créer l'intervention"
-              : "Enregistrer les modifications"}
-        </button>
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="px-6 py-2.5 rounded-lg border border-border text-muted hover:bg-surface-alt transition-colors font-medium"
-        >
-          Annuler
-        </button>
+      {/* Status + submit row */}
+      <div className="bg-white rounded-xl border border-border p-4 flex flex-wrap items-center gap-4">
+        {/* Publish toggle */}
+        <div className="flex items-center gap-1 p-1 bg-surface rounded-lg border border-border">
+          <button
+            type="button"
+            onClick={() => setStatus("draft")}
+            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+              status === "draft"
+                ? "bg-amber-100 text-amber-700"
+                : "text-muted hover:text-foreground"
+            }`}
+          >
+            Brouillon
+          </button>
+          <button
+            type="button"
+            onClick={() => setStatus("published")}
+            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+              status === "published"
+                ? "bg-green-100 text-green-700"
+                : "text-muted hover:text-foreground"
+            }`}
+          >
+            ● Publié
+          </button>
+        </div>
+
+        <div className="flex items-center gap-3 ml-auto">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="px-4 py-2 rounded-lg border border-border text-muted hover:bg-surface-alt transition-colors text-sm font-medium"
+          >
+            Annuler
+          </button>
+          <button
+            type="submit"
+            disabled={saving}
+            className="flex items-center gap-2 bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium disabled:opacity-50"
+          >
+            <Save className="w-4 h-4" />
+            {saving ? "Enregistrement..." : mode === "create" ? "Créer" : "Enregistrer"}
+          </button>
+        </div>
       </div>
     </form>
   );
