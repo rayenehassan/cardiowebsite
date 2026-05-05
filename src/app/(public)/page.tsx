@@ -1,7 +1,8 @@
 export const dynamic = "force-dynamic";
 
-import { Activity, ShieldCheck, BookOpen, Heart, Lock, Users, ArrowRight } from "lucide-react";
+import { Activity, ShieldCheck, BookOpen, Heart, Lock, Users, ArrowRight, Phone, Mail } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import InterventionCard from "@/components/ui/InterventionCard";
 import InterventionSearch from "@/components/ui/InterventionSearch";
 import AnimateIn from "@/components/ui/AnimateIn";
@@ -111,6 +112,78 @@ export default async function HomePage() {
               </div>
             </AnimateIn>
           )}
+        </div>
+      </section>
+
+      {/* ── Équipe ── */}
+      <section className="py-24 sm:py-32 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <AnimateIn className="mb-14">
+            <span className="section-label mb-5 inline-flex">
+              <Users className="w-3 h-3" />
+              Notre équipe
+            </span>
+            <h2
+              className="text-4xl sm:text-5xl font-bold tracking-[-0.03em] mb-4 text-foreground"
+              style={{ fontFamily: "var(--font-heading)" }}
+            >
+              Vos cardiologues
+            </h2>
+            <p className="text-muted text-lg max-w-lg">
+              Des spécialistes en cardiologie interventionnelle à votre écoute à l&apos;Hôpital privé de la Loire.
+            </p>
+          </AnimateIn>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+            {[
+              { name: "Dr Mustapha HASSAN", photo: "/Mustapha%20Hassan.jpg", email: "moustapha@gmail.com", tel: "04 78 22 91 12" },
+              { name: "Dr Antoine GERBAY",  photo: "/Antoine%20Gerbay.jpg",  email: "jeremy@gmail.com",    tel: "04 72 81 93 12" },
+              { name: "Dr Jeremy TERREAUX", photo: "/Jeremy%20Terreaux.jpg", email: "antoine@gmail.com",   tel: "04 71 88 82 22" },
+            ].map(({ name, photo, email, tel }, i) => (
+              <AnimateIn key={name} delay={i * 100}>
+                <div className="glass glass-hover rounded-2xl overflow-hidden">
+                  <div className="relative h-52 w-full">
+                    <Image
+                      src={photo}
+                      alt={name}
+                      fill
+                      quality={90}
+                      sizes="(max-width: 640px) 100vw, 33vw"
+                      className="object-cover"
+                      style={{ objectPosition: "center 15%" }}
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h3
+                      className="font-semibold text-lg text-foreground mb-0.5"
+                      style={{ fontFamily: "var(--font-heading)" }}
+                    >
+                      {name}
+                    </h3>
+                    <p className="text-sm text-muted mb-4">Cardiologie interventionnelle</p>
+                    <div className="space-y-2">
+                      <a
+                        href={`tel:${tel.replace(/\s/g, "")}`}
+                        className="flex items-center gap-2 text-sm hover:text-primary transition-colors"
+                        style={{ color: "rgba(15,23,42,0.6)" }}
+                      >
+                        <Phone className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#0284C7" }} />
+                        {tel}
+                      </a>
+                      <a
+                        href={`mailto:${email}`}
+                        className="flex items-center gap-2 text-sm hover:text-primary transition-colors"
+                        style={{ color: "rgba(15,23,42,0.6)" }}
+                      >
+                        <Mail className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#0284C7" }} />
+                        {email}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </AnimateIn>
+            ))}
+          </div>
         </div>
       </section>
 
