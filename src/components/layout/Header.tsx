@@ -2,80 +2,85 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X, Heart } from "lucide-react";
+import { Menu, X, Activity } from "lucide-react";
+
+const navLinks = [
+  { href: "/", label: "Accueil" },
+  { href: "/#interventions", label: "Interventions" },
+  { href: "/#contact", label: "Contact" },
+];
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="bg-white border-b border-border sticky top-0 z-50">
+    <header
+      className="sticky top-0 z-50 border-b"
+      style={{
+        background: "#0F172A",
+        borderColor: "rgba(255,255,255,0.07)",
+      }}
+    >
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-[64px]">
+          {/* Logo */}
           <Link
             href="/"
-            className="flex items-center gap-2 text-primary font-bold text-xl"
+            className="flex items-center gap-2.5"
+            style={{ fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: "17px", color: "#ffffff" }}
           >
-            <Heart className="w-7 h-7" fill="currentColor" />
-            <span>CardioInfo</span>
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+              style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)" }}
+            >
+              <Activity className="w-4 h-4" style={{ color: "#ffffff" }} />
+            </div>
+            Cardio<span style={{ color: "#7DD3FC" }}>Info</span>
           </Link>
 
-          {/* Navigation desktop */}
-          <nav className="hidden md:flex items-center gap-6">
-            <Link
-              href="/"
-              className="text-foreground hover:text-primary transition-colors font-medium"
-            >
-              Accueil
-            </Link>
-            <Link
-              href="/#interventions"
-              className="text-foreground hover:text-primary transition-colors font-medium"
-            >
-              Interventions
-            </Link>
-            <Link
-              href="/#contact"
-              className="text-foreground hover:text-primary transition-colors font-medium"
-            >
-              Contact
-            </Link>
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-1">
+            {navLinks.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                className="px-4 py-2 text-sm rounded-lg transition-colors hover:bg-white/10"
+                style={{ fontFamily: "var(--font-heading)", color: "rgba(255,255,255,0.7)" }}
+              >
+                {label}
+              </Link>
+            ))}
           </nav>
 
-          {/* Bouton du menu mobile */}
+          {/* Mobile toggle */}
           <button
-            className="md:hidden p-2 rounded-lg hover:bg-surface-alt transition-colors"
+            className="md:hidden p-2 rounded-lg transition-colors hover:bg-white/10"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
             aria-expanded={menuOpen}
+            style={{ color: "rgba(255,255,255,0.8)" }}
           >
-            {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
 
-        {/* Navigation mobile */}
+        {/* Mobile nav */}
         {menuOpen && (
-          <nav className="md:hidden pb-4 border-t border-border pt-4 flex flex-col gap-3">
-            <Link
-              href="/"
-              className="text-foreground hover:text-primary transition-colors font-medium py-2"
-              onClick={() => setMenuOpen(false)}
-            >
-              Accueil
-            </Link>
-            <Link
-              href="/#interventions"
-              className="text-foreground hover:text-primary transition-colors font-medium py-2"
-              onClick={() => setMenuOpen(false)}
-            >
-              Interventions
-            </Link>
-            <Link
-              href="/#contact"
-              className="text-foreground hover:text-primary transition-colors font-medium py-2"
-              onClick={() => setMenuOpen(false)}
-            >
-              Contact
-            </Link>
+          <nav
+            className="md:hidden pb-3 pt-2 flex flex-col gap-0.5 border-t"
+            style={{ borderColor: "rgba(255,255,255,0.08)" }}
+          >
+            {navLinks.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                className="px-3 py-2.5 text-sm rounded-lg transition-colors hover:bg-white/10"
+                style={{ fontFamily: "var(--font-heading)", color: "rgba(255,255,255,0.7)" }}
+                onClick={() => setMenuOpen(false)}
+              >
+                {label}
+              </Link>
+            ))}
           </nav>
         )}
       </div>

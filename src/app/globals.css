@@ -1,37 +1,220 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-primary: #1e40af;
-  --color-primary-light: #3b82f6;
-  --color-primary-dark: #1e3a8a;
-  --color-secondary: #0f766e;
-  --color-secondary-light: #14b8a6;
-  --color-accent: #f59e0b;
+  --color-primary: #0284C7;
+  --color-primary-light: #38BDF8;
+  --color-primary-dark: #0369A1;
+  --color-accent: #6366F1;
+  --color-accent-2: #059669;
   --color-background: #ffffff;
-  --color-surface: #f8fafc;
-  --color-surface-alt: #f1f5f9;
-  --color-foreground: #1e293b;
-  --color-muted: #64748b;
-  --color-border: #e2e8f0;
-  --color-danger: #dc2626;
-  --color-success: #16a34a;
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface: #F8FAFF;
+  --color-surface-alt: #EEF4FF;
+  --color-foreground: #0F172A;
+  --color-muted: #64748B;
+  --color-border: rgba(0, 0, 0, 0.07);
+  --color-danger: #DC2626;
+  --color-success: #059669;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-heading: var(--font-space-grotesk), system-ui, sans-serif;
+  --font-mono: ui-monospace, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--color-background);
   color: var(--color-foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Styles de focus accessibles */
 *:focus-visible {
-  outline: 3px solid var(--color-primary-light);
-  outline-offset: 2px;
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
 }
 
-/* Defilement fluide pour les liens d'ancrage */
-html {
-  scroll-behavior: smooth;
+/* ── Mesh gradient — même technique que Sloan, 4 ellipses, palette bleue ── */
+.mesh-bg {
+  background:
+    radial-gradient(ellipse 700px 600px at 65% 10%, rgba(147, 197, 253, 0.52) 0%, transparent 70%),
+    radial-gradient(ellipse 600px 500px at 35% 85%, rgba(165, 180, 252, 0.38) 0%, transparent 65%),
+    radial-gradient(ellipse 800px 500px at 90% 45%, rgba(103, 232, 249, 0.28) 0%, transparent 70%),
+    radial-gradient(ellipse 500px 500px at 15% 10%, rgba(196, 181, 253, 0.22) 0%, transparent 60%),
+    #ffffff;
+}
+
+/* ── Glassmorphism (sur fond clair) ── */
+.glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.glass-hover {
+  transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.glass-hover:hover {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(2, 132, 199, 0.22);
+  box-shadow: 0 8px 32px rgba(2, 132, 199, 0.1), 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* ── Gradient text ── */
+.text-gradient {
+  background: linear-gradient(135deg, #0EA5E9 0%, #6366F1 55%, #0284C7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Section label ── */
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 14px;
+  background: rgba(2, 132, 199, 0.08);
+  border: 1px solid rgba(2, 132, 199, 0.16);
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #0284C7;
+  font-family: var(--font-heading);
+}
+
+/* ── Glow effects ── */
+.glow-btn {
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.18), 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.glow-btn:hover {
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.24), 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ── Keyframe animations ── */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes floatY {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-18px); }
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.8); }
+}
+
+/* ── Animation utilities ── */
+.anim-fade-up {
+  animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.anim-fade-in {
+  animation: fadeIn 0.8s ease both;
+}
+
+.anim-float {
+  animation: floatY 7s ease-in-out infinite;
+}
+
+.anim-pulse-dot {
+  animation: pulseDot 2.5s ease-in-out infinite;
+}
+
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+
+/* ── Floating orbs ── */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* ── Buttons ── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 28px;
+  background: #0F172A;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 14px;
+  border-radius: 100px;
+  font-family: var(--font-heading);
+  letter-spacing: 0.01em;
+  transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-primary:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 28px;
+  background: transparent;
+  color: #0F172A;
+  font-weight: 500;
+  font-size: 14px;
+  border-radius: 100px;
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  font-family: var(--font-heading);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.btn-ghost:hover {
+  border-color: rgba(2, 132, 199, 0.4);
+  background: rgba(2, 132, 199, 0.04);
+}
+
+/* ── Intervention card hover (CSS custom properties, no JS) ── */
+.intervention-card {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease;
+}
+
+.intervention-card:hover {
+  border-color: var(--card-accent-border, rgba(2, 132, 199, 0.3));
+  box-shadow: var(--card-accent-shadow, 0 8px 32px rgba(2,132,199,0.14)), 0 2px 8px rgba(0,0,0,0.06);
+  transform: translateY(-4px);
+}
+
+/* ── Light content scope (pages médicales) ── */
+.light-content {
+  background: #ffffff;
+  color: #111827;
 }

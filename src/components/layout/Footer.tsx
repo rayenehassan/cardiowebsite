@@ -1,68 +1,89 @@
 import Link from "next/link";
-import { Heart } from "lucide-react";
+import { Activity } from "lucide-react";
+
+const navLinks = [
+  { href: "/", label: "Accueil" },
+  { href: "/#interventions", label: "Interventions" },
+  { href: "/#contact", label: "Contact" },
+];
 
 export default function Footer() {
   return (
-    <footer className="bg-primary-dark text-white mt-auto">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <footer
+      id="contact"
+      className="mt-auto border-t"
+      style={{ background: "#F8FAFF", borderColor: "rgba(0,0,0,0.07)" }}
+    >
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          {/* Brand */}
           <div>
-            <div className="flex items-center gap-2 font-bold text-lg mb-3">
-              <Heart className="w-5 h-5" fill="currentColor" />
-              <span>CardioInfo</span>
+            <div
+              className="flex items-center gap-2.5 mb-4"
+              style={{ fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: "17px", color: "#0F172A" }}
+            >
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                style={{ background: "rgba(2,132,199,0.09)", border: "1px solid rgba(2,132,199,0.18)" }}
+              >
+                <Activity className="w-4 h-4" style={{ color: "#0284C7" }} />
+              </div>
+              Cardio<span style={{ color: "#0284C7" }}>Info</span>
             </div>
-            <p className="text-blue-200 text-sm leading-relaxed">
-              Plateforme d’information pré-interventionnelle pour les patients
-              de cardiologie interventionnelle. Ces informations générales ne
-              remplacent pas l’avis médical de votre cardiologue.
+            <p className="text-muted text-sm leading-relaxed">
+              Plateforme d&apos;information pré-interventionnelle pour les patients de
+              cardiologie. Ces informations ne remplacent pas l&apos;avis de votre cardiologue.
             </p>
           </div>
 
+          {/* Links */}
           <div>
-            <h3 className="font-semibold mb-3">Liens rapides</h3>
-            <ul className="space-y-2 text-blue-200 text-sm">
-              <li>
-                <Link href="/" className="hover:text-white transition-colors">
-                  Accueil
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/#interventions"
-                  className="hover:text-white transition-colors"
-                >
-                  Interventions
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/#contact"
-                  className="hover:text-white transition-colors"
-                >
-                  Contact
-                </Link>
-              </li>
+            <h3
+              className="text-sm font-semibold text-foreground mb-4"
+              style={{ fontFamily: "var(--font-heading)" }}
+            >
+              Liens rapides
+            </h3>
+            <ul className="space-y-2.5">
+              {navLinks.map(({ href, label }) => (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    className="text-sm text-muted hover:text-foreground transition-colors"
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          <div id="contact">
-            <h3 className="font-semibold mb-3">Contact</h3>
-            <div className="text-blue-200 text-sm space-y-1">
+          {/* Contact */}
+          <div>
+            <h3
+              className="text-sm font-semibold text-foreground mb-4"
+              style={{ fontFamily: "var(--font-heading)" }}
+            >
+              Contact
+            </h3>
+            <div className="text-muted text-sm space-y-2">
               <p>Service de cardiologie</p>
               <p>Tél. : +32 (0)2 123 45 67</p>
-              <p>E-mail : cardio@hospital-example.be</p>
+              <p>cardio@hospital-example.be</p>
             </div>
           </div>
         </div>
 
-        <div className="border-t border-blue-800 mt-8 pt-6 text-center text-blue-300 text-xs">
-          <p>
-            Ce site ne collecte aucune donnée personnelle, n’utilise pas de
-            cookies et ne suit pas les visiteurs.
+        {/* Bottom */}
+        <div
+          className="mt-12 pt-6 border-t flex flex-col sm:flex-row items-center justify-between gap-3"
+          style={{ borderColor: "rgba(0,0,0,0.07)" }}
+        >
+          <p className="text-xs text-muted">
+            Ce site ne collecte aucune donnée, n&apos;utilise pas de cookies et ne suit pas les visiteurs.
           </p>
-          <p className="mt-1">
-            &copy; {new Date().getFullYear()} CardioInfo. Informations
-            générales uniquement.
+          <p className="text-xs text-muted">
+            &copy; {new Date().getFullYear()} CardioInfo
           </p>
         </div>
       </div>

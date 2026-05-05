@@ -2,12 +2,10 @@ export const dynamic = "force-dynamic";
 
 import { notFound } from "next/navigation";
 import { getPublishedInterventionBySlug } from "@/lib/interventions";
-import SectionHeading from "@/components/ui/SectionHeading";
 import Accordion from "@/components/ui/Accordion";
 import VideoEmbed from "@/components/ui/VideoEmbed";
 import NextImage from "next/image";
 import {
-  Type,
   List,
   Video,
   Image as ImageIcon,
@@ -15,6 +13,7 @@ import {
   HelpCircle,
   Download,
   ArrowLeft,
+  Activity,
 } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -28,17 +27,6 @@ function sectionAnchor(section: Section, index: number): string {
   return `s-${index}-${section.id.slice(0, 6)}`;
 }
 
-function sectionIcon(type: Section["type"]) {
-  switch (type) {
-    case "text": return Type;
-    case "list": return List;
-    case "video": return Video;
-    case "image": return ImageIcon;
-    case "document": return FileText;
-    case "faqs": return HelpCircle;
-  }
-}
-
 function sectionHasContent(section: Section): boolean {
   switch (section.type) {
     case "text": return Boolean(section.body?.trim());
@@ -50,51 +38,51 @@ function sectionHasContent(section: Section): boolean {
   }
 }
 
-function renderPublicSection(
-  section: Section,
-  index: number
-): React.ReactNode {
+function renderSection(section: Section, index: number): React.ReactNode {
   if (!sectionHasContent(section)) return null;
   const anchor = sectionAnchor(section, index);
-  const icon = sectionIcon(section.type);
 
   switch (section.type) {
     case "text":
       return (
-        <section key={section.id}>
-          <SectionHeading icon={icon} title={section.title} id={anchor} />
-          <p className="text-muted leading-relaxed">{section.body}</p>
-        </section>
+        <div key={section.id} id={anchor} className="scroll-mt-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-4 pb-3 border-b border-gray-100" style={{ fontFamily: "var(--font-heading)" }}>
+            {section.title}
+          </h2>
+          <p className="text-gray-600 leading-[1.85] text-[17px]">{section.body}</p>
+        </div>
       );
 
     case "list": {
       const items = (section.items || []).filter((i) => i.trim());
-      const Tag = section.ordered !== false ? "ol" : "ul";
       return (
-        <section key={section.id}>
-          <SectionHeading icon={icon} title={section.title} id={anchor} />
-          <Tag className="space-y-2">
+        <div key={section.id} id={anchor} className="scroll-mt-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-4 pb-3 border-b border-gray-100" style={{ fontFamily: "var(--font-heading)" }}>
+            {section.title}
+          </h2>
+          <ul className="space-y-3">
             {items.map((item, i) => (
-              <li key={i} className="flex items-start gap-3">
-                {section.ordered !== false ? (
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold shrink-0 mt-0.5">
-                    {i + 1}
-                  </span>
-                ) : (
-                  <span className="text-primary mt-1.5 shrink-0">&#9679;</span>
-                )}
-                <span className="text-muted leading-relaxed">{item}</span>
+              <li key={i} className="flex items-start gap-3.5">
+                <span
+                  className="flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold shrink-0 mt-0.5"
+                  style={{ background: "rgba(56,189,248,0.12)", color: "#0284C7", fontFamily: "var(--font-heading)" }}
+                >
+                  {section.ordered !== false ? i + 1 : "·"}
+                </span>
+                <span className="text-gray-600 leading-relaxed text-[17px]">{item}</span>
               </li>
             ))}
-          </Tag>
-        </section>
+          </ul>
+        </div>
       );
     }
 
     case "video":
       return (
-        <section key={section.id}>
-          <SectionHeading icon={icon} title={section.title} id={anchor} />
+        <div key={section.id} id={anchor} className="scroll-mt-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-4 pb-3 border-b border-gray-100" style={{ fontFamily: "var(--font-heading)" }}>
+            {section.title}
+          </h2>
           <VideoEmbed
             video={{
               id: section.id,
@@ -103,15 +91,17 @@ function renderPublicSection(
               type: section.videoType || "youtube",
             }}
           />
-        </section>
+        </div>
       );
 
     case "image":
       return (
-        <section key={section.id}>
-          <SectionHeading icon={icon} title={section.title} id={anchor} />
-          <div className="rounded-lg border border-border overflow-hidden bg-surface">
-            <div className="relative aspect-video bg-surface-alt">
+        <div key={section.id} id={anchor} className="scroll-mt-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-4 pb-3 border-b border-gray-100" style={{ fontFamily: "var(--font-heading)" }}>
+            {section.title}
+          </h2>
+          <div className="rounded-xl overflow-hidden border border-gray-200">
+            <div className="relative aspect-video bg-gray-50">
               <NextImage
                 src={section.imageUrl!}
                 alt={section.imageAlt || section.title}
@@ -122,39 +112,43 @@ function renderPublicSection(
               />
             </div>
             {section.imageAlt && (
-              <p className="p-3 text-sm text-muted">{section.imageAlt}</p>
+              <p className="p-3 text-sm text-gray-500 text-center">{section.imageAlt}</p>
             )}
           </div>
-        </section>
+        </div>
       );
 
     case "document":
       return section.isPublic !== false ? (
-        <section key={section.id}>
-          <SectionHeading icon={icon} title={section.title} id={anchor} />
+        <div key={section.id} id={anchor} className="scroll-mt-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-4 pb-3 border-b border-gray-100" style={{ fontFamily: "var(--font-heading)" }}>
+            {section.title}
+          </h2>
           <a
             href={section.documentUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 p-4 rounded-lg border border-border hover:bg-surface-alt transition-colors group"
+            className="flex items-center gap-3 p-4 rounded-xl border border-gray-200 hover:border-blue-200 hover:bg-blue-50 transition-colors group"
           >
-            <FileText className="w-5 h-5 text-primary shrink-0" />
-            <span className="flex-1 text-foreground text-sm font-medium">
-              {section.title}
-            </span>
-            <Download className="w-4 h-4 text-muted group-hover:text-primary transition-colors shrink-0" />
+            <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+              <FileText className="w-5 h-5 text-blue-500" />
+            </div>
+            <span className="flex-1 text-gray-800 text-sm font-medium">{section.title}</span>
+            <Download className="w-4 h-4 text-gray-400 group-hover:text-blue-500 transition-colors shrink-0" />
           </a>
-        </section>
+        </div>
       ) : null;
 
     case "faqs": {
       const faqs = (section.faqs || []).filter((f) => f.question.trim());
       if (!faqs.length) return null;
       return (
-        <section key={section.id}>
-          <SectionHeading icon={icon} title={section.title} id={anchor} />
+        <div key={section.id} id={anchor} className="scroll-mt-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-4 pb-3 border-b border-gray-100" style={{ fontFamily: "var(--font-heading)" }}>
+            {section.title}
+          </h2>
           <Accordion items={faqs} />
-        </section>
+        </div>
       );
     }
 
@@ -163,17 +157,25 @@ function renderPublicSection(
   }
 }
 
-function buildNavItems(
-  sections: Section[]
-): Array<{ id: string; label: string }> {
+function buildNavItems(sections: Section[]): Array<{ id: string; label: string; type: Section["type"] }> {
   return sections
     .map((section, index) => {
       if (!sectionHasContent(section)) return null;
-      // Documents with isPublic === false are hidden
       if (section.type === "document" && section.isPublic === false) return null;
-      return { id: sectionAnchor(section, index), label: section.title };
+      return { id: sectionAnchor(section, index), label: section.title, type: section.type };
     })
-    .filter((item): item is { id: string; label: string } => item !== null);
+    .filter((item): item is { id: string; label: string; type: Section["type"] } => item !== null);
+}
+
+function sectionTypeIcon(type: Section["type"]) {
+  switch (type) {
+    case "text": return null;
+    case "list": return <List className="w-3.5 h-3.5 shrink-0" />;
+    case "video": return <Video className="w-3.5 h-3.5 shrink-0" />;
+    case "image": return <ImageIcon className="w-3.5 h-3.5 shrink-0" />;
+    case "document": return <FileText className="w-3.5 h-3.5 shrink-0" />;
+    case "faqs": return <HelpCircle className="w-3.5 h-3.5 shrink-0" />;
+  }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -194,56 +196,125 @@ export default async function InterventionPage({ params }: Props) {
   const navItems = buildNavItems(intervention.sections);
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-      <Link
-        href="/"
-        className="inline-flex items-center gap-1 text-primary hover:text-primary-dark text-sm font-medium mb-6 transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Retour à toutes les procédures
-      </Link>
-
-      <div className="mb-10">
-        <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
-          {intervention.title}
-        </h1>
-        {intervention.subtitle?.trim() && (
-          <p className="text-lg text-muted">{intervention.subtitle}</p>
-        )}
+    <div className="light-content min-h-screen">
+      {/* Top bar */}
+      <div className="border-b border-gray-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors"
+            style={{ fontFamily: "var(--font-heading)" }}
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Toutes les procédures
+          </Link>
+        </div>
       </div>
 
-      {navItems.length > 0 && (
-        <nav className="bg-surface rounded-xl p-5 mb-10 border border-border">
-          <h2 className="font-semibold text-foreground mb-3 text-sm uppercase tracking-wide">
-            Sur cette page
-          </h2>
-          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-            {navItems.map((item) => (
-              <li key={item.id}>
-                <a
-                  href={`#${item.id}`}
-                  className="text-primary hover:text-primary-dark transition-colors"
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+        <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-12">
+
+          {/* ── Sidebar ── */}
+          <aside className="hidden lg:block">
+            <div className="sticky top-24 space-y-6">
+              {/* Identity */}
+              <div className="flex items-center gap-3 mb-2">
+                <div
+                  className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                  style={{ background: "rgba(56,189,248,0.1)", border: "1px solid rgba(56,189,248,0.2)" }}
                 >
-                  {item.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      )}
+                  <Activity className="w-4 h-4" style={{ color: "#0284C7" }} />
+                </div>
+                <span className="text-xs font-semibold tracking-widest uppercase text-gray-400" style={{ fontFamily: "var(--font-heading)" }}>
+                  CardioInfo
+                </span>
+              </div>
 
-      <div className="space-y-12">
-        {intervention.sections.map((section, index) =>
-          renderPublicSection(section, index)
-        )}
-      </div>
+              {navItems.length > 0 && (
+                <nav>
+                  <p className="text-[11px] font-bold tracking-widest uppercase text-gray-400 mb-3" style={{ fontFamily: "var(--font-heading)" }}>
+                    Sur cette page
+                  </p>
+                  <ul className="space-y-0.5">
+                    {navItems.map((item) => (
+                      <li key={item.id}>
+                        <a
+                          href={`#${item.id}`}
+                          className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                          style={{ fontFamily: "var(--font-heading)" }}
+                        >
+                          {sectionTypeIcon(item.type)}
+                          <span>{item.label}</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
+              )}
 
-      <div className="mt-12 bg-surface rounded-xl p-6 border border-border text-center">
-        <p className="text-muted text-sm leading-relaxed">
-          Ces informations sont fournies à titre général. Elles ne remplacent
-          pas les conseils personnalisés de votre cardiologue. En cas de
-          question ou d&apos;inquiétude, contactez votre équipe médicale.
-        </p>
+              {/* Disclaimer card */}
+              <div className="rounded-xl p-4 text-xs leading-relaxed text-gray-500 bg-amber-50 border border-amber-100">
+                <p className="font-semibold text-amber-700 mb-1">Information générale</p>
+                Ces informations ne remplacent pas l&apos;avis de votre cardiologue.
+              </div>
+            </div>
+          </aside>
+
+          {/* ── Main content ── */}
+          <main className="min-w-0">
+            {/* Header */}
+            <div className="mb-10 pb-8 border-b border-gray-100">
+              <h1
+                className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3 tracking-[-0.02em] leading-tight"
+                style={{ fontFamily: "var(--font-heading)" }}
+              >
+                {intervention.title}
+              </h1>
+              {intervention.subtitle?.trim() && (
+                <p className="text-lg text-gray-500 leading-relaxed">{intervention.subtitle}</p>
+              )}
+            </div>
+
+            {/* Mobile nav */}
+            {navItems.length > 0 && (
+              <nav className="lg:hidden mb-8 p-4 rounded-xl bg-gray-50 border border-gray-200">
+                <p className="text-xs font-bold tracking-widest uppercase text-gray-400 mb-3" style={{ fontFamily: "var(--font-heading)" }}>
+                  Sur cette page
+                </p>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                  {navItems.map((item) => (
+                    <li key={item.id}>
+                      <a
+                        href={`#${item.id}`}
+                        className="flex items-center gap-2 px-2 py-1.5 rounded text-sm text-blue-600 hover:underline"
+                        style={{ fontFamily: "var(--font-heading)" }}
+                      >
+                        {sectionTypeIcon(item.type)}
+                        {item.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            )}
+
+            {/* Sections */}
+            <div className="space-y-12">
+              {intervention.sections.map((section, index) =>
+                renderSection(section, index)
+              )}
+            </div>
+
+            {/* Bottom disclaimer */}
+            <div className="mt-14 p-6 rounded-2xl bg-blue-50 border border-blue-100 text-center">
+              <p className="text-sm text-blue-700 leading-relaxed">
+                Ces informations sont fournies à titre général. Elles ne remplacent pas
+                les conseils personnalisés de votre cardiologue. En cas de question ou
+                d&apos;inquiétude, contactez votre équipe médicale.
+              </p>
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   );
