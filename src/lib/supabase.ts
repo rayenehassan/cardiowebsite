@@ -1,20 +1,24 @@
 import { createClient } from "@supabase/supabase-js";
 
-const url = process.env.SUPABASE_URL;
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const anonKey = process.env.SUPABASE_ANON_KEY;
+function requireSupabaseEnv() {
+  const url = process.env.SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!url || !serviceRoleKey) {
-  throw new Error(
-    "Variables Supabase manquantes. Vérifiez SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY dans .env.local"
-  );
+  if (!url || !serviceRoleKey) {
+    throw new Error(
+      "Variables Supabase manquantes. Vérifiez SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY."
+    );
+  }
+
+  return {
+    anonKey: process.env.SUPABASE_ANON_KEY,
+    serviceRoleKey,
+    url,
+  };
 }
 
-const supabaseUrl = url;
-const supabaseServiceRoleKey = serviceRoleKey;
-
-function createServerClient(key: string) {
-  return createClient(supabaseUrl, key, {
+function createServerClient(url: string, key: string) {
+  return createClient(url, key, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
@@ -26,7 +30,10 @@ function createServerClient(key: string) {
  * Client admin côté serveur uniquement.
  * Utilise la clé service_role — ne jamais exposer côté client.
  */
-export const supabaseAdmin = createServerClient(supabaseServiceRoleKey);
+export function getSupabaseAdmin() {
+  const { serviceRoleKey, url } = requireSupabaseEnv();
+  return createServerClient(url, serviceRoleKey);
+}
 
 /**
  * Client utilisé par les lectures publiques.
@@ -34,6 +41,7 @@ export const supabaseAdmin = createServerClient(supabaseServiceRoleKey);
  * les données publiées au niveau base. Sinon, les requêtes serveur gardent le
  * filtre explicite status = published.
  */
-export const supabasePublic = createServerClient(
-  anonKey || supabaseServiceRoleKey
-);
+export function getSupabasePublic() {
+  const { anonKey, serviceRoleKey, url } = requireSupabaseEnv();
+  return createServerClient(url, anonKey || serviceRoleKey);
+}
