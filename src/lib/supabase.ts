@@ -1,24 +1,20 @@
 import { createClient } from "@supabase/supabase-js";
 
-function requireSupabaseEnv() {
-  const url = process.env.SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const url = process.env.SUPABASE_URL;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const anonKey = process.env.SUPABASE_ANON_KEY;
 
-  if (!url || !serviceRoleKey) {
-    throw new Error(
-      "Variables Supabase manquantes. Vérifiez SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY."
-    );
-  }
-
-  return {
-    anonKey: process.env.SUPABASE_ANON_KEY,
-    serviceRoleKey,
-    url,
-  };
+if (!url || !serviceRoleKey) {
+  throw new Error(
+    "Variables Supabase manquantes. Vérifiez SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY dans .env.local"
+  );
 }
 
-function createServerClient(url: string, key: string) {
-  return createClient(url, key, {
+const supabaseUrl = url;
+const supabaseServiceRoleKey = serviceRoleKey;
+
+function createServerClient(key: string) {
+  return createClient(supabaseUrl, key, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
@@ -30,10 +26,7 @@ function createServerClient(url: string, key: string) {
  * Client admin côté serveur uniquement.
  * Utilise la clé service_role — ne jamais exposer côté client.
  */
-export function getSupabaseAdmin() {
-  const { serviceRoleKey, url } = requireSupabaseEnv();
-  return createServerClient(url, serviceRoleKey);
-}
+export const supabaseAdmin = createServerClient(supabaseServiceRoleKey);
 
 /**
  * Client utilisé par les lectures publiques.
@@ -41,7 +34,6 @@ export function getSupabaseAdmin() {
  * les données publiées au niveau base. Sinon, les requêtes serveur gardent le
  * filtre explicite status = published.
  */
-export function getSupabasePublic() {
-  const { anonKey, serviceRoleKey, url } = requireSupabaseEnv();
-  return createServerClient(url, anonKey || serviceRoleKey);
-}
+export const supabasePublic = createServerClient(
+  anonKey || supabaseServiceRoleKey
+);

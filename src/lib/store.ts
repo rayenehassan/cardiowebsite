@@ -3,7 +3,7 @@
  * Toutes les opérations sont asynchrones et exécutées côté serveur.
  */
 
-import { getSupabaseAdmin, getSupabasePublic } from "@/lib/supabase";
+import { supabaseAdmin, supabasePublic } from "@/lib/supabase";
 import { Intervention, InterventionStatus, Section } from "@/types/intervention";
 
 // Includes legacy columns so toModel can migrate old rows on the fly.
@@ -180,7 +180,7 @@ function mapError(operation: string, error: { message: string; code?: string }) 
 }
 
 export async function readAll(): Promise<Intervention[]> {
-  const { data, error } = await getSupabaseAdmin()
+  const { data, error } = await supabaseAdmin
     .from("interventions")
     .select(FULL_SELECT)
     .order("created_at", { ascending: true });
@@ -190,7 +190,7 @@ export async function readAll(): Promise<Intervention[]> {
 }
 
 export async function readPublished(): Promise<Intervention[]> {
-  const { data, error } = await getSupabasePublic()
+  const { data, error } = await supabasePublic
     .from("interventions")
     .select(FULL_SELECT)
     .eq("status", "published")
@@ -201,7 +201,7 @@ export async function readPublished(): Promise<Intervention[]> {
 }
 
 export async function readById(id: string): Promise<Intervention | undefined> {
-  const { data, error } = await getSupabaseAdmin()
+  const { data, error } = await supabaseAdmin
     .from("interventions")
     .select(FULL_SELECT)
     .eq("id", id)
@@ -214,7 +214,7 @@ export async function readById(id: string): Promise<Intervention | undefined> {
 export async function readPublishedBySlug(
   slug: string
 ): Promise<Intervention | undefined> {
-  const { data, error } = await getSupabasePublic()
+  const { data, error } = await supabasePublic
     .from("interventions")
     .select(FULL_SELECT)
     .eq("slug", slug)
@@ -227,7 +227,7 @@ export async function readPublishedBySlug(
 
 export async function insertOne(intervention: Intervention): Promise<Intervention> {
   const row = toRow(intervention);
-  const { data, error } = await getSupabaseAdmin()
+  const { data, error } = await supabaseAdmin
     .from("interventions")
     .insert(row)
     .select(FULL_SELECT)
@@ -249,7 +249,7 @@ export async function updateOne(
   if (patch.sections !== undefined) rowPatch.sections = patch.sections;
   if (patch.updatedAt !== undefined) rowPatch.updated_at = patch.updatedAt;
 
-  const { data, error } = await getSupabaseAdmin()
+  const { data, error } = await supabaseAdmin
     .from("interventions")
     .update(rowPatch)
     .eq("id", id)
@@ -261,7 +261,7 @@ export async function updateOne(
 }
 
 export async function removeOne(id: string): Promise<boolean> {
-  const { data, error } = await getSupabaseAdmin()
+  const { data, error } = await supabaseAdmin
     .from("interventions")
     .delete()
     .eq("id", id)
