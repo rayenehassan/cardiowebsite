@@ -36,6 +36,14 @@ body {
   outline-offset: 3px;
 }
 
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* ── Mesh gradient — même technique que Sloan, 4 ellipses, palette bleue ── */
 .mesh-bg {
   background:

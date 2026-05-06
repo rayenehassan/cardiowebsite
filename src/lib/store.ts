@@ -119,19 +119,6 @@ function legacyToSections(row: Row): Section[] {
     }
   }
 
-  type LegacyDoc = { id: string; title: string; url: string; isPublic: boolean };
-  for (const doc of asArray<LegacyDoc>(row.documents)) {
-    if (doc.url?.trim()) {
-      sections.push({
-        id: uid(),
-        type: "document",
-        title: doc.title || "Document",
-        documentUrl: doc.url,
-        isPublic: doc.isPublic !== false,
-      });
-    }
-  }
-
   type LegacyFaq = { id: string; question: string; answer: string };
   const faqs = asArray<LegacyFaq>(row.faqs).filter((f) => f.question?.trim());
   if (faqs.length) {

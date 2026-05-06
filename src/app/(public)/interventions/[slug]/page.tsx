@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getPublishedInterventionBySlug } from "@/lib/interventions";
 import Accordion from "@/components/ui/Accordion";
 import VideoEmbed from "@/components/ui/VideoEmbed";
+import InterventionSidebarNav from "@/components/ui/InterventionSidebarNav";
 import NextImage from "next/image";
 import {
   List,
@@ -13,7 +14,6 @@ import {
   HelpCircle,
   Download,
   ArrowLeft,
-  Activity,
 } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -62,13 +62,17 @@ function renderSection(section: Section, index: number): React.ReactNode {
           </h2>
           <ul className="space-y-3">
             {items.map((item, i) => (
-              <li key={i} className="flex items-start gap-3.5">
-                <span
-                  className="flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold shrink-0 mt-0.5"
-                  style={{ background: "rgba(56,189,248,0.12)", color: "#0284C7", fontFamily: "var(--font-heading)" }}
-                >
-                  {section.ordered !== false ? i + 1 : "·"}
-                </span>
+              <li key={i} className="flex items-start gap-3">
+                {section.ordered !== false ? (
+                  <span
+                    className="text-sm font-bold shrink-0 w-6 pt-[3px] text-right"
+                    style={{ color: "#0284C7", fontFamily: "var(--font-heading)" }}
+                  >
+                    {i + 1}.
+                  </span>
+                ) : (
+                  <span className="w-1.5 h-1.5 rounded-full shrink-0 mt-[10px]" style={{ background: "#0284C7" }} />
+                )}
                 <span className="text-gray-600 leading-relaxed text-[17px]">{item}</span>
               </li>
             ))}
@@ -197,8 +201,9 @@ export default async function InterventionPage({ params }: Props) {
 
   return (
     <div className="light-content min-h-screen">
-      {/* Top bar */}
-      <div className="border-b border-gray-100">
+
+      {/* Top bar — sticky below global header */}
+      <div className="sticky top-[60px] z-40 bg-white border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4">
           <Link
             href="/"
@@ -212,57 +217,15 @@ export default async function InterventionPage({ params }: Props) {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
-        <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-12 items-start">
 
           {/* ── Sidebar ── */}
-          <aside className="hidden lg:block">
-            <div className="sticky top-24 space-y-6">
-              {/* Identity */}
-              <div className="flex items-center gap-3 mb-2">
-                <div
-                  className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                  style={{ background: "rgba(56,189,248,0.1)", border: "1px solid rgba(56,189,248,0.2)" }}
-                >
-                  <Activity className="w-4 h-4" style={{ color: "#0284C7" }} />
-                </div>
-                <span className="text-xs font-semibold tracking-widest uppercase text-gray-400" style={{ fontFamily: "var(--font-heading)" }}>
-                  CardioInfo
-                </span>
-              </div>
-
-              {navItems.length > 0 && (
-                <nav>
-                  <p className="text-[11px] font-bold tracking-widest uppercase text-gray-400 mb-3" style={{ fontFamily: "var(--font-heading)" }}>
-                    Sur cette page
-                  </p>
-                  <ul className="space-y-0.5">
-                    {navItems.map((item) => (
-                      <li key={item.id}>
-                        <a
-                          href={`#${item.id}`}
-                          className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-                          style={{ fontFamily: "var(--font-heading)" }}
-                        >
-                          {sectionTypeIcon(item.type)}
-                          <span>{item.label}</span>
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </nav>
-              )}
-
-              {/* Disclaimer card */}
-              <div className="rounded-xl p-4 text-xs leading-relaxed text-gray-500 bg-amber-50 border border-amber-100">
-                <p className="font-semibold text-amber-700 mb-1">Information générale</p>
-                Ces informations ne remplacent pas l&apos;avis de votre cardiologue.
-              </div>
-            </div>
+          <aside className="hidden lg:block sticky top-[112px]">
+            <InterventionSidebarNav items={navItems} />
           </aside>
 
           {/* ── Main content ── */}
           <main className="min-w-0">
-            {/* Header */}
             <div className="mb-10 pb-8 border-b border-gray-100">
               <h1
                 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3 tracking-[-0.02em] leading-tight"
@@ -298,14 +261,12 @@ export default async function InterventionPage({ params }: Props) {
               </nav>
             )}
 
-            {/* Sections */}
             <div className="space-y-12">
               {intervention.sections.map((section, index) =>
                 renderSection(section, index)
               )}
             </div>
 
-            {/* Bottom disclaimer */}
             <div className="mt-14 p-6 rounded-2xl bg-blue-50 border border-blue-100 text-center">
               <p className="text-sm text-blue-700 leading-relaxed">
                 Ces informations sont fournies à titre général. Elles ne remplacent pas
@@ -314,6 +275,7 @@ export default async function InterventionPage({ params }: Props) {
               </p>
             </div>
           </main>
+
         </div>
       </div>
     </div>
