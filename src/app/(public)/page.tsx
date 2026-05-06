@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import { Heart, Lock, Users, ArrowRight, Phone, Mail, BookOpen, ShieldCheck, MapPin } from "lucide-react";
+import { Users, ArrowRight, Phone, Mail, BookOpen, MapPin, Heart, Lock } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import InterventionCard from "@/components/ui/InterventionCard";
@@ -70,9 +70,19 @@ export default async function HomePage() {
             >
               Quelle est votre intervention ?
             </h2>
-            <p className="text-muted text-lg max-w-lg">
+            <p className="text-muted text-lg mt-4">
               Trouvez la fiche correspondant à l&apos;intervention que vous allez avoir.
             </p>
+            <div className="flex flex-col gap-1.5 mt-3">
+              <span className="flex items-center gap-1.5 text-sm text-muted">
+                <Heart className="w-3.5 h-3.5 shrink-0" style={{ color: "#6366F1" }} />
+                Fiches rédigées par des spécialistes en cardiologie interventionnelle.
+              </span>
+              <span className="flex items-center gap-1.5 text-sm text-muted">
+                <Lock className="w-3.5 h-3.5 shrink-0" style={{ color: "#0284C7" }} />
+                Ni compte, ni cookie, ni tracking — visite strictement anonyme.
+              </span>
+            </div>
           </AnimateIn>
 
           {interventions.length > 0 ? (
@@ -182,73 +192,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Features ── */}
-      <section className="py-24 sm:py-32" style={{ background: "#F8FAFF" }}>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <AnimateIn className="mb-16">
-            <span className="section-label mb-5 inline-flex">
-              <ShieldCheck className="w-3 h-3" />
-              Information validée médicalement
-            </span>
-            <h2
-              className="text-4xl sm:text-5xl font-bold tracking-[-0.03em] mb-4 text-foreground"
-              style={{ fontFamily: "var(--font-heading)" }}
-            >
-              Rédigé par des cardiologues,{" "}<span className="text-gradient">pour vous</span>
-            </h2>
-          </AnimateIn>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {[
-              {
-                icon: Lock,
-                title: "Aucune donnée collectée",
-                desc: "Ni compte, ni cookie, ni tracking. Votre visite est strictement anonyme.",
-                delay: 0,
-                accentBg: "rgba(2,132,199,0.07)",
-                accentBorder: "rgba(2,132,199,0.15)",
-                iconColor: "#0284C7",
-              },
-              {
-                icon: Heart,
-                title: "Validé par des cardiologues",
-                desc: "Chaque fiche est rédigée et vérifiée par des spécialistes en cardiologie interventionnelle.",
-                delay: 100,
-                accentBg: "rgba(99,102,241,0.07)",
-                accentBorder: "rgba(99,102,241,0.15)",
-                iconColor: "#6366F1",
-              },
-              {
-                icon: Users,
-                title: "Pensé pour les patients",
-                desc: "Un langage clair, accessible, pour arriver serein le jour J.",
-                delay: 200,
-                accentBg: "rgba(5,150,105,0.07)",
-                accentBorder: "rgba(5,150,105,0.14)",
-                iconColor: "#059669",
-              },
-            ].map(({ icon: Icon, title, desc, delay, accentBg, accentBorder, iconColor }) => (
-              <AnimateIn key={title} delay={delay}>
-                <div className="glass glass-hover rounded-2xl p-8 h-full">
-                  <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
-                    style={{ background: accentBg, border: `1px solid ${accentBorder}` }}
-                  >
-                    <Icon className="w-5 h-5" style={{ color: iconColor }} />
-                  </div>
-                  <h3
-                    className="font-semibold text-lg text-foreground mb-2"
-                    style={{ fontFamily: "var(--font-heading)" }}
-                  >
-                    {title}
-                  </h3>
-                  <p className="text-muted text-sm leading-relaxed">{desc}</p>
-                </div>
-              </AnimateIn>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ── Disclaimer ── */}
       <section className="py-16 bg-white">
