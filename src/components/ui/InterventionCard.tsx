@@ -79,7 +79,7 @@ export default function InterventionCard({
         "--card-accent-shadow": `0 8px 32px ${p.shadow}`,
       } as React.CSSProperties}
     >
-      <div className="flex flex-col flex-1 p-7">
+      <div className="flex flex-col flex-1 p-5 sm:p-7">
         {/* Titre */}
         <h3
           className="text-[19px] font-bold leading-snug mb-3"

@@ -199,7 +199,7 @@ export default async function InterventionPage({ params }: Props) {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
-        <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-12 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-8 lg:gap-12 items-start">
 
           {/* ── Sidebar ── */}
           <aside className="hidden lg:block sticky top-[112px]">
@@ -208,9 +208,9 @@ export default async function InterventionPage({ params }: Props) {
 
           {/* ── Main content ── */}
           <main className="min-w-0">
-            <div className="mb-10 pb-8 border-b border-gray-100">
+            <div className="mb-8 sm:mb-10 pb-6 sm:pb-8 border-b border-gray-100">
               <h1
-                className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3 tracking-[-0.02em] leading-tight"
+                className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 tracking-[-0.02em] leading-tight"
                 style={{ fontFamily: "var(--font-heading)" }}
               >
                 {intervention.title}
@@ -227,7 +227,7 @@ export default async function InterventionPage({ params }: Props) {
               </div>
             )}
 
-            <div className="space-y-12">
+            <div className="space-y-8 sm:space-y-12">
               {intervention.sections.map((section, index) =>
                 renderSection(section, index)
               )}

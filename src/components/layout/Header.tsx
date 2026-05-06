@@ -56,7 +56,7 @@ export default function Header() {
 
             {/* Mobile toggle */}
             <button
-              className="md:hidden p-2 rounded-lg transition-colors hover:bg-white/10"
+              className="md:hidden p-3 rounded-lg transition-colors hover:bg-white/10"
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
               aria-expanded={menuOpen}
@@ -75,7 +75,7 @@ export default function Header() {
                 <Link
                   key={href}
                   href={href}
-                  className="px-3 py-2.5 text-sm rounded-lg transition-colors hover:bg-white/10"
+                  className="px-3 py-3 text-sm rounded-lg transition-colors hover:bg-white/10"
                   style={{ fontFamily: "var(--font-heading)", color: "rgba(255,255,255,0.7)" }}
                   onClick={() => setMenuOpen(false)}
                 >

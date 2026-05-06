@@ -14,27 +14,27 @@ export default async function HomePage() {
   return (
     <>
       {/* ── Hero ── */}
-      <section className="relative min-h-screen flex items-center mesh-bg overflow-hidden">
-        <div className="relative w-full max-w-[1440px] mx-auto px-6 sm:px-8 py-24">
+      <section className="relative min-h-[85svh] sm:min-h-screen flex items-center mesh-bg overflow-hidden">
+        <div className="relative w-full max-w-[1440px] mx-auto px-5 sm:px-8 py-14 sm:py-24">
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,700px)_460px] gap-10 lg:gap-16 lg:justify-center items-center">
 
             {/* ── Colonne gauche : texte ── */}
             <div>
-              <div className="anim-fade-up mb-6">
+              <div className="anim-fade-up mb-5 sm:mb-6">
                 <span className="section-label">
                   <MapPin className="w-3 h-3" />
                   Hôpital Privé de la Loire, Saint-Étienne
                 </span>
               </div>
               <h1
-                className="anim-fade-up delay-100 text-5xl sm:text-6xl lg:text-[64px] font-bold leading-[1.05] tracking-[-0.03em] mb-5 text-foreground"
+                className="anim-fade-up delay-100 text-[2.1rem] sm:text-5xl lg:text-[64px] font-bold leading-[1.08] sm:leading-[1.05] tracking-[-0.03em] mb-4 sm:mb-5 text-foreground"
                 style={{ fontFamily: "var(--font-heading)" }}
               >
                 Comprendre votre{" "}
                 <span className="text-gradient">intervention&nbsp;cardiaque</span>
               </h1>
 
-              <p className="anim-fade-up delay-200 text-lg text-muted leading-relaxed mb-8 max-w-lg">
+              <p className="anim-fade-up delay-200 text-base sm:text-lg text-muted leading-relaxed mb-7 sm:mb-8 max-w-lg">
                 Votre cardiologue vous a proposé un geste interventionnel. Trouvez ici
                 toutes les informations pour vous préparer sereinement.
               </p>
@@ -45,9 +45,14 @@ export default async function HomePage() {
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
+
+              {/* ── Recherche mobile ── */}
+              <div className="lg:hidden mt-8 anim-fade-up delay-400">
+                <InterventionSearch interventions={interventions} />
+              </div>
             </div>
 
-            {/* ── Colonne droite : recherche ── */}
+            {/* ── Colonne droite : recherche desktop ── */}
             <div className="anim-fade-up delay-400 hidden lg:block">
               <InterventionSearch interventions={interventions} />
             </div>
@@ -57,15 +62,15 @@ export default async function HomePage() {
       </section>
 
       {/* ── Interventions ── */}
-      <section id="interventions" className="py-24 sm:py-32 scroll-mt-16" style={{ background: "#F8FAFF" }}>
+      <section id="interventions" className="py-14 sm:py-24 lg:py-32 scroll-mt-16" style={{ background: "#F8FAFF" }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <AnimateIn className="mb-14">
-            <span className="section-label mb-5 inline-flex">
+          <AnimateIn className="mb-8 sm:mb-14">
+            <span className="section-label mb-4 sm:mb-5 inline-flex">
               <BookOpen className="w-3 h-3" />
               Votre intervention
             </span>
             <h2
-              className="text-4xl sm:text-5xl font-bold tracking-[-0.03em] mb-4 text-foreground"
+              className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] mb-3 sm:mb-4 text-foreground"
               style={{ fontFamily: "var(--font-heading)" }}
             >
               Quelle est votre intervention ?
@@ -121,25 +126,25 @@ export default async function HomePage() {
       </section>
 
       {/* ── Équipe ── */}
-      <section id="equipe" className="py-24 sm:py-32 bg-white scroll-mt-16">
+      <section id="equipe" className="py-14 sm:py-24 lg:py-32 bg-white scroll-mt-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <AnimateIn className="mb-14">
-            <span className="section-label mb-5 inline-flex">
+          <AnimateIn className="mb-8 sm:mb-14">
+            <span className="section-label mb-4 sm:mb-5 inline-flex">
               <Users className="w-3 h-3" />
               Votre équipe médicale
             </span>
             <h2
-              className="text-4xl sm:text-5xl font-bold tracking-[-0.03em] mb-4 text-foreground"
+              className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] mb-3 sm:mb-4 text-foreground"
               style={{ fontFamily: "var(--font-heading)" }}
             >
               Vos cardiologues
             </h2>
-            <p className="text-muted text-lg max-w-lg">
+            <p className="text-muted text-base sm:text-lg max-w-lg">
               Des spécialistes en cardiologie interventionnelle à votre écoute à l&apos;Hôpital privé de la Loire.
             </p>
           </AnimateIn>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-8">
             {[
               { name: "Dr Mustapha HASSAN", photo: "/Mustapha%20Hassan.jpg", email: "moustapha@gmail.com", tel: "04 78 22 91 12" },
               { name: "Dr Antoine GERBAY",  photo: "/Antoine%20Gerbay.jpg",  email: "jeremy@gmail.com",    tel: "04 72 81 93 12" },
@@ -147,7 +152,7 @@ export default async function HomePage() {
             ].map(({ name, photo, email, tel }, i) => (
               <AnimateIn key={name} delay={i * 100}>
                 <div className="glass glass-hover rounded-2xl overflow-hidden">
-                  <div className="relative h-72 w-full">
+                  <div className="relative h-56 sm:h-72 w-full">
                     <Image
                       src={photo}
                       alt={name}
@@ -158,7 +163,7 @@ export default async function HomePage() {
                       style={{ objectPosition: "50% 25%" }}
                     />
                   </div>
-                  <div className="p-6">
+                  <div className="p-5 sm:p-6">
                     <h3
                       className="font-semibold text-lg text-foreground mb-0.5"
                       style={{ fontFamily: "var(--font-heading)" }}
@@ -194,11 +199,11 @@ export default async function HomePage() {
 
 
       {/* ── Disclaimer ── */}
-      <section className="py-16 bg-white">
+      <section className="py-10 sm:py-16 bg-white">
         <div className="max-w-2xl mx-auto px-4 sm:px-6">
           <AnimateIn>
             <div
-              className="rounded-2xl p-8 text-center border"
+              className="rounded-2xl p-5 sm:p-8 text-center border"
               style={{ background: "#F0F6FF", borderColor: "rgba(2,132,199,0.12)" }}
             >
               <h2

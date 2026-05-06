@@ -12,7 +12,7 @@ export default function Footer() {
       className="mt-auto border-t"
       style={{ background: "#F8FAFF", borderColor: "rgba(0,0,0,0.07)" }}
     >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
 
           {/* Brand */}
@@ -80,7 +80,7 @@ export default function Footer() {
 
         {/* Bottom */}
         <div
-          className="mt-12 pt-6 border-t flex flex-col sm:flex-row items-center justify-between gap-3"
+          className="mt-8 sm:mt-12 pt-6 border-t flex flex-col sm:flex-row items-center justify-between gap-3"
           style={{ borderColor: "rgba(0,0,0,0.07)" }}
         >
           <p className="text-xs text-muted">
