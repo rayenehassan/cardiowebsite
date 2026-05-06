@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import Link from "next/link";
-import { Search, ArrowRight, X, Stethoscope } from "lucide-react";
+import { Search, ArrowRight, X } from "lucide-react";
 import type { Intervention } from "@/types/intervention";
 
 interface Props {
@@ -43,25 +43,16 @@ export default function InterventionSearch({ interventions }: Props) {
           background: "linear-gradient(135deg, rgba(238,244,255,0.9) 0%, rgba(248,250,255,0.7) 100%)",
         }}
       >
-        <div className="flex items-center gap-3 mb-1">
-          <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{ background: "rgba(2,132,199,0.12)", border: "1px solid rgba(2,132,199,0.2)" }}
-          >
-            <Stethoscope className="w-4.5 h-4.5" style={{ color: "#0284C7", width: 18, height: 18 }} />
-          </div>
-          <div>
-            <p
-              className="text-base font-bold text-foreground leading-tight"
-              style={{ fontFamily: "var(--font-heading)" }}
-            >
-              Trouvez votre intervention
-            </p>
-            <p className="text-xs text-muted mt-0.5">
-              Tapez le nom indiqué par votre cardiologue
-            </p>
-          </div>
-        </div>
+        <p
+          className="text-base font-bold text-foreground leading-tight"
+          style={{ fontFamily: "var(--font-heading)" }}
+        >
+          Trouvez votre intervention
+        </p>
+        <p className="text-xs text-muted mt-0.5">
+          Tapez le nom indiqué par votre cardiologue
+        </p>
+
       </div>
 
       {/* ── Search input ── */}

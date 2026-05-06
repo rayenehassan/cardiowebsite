@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import { Activity, ShieldCheck, BookOpen, Heart, Lock, Users, ArrowRight, Phone, Mail } from "lucide-react";
+import { Heart, Lock, Users, ArrowRight, Phone, Mail, BookOpen, ShieldCheck, MapPin } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import InterventionCard from "@/components/ui/InterventionCard";
@@ -15,18 +15,17 @@ export default async function HomePage() {
     <>
       {/* ── Hero ── */}
       <section className="relative min-h-screen flex items-center mesh-bg overflow-hidden">
-        <div className="relative w-full max-w-6xl mx-auto px-6 sm:px-8 py-24">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_460px] gap-12 lg:gap-14 items-center">
+        <div className="relative w-full max-w-[1440px] mx-auto px-6 sm:px-8 py-24">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,700px)_460px] gap-10 lg:gap-16 lg:justify-center items-center">
 
             {/* ── Colonne gauche : texte ── */}
             <div>
               <div className="anim-fade-up mb-6">
                 <span className="section-label">
-                  <Activity className="w-3 h-3" />
-                  Cardiologie interventionnelle
+                  <MapPin className="w-3 h-3" />
+                  Hôpital Privé de la Loire, Saint-Étienne
                 </span>
               </div>
-
               <h1
                 className="anim-fade-up delay-100 text-5xl sm:text-6xl lg:text-[64px] font-bold leading-[1.05] tracking-[-0.03em] mb-5 text-foreground"
                 style={{ fontFamily: "var(--font-heading)" }}
@@ -45,10 +44,6 @@ export default async function HomePage() {
                   Voir les interventions
                   <ArrowRight className="w-4 h-4" />
                 </Link>
-                <div className="flex items-center gap-2 text-sm text-muted">
-                  <span className="w-2 h-2 rounded-full anim-pulse-dot inline-block" style={{ background: "#059669" }} />
-                  Mis à jour régulièrement
-                </div>
               </div>
             </div>
 
@@ -67,7 +62,7 @@ export default async function HomePage() {
           <AnimateIn className="mb-14">
             <span className="section-label mb-5 inline-flex">
               <BookOpen className="w-3 h-3" />
-              Fiches pratiques
+              Votre intervention
             </span>
             <h2
               className="text-4xl sm:text-5xl font-bold tracking-[-0.03em] mb-4 text-foreground"
@@ -116,12 +111,12 @@ export default async function HomePage() {
       </section>
 
       {/* ── Équipe ── */}
-      <section className="py-24 sm:py-32 bg-white">
+      <section id="equipe" className="py-24 sm:py-32 bg-white scroll-mt-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <AnimateIn className="mb-14">
             <span className="section-label mb-5 inline-flex">
               <Users className="w-3 h-3" />
-              Notre équipe
+              Votre équipe médicale
             </span>
             <h2
               className="text-4xl sm:text-5xl font-bold tracking-[-0.03em] mb-4 text-foreground"
@@ -142,15 +137,15 @@ export default async function HomePage() {
             ].map(({ name, photo, email, tel }, i) => (
               <AnimateIn key={name} delay={i * 100}>
                 <div className="glass glass-hover rounded-2xl overflow-hidden">
-                  <div className="relative h-52 w-full">
+                  <div className="relative h-72 w-full">
                     <Image
                       src={photo}
                       alt={name}
                       fill
-                      quality={90}
+                      quality={85}
                       sizes="(max-width: 640px) 100vw, 33vw"
                       className="object-cover"
-                      style={{ objectPosition: "center 15%" }}
+                      style={{ objectPosition: "50% 25%" }}
                     />
                   </div>
                   <div className="p-6">
@@ -193,7 +188,7 @@ export default async function HomePage() {
           <AnimateIn className="mb-16">
             <span className="section-label mb-5 inline-flex">
               <ShieldCheck className="w-3 h-3" />
-              Notre engagement
+              Information validée médicalement
             </span>
             <h2
               className="text-4xl sm:text-5xl font-bold tracking-[-0.03em] mb-4 text-foreground"
