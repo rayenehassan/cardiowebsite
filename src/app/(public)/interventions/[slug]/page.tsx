@@ -182,7 +182,7 @@ export default async function InterventionPage({ params }: Props) {
   const navItems = buildNavItems(intervention.sections);
 
   return (
-    <div className="light-content min-h-screen">
+    <div className="light-content min-h-screen smooth-scroll">
 
       {/* Top bar — sticky below global header */}
       <div className="sticky top-[60px] z-40 bg-white border-b border-gray-100">

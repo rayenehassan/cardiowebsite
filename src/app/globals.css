@@ -20,6 +20,10 @@
 }
 
 html {
+  scroll-behavior: auto;
+}
+
+.smooth-scroll {
   scroll-behavior: smooth;
 }
 
