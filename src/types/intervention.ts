@@ -56,7 +56,7 @@ export interface FAQ {
   answer: string;
 }
 
-export type InterventionStatus = "draft" | "published";
+export type InterventionStatus = "draft" | "published" | "archived";
 
 export interface Intervention {
   id: string;

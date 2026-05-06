@@ -7,11 +7,16 @@ CREATE TABLE IF NOT EXISTS interventions (
   title            TEXT        NOT NULL,
   subtitle         TEXT        NOT NULL DEFAULT '',
   status           TEXT        NOT NULL DEFAULT 'draft'
-                                CHECK (status IN ('draft', 'published')),
+                                CHECK (status IN ('draft', 'published', 'archived')),
   sections         JSONB       NOT NULL DEFAULT '[]',
   created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Migration : ajout du statut 'archived' (soft delete) — run once:
+-- ALTER TABLE interventions DROP CONSTRAINT IF EXISTS interventions_status_check;
+-- ALTER TABLE interventions ADD CONSTRAINT interventions_status_check
+--   CHECK (status IN ('draft', 'published', 'archived'));
 
 -- Migration (existing table — run once if upgrading from old schema):
 -- ALTER TABLE interventions ADD COLUMN IF NOT EXISTS sections JSONB NOT NULL DEFAULT '[]';

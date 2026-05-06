@@ -5,6 +5,8 @@ import { Intervention } from "@/types/intervention";
 interface Props {
   intervention: Intervention;
   index?: number;
+  href?: string;
+  actionLabel?: string;
 }
 
 const PALETTES = [
@@ -58,12 +60,17 @@ const PALETTES = [
   },
 ];
 
-export default function InterventionCard({ intervention, index = 0 }: Props) {
+export default function InterventionCard({
+  intervention,
+  index = 0,
+  href,
+  actionLabel = "Voir la fiche",
+}: Props) {
   const p = PALETTES[index % PALETTES.length];
 
   return (
     <Link
-      href={`/interventions/${intervention.slug}`}
+      href={href || `/interventions/${intervention.slug}`}
       className="intervention-card group flex flex-col rounded-2xl overflow-hidden h-full"
       style={{
         background: p.bg,
@@ -98,7 +105,7 @@ export default function InterventionCard({ intervention, index = 0 }: Props) {
             className="text-sm font-semibold"
             style={{ color: p.ctaText, fontFamily: "var(--font-heading)" }}
           >
-            Voir la fiche
+            {actionLabel}
           </span>
           <ArrowRight
             className="w-4 h-4 group-hover:translate-x-1 transition-transform"

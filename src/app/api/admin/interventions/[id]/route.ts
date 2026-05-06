@@ -4,6 +4,7 @@ import { getSession } from "@/lib/auth";
 import {
   getInterventionById,
   updateIntervention,
+  restoreIntervention,
   deleteIntervention,
 } from "@/lib/interventions";
 import { StoreConflictError } from "@/lib/store";
@@ -70,6 +71,26 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json(
       { error: "Impossible d’enregistrer l’intervention dans Supabase." },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(_request: NextRequest, { params }: RouteParams) {
+  const denied = await requireAuth();
+  if (denied) return denied;
+
+  const { id } = await params;
+  try {
+    const restored = await restoreIntervention(id);
+    if (!restored) {
+      return NextResponse.json({ error: "Introuvable" }, { status: 404 });
+    }
+    revalidatePath("/");
+    return NextResponse.json(restored);
+  } catch {
+    return NextResponse.json(
+      { error: "Impossible de restaurer l'intervention." },
       { status: 500 }
     );
   }

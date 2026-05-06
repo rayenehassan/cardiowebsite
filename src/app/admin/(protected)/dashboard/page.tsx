@@ -1,7 +1,8 @@
 export const dynamic = "force-dynamic";
 
 import { getAllInterventions } from "@/lib/interventions";
-import { FileText, Eye, EyeOff } from "lucide-react";
+import InterventionCard from "@/components/ui/InterventionCard";
+import { Eye, EyeOff, FileText, PlusCircle } from "lucide-react";
 import Link from "next/link";
 
 export default async function AdminDashboard() {
@@ -11,7 +12,7 @@ export default async function AdminDashboard() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-foreground mb-6">
+      <h1 className="text-2xl font-bold text-foreground mb-6" style={{ fontFamily: "var(--font-heading)" }}>
         Tableau de bord
       </h1>
 
@@ -46,60 +47,61 @@ export default async function AdminDashboard() {
         </div>
       </div>
 
-      {/* Interventions récentes */}
-      <div className="bg-white rounded-xl border border-border">
-        <div className="p-5 border-b border-border flex items-center justify-between">
-          <h2 className="font-semibold text-foreground">
-            Interventions récentes
-          </h2>
+      <section>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between mb-6">
+          <div>
+            <h2
+              className="text-3xl sm:text-4xl font-bold tracking-[-0.03em] text-foreground"
+              style={{ fontFamily: "var(--font-heading)" }}
+            >
+              Vos interventions
+            </h2>
+            <p className="text-muted text-base mt-2 max-w-xl">
+              Retrouvez les fiches comme elles sont présentées aux patients, puis ouvrez-les pour les modifier.
+            </p>
+          </div>
           <Link
-            href="/admin/interventions"
-            className="text-sm text-primary hover:text-primary-dark font-medium"
+            href="/admin/interventions/new"
+            className="inline-flex items-center justify-center gap-2 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-opacity hover:opacity-85 shrink-0"
+            style={{ background: "#0F172A", fontFamily: "var(--font-heading)" }}
           >
-            Tout voir
+            <PlusCircle className="w-4 h-4" />
+            Ajouter une intervention
           </Link>
         </div>
-        <div className="divide-y divide-border">
-          {interventions.length > 0 ? (
-            interventions.slice(0, 5).map((intervention) => (
-              <div
+
+        {interventions.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            {interventions.map((intervention, i) => (
+              <InterventionCard
                 key={intervention.id}
-                className="p-4 flex items-center justify-between gap-4"
-              >
-                <div>
-                  <p className="font-medium text-foreground">
-                    {intervention.title}
-                  </p>
-                  <p className="text-sm text-muted">{intervention.subtitle}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`text-xs px-2.5 py-1 rounded-full font-medium ${
-                      intervention.status === "published"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-amber-100 text-amber-700"
-                    }`}
-                  >
-                    {intervention.status === "published"
-                      ? "Publiée"
-                      : "Brouillon"}
-                  </span>
-                  <Link
-                    href={`/admin/interventions/${intervention.id}`}
-                    className="text-sm text-primary hover:text-primary-dark font-medium"
-                  >
-                    Modifier
-                  </Link>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="p-6 text-sm text-muted">
-              Aucune intervention enregistrée dans Supabase.
-            </div>
-          )}
-        </div>
-      </div>
+                intervention={intervention}
+                index={i}
+                href={`/admin/interventions/${intervention.id}`}
+                actionLabel="Modifier la fiche"
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl p-10 text-center border bg-white border-border">
+            <PlusCircle className="w-8 h-8 text-primary mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-foreground mb-2" style={{ fontFamily: "var(--font-heading)" }}>
+              Aucune intervention enregistrée
+            </h3>
+            <p className="text-sm text-muted mb-5">
+              Créez la première fiche patient depuis le tableau de bord.
+            </p>
+            <Link
+              href="/admin/interventions/new"
+              className="inline-flex items-center justify-center gap-2 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-opacity hover:opacity-85"
+              style={{ background: "#0F172A", fontFamily: "var(--font-heading)" }}
+            >
+              <PlusCircle className="w-4 h-4" />
+              Ajouter une intervention
+            </Link>
+          </div>
+        )}
+      </section>
     </div>
   );
 }

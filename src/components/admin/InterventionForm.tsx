@@ -616,7 +616,7 @@ export default function InterventionForm({ intervention, mode }: Props) {
 
       {/* General info — fixed */}
       <fieldset className="bg-white rounded-xl border border-border p-5 space-y-4">
-        <legend className="text-lg font-semibold text-foreground px-1">
+        <legend className="text-lg font-semibold text-foreground px-1" style={{ fontFamily: "var(--font-heading)" }}>
           Informations générales
         </legend>
 
@@ -702,7 +702,8 @@ export default function InterventionForm({ intervention, mode }: Props) {
               <button
                 type="button"
                 onClick={loadTemplate}
-                className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors"
+                className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-medium transition-opacity hover:opacity-85"
+                style={{ background: "#0F172A", fontFamily: "var(--font-heading)" }}
               >
                 Charger le modèle de base
               </button>
@@ -791,7 +792,8 @@ export default function InterventionForm({ intervention, mode }: Props) {
           <button
             type="submit"
             disabled={saving}
-            className="flex items-center gap-2 bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium disabled:opacity-50"
+            className="flex items-center gap-2 text-white px-6 py-2 rounded-lg text-sm font-medium disabled:opacity-50 transition-opacity hover:opacity-85"
+            style={{ background: "#0F172A", fontFamily: "var(--font-heading)" }}
           >
             <Save className="w-4 h-4" />
             {saving ? "Enregistrement..." : mode === "create" ? "Créer" : "Enregistrer"}

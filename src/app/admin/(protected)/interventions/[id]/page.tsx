@@ -16,7 +16,7 @@ export default async function EditInterventionPage({ params }: Props) {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-foreground mb-6">
+      <h1 className="text-2xl font-bold text-foreground mb-6" style={{ fontFamily: "var(--font-heading)" }}>
         Modifier : {intervention.title}
       </h1>
       <InterventionForm intervention={intervention} mode="edit" />

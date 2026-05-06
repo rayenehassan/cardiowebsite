@@ -17,7 +17,7 @@ export default function AdminError({ error, reset }: Props) {
     <div className="max-w-2xl">
       <div className="rounded-xl border border-amber-200 bg-amber-50 p-6">
         <AlertTriangle className="w-8 h-8 text-amber-600 mb-4" />
-        <h1 className="text-xl font-bold text-foreground mb-2">
+        <h1 className="text-xl font-bold text-foreground mb-2" style={{ fontFamily: "var(--font-heading)" }}>
           Données indisponibles
         </h1>
         <p className="text-sm text-amber-900 leading-relaxed mb-5">
@@ -28,7 +28,8 @@ export default function AdminError({ error, reset }: Props) {
         <button
           type="button"
           onClick={reset}
-          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white hover:bg-primary-dark transition-colors"
+          className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-85"
+          style={{ background: "#0F172A", fontFamily: "var(--font-heading)" }}
         >
           <RefreshCw className="w-4 h-4" />
           Réessayer

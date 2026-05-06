@@ -6,7 +6,6 @@
 import { supabaseAdmin, supabasePublic } from "@/lib/supabase";
 import { Intervention, InterventionStatus, Section } from "@/types/intervention";
 
-// Includes legacy columns so toModel can migrate old rows on the fly.
 interface Row {
   id: string;
   slug: string;
@@ -14,27 +13,12 @@ interface Row {
   subtitle: string;
   status: string;
   sections: unknown;
-  // legacy columns (present until explicitly dropped in Supabase)
-  overview?: string;
-  why_performed?: string;
-  preparation?: unknown;
-  during_procedure?: string;
-  after_procedure?: string;
-  risks?: unknown;
-  practical_info?: string;
-  videos?: unknown;
-  images?: unknown;
-  documents?: unknown;
-  faqs?: unknown;
   created_at: string;
   updated_at: string;
 }
 
 const FULL_SELECT =
-  "id, slug, title, subtitle, status, sections, " +
-  "overview, why_performed, preparation, during_procedure, after_procedure, " +
-  "risks, practical_info, videos, images, documents, faqs, " +
-  "created_at, updated_at";
+  "id, slug, title, subtitle, status, sections, created_at, updated_at";
 
 export class StoreError extends Error {
   constructor(
@@ -57,80 +41,9 @@ function asArray<T>(value: unknown): T[] {
   return Array.isArray(value) ? (value as T[]) : [];
 }
 
-function uid(): string {
-  return `m-${Math.random().toString(36).slice(2, 10)}`;
-}
-
-/** Converts legacy row columns into a Section[] when sections is empty. */
-function legacyToSections(row: Row): Section[] {
-  const sections: Section[] = [];
-
-  if (row.overview?.trim()) {
-    sections.push({ id: uid(), type: "text", title: "Vue d'ensemble", body: row.overview });
-  }
-  if (row.why_performed?.trim()) {
-    sections.push({ id: uid(), type: "text", title: "Pourquoi cette procédure ?", body: row.why_performed });
-  }
-
-  const prep = asArray<string>(row.preparation).filter((s) => s.trim());
-  if (prep.length) {
-    sections.push({ id: uid(), type: "list", title: "Comment se préparer", ordered: true, items: prep });
-  }
-
-  if (row.during_procedure?.trim()) {
-    sections.push({ id: uid(), type: "text", title: "Pendant l'intervention", body: row.during_procedure });
-  }
-  if (row.after_procedure?.trim()) {
-    sections.push({ id: uid(), type: "text", title: "Après l'intervention", body: row.after_procedure });
-  }
-
-  const risks = asArray<string>(row.risks).filter((s) => s.trim());
-  if (risks.length) {
-    sections.push({ id: uid(), type: "list", title: "Risques", ordered: false, items: risks });
-  }
-
-  if (row.practical_info?.trim()) {
-    sections.push({ id: uid(), type: "text", title: "Informations pratiques", body: row.practical_info });
-  }
-
-  type LegacyVideo = { id: string; title: string; url: string; type: string };
-  for (const v of asArray<LegacyVideo>(row.videos)) {
-    if (v.url?.trim()) {
-      sections.push({
-        id: uid(),
-        type: "video",
-        title: v.title || "Vidéo",
-        videoUrl: v.url,
-        videoType: (v.type as Section["videoType"]) ?? "youtube",
-      });
-    }
-  }
-
-  type LegacyImage = { id: string; title: string; url: string; alt: string };
-  for (const img of asArray<LegacyImage>(row.images)) {
-    if (img.url?.trim()) {
-      sections.push({
-        id: uid(),
-        type: "image",
-        title: img.title || "Image",
-        imageUrl: img.url,
-        imageAlt: img.alt || "",
-      });
-    }
-  }
-
-  type LegacyFaq = { id: string; question: string; answer: string };
-  const faqs = asArray<LegacyFaq>(row.faqs).filter((f) => f.question?.trim());
-  if (faqs.length) {
-    sections.push({ id: uid(), type: "faqs", title: "Questions fréquentes", faqs });
-  }
-
-  return sections;
-}
 
 function toModel(row: Row): Intervention {
-  const stored = asArray<Section>(row.sections);
-  const sections = stored.length > 0 ? stored : legacyToSections(row);
+  const sections = asArray<Section>(row.sections);
   return {
     id: row.id,
     slug: row.slug,
@@ -170,9 +83,21 @@ export async function readAll(): Promise<Intervention[]> {
   const { data, error } = await supabaseAdmin
     .from("interventions")
     .select(FULL_SELECT)
+    .neq("status", "archived")
     .order("created_at", { ascending: true });
 
   if (error) throw mapError("readAll", error);
+  return (data as unknown as Row[]).map(toModel);
+}
+
+export async function readArchived(): Promise<Intervention[]> {
+  const { data, error } = await supabaseAdmin
+    .from("interventions")
+    .select(FULL_SELECT)
+    .eq("status", "archived")
+    .order("updated_at", { ascending: false });
+
+  if (error) throw mapError("readArchived", error);
   return (data as unknown as Row[]).map(toModel);
 }
 
@@ -250,7 +175,7 @@ export async function updateOne(
 export async function removeOne(id: string): Promise<boolean> {
   const { data, error } = await supabaseAdmin
     .from("interventions")
-    .delete()
+    .update({ status: "archived" })
     .eq("id", id)
     .select("id")
     .maybeSingle();
