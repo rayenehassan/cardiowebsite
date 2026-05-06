@@ -6,15 +6,7 @@ import Accordion from "@/components/ui/Accordion";
 import VideoEmbed from "@/components/ui/VideoEmbed";
 import InterventionSidebarNav from "@/components/ui/InterventionSidebarNav";
 import NextImage from "next/image";
-import {
-  List,
-  Video,
-  Image as ImageIcon,
-  FileText,
-  HelpCircle,
-  Download,
-  ArrowLeft,
-} from "lucide-react";
+import { Download, ArrowLeft, FileText } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
 import type { Section } from "@/types/intervention";
@@ -171,16 +163,6 @@ function buildNavItems(sections: Section[]): Array<{ id: string; label: string; 
     .filter((item): item is { id: string; label: string; type: Section["type"] } => item !== null);
 }
 
-function sectionTypeIcon(type: Section["type"]) {
-  switch (type) {
-    case "text": return null;
-    case "list": return <List className="w-3.5 h-3.5 shrink-0" />;
-    case "video": return <Video className="w-3.5 h-3.5 shrink-0" />;
-    case "image": return <ImageIcon className="w-3.5 h-3.5 shrink-0" />;
-    case "document": return <FileText className="w-3.5 h-3.5 shrink-0" />;
-    case "faqs": return <HelpCircle className="w-3.5 h-3.5 shrink-0" />;
-  }
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
@@ -238,27 +220,11 @@ export default async function InterventionPage({ params }: Props) {
               )}
             </div>
 
-            {/* Mobile nav */}
+            {/* Mobile nav — collapsible, collapsed by default */}
             {navItems.length > 0 && (
-              <nav className="lg:hidden mb-8 p-4 rounded-xl bg-gray-50 border border-gray-200">
-                <p className="text-xs font-bold tracking-widest uppercase text-gray-400 mb-3" style={{ fontFamily: "var(--font-heading)" }}>
-                  Sur cette page
-                </p>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1">
-                  {navItems.map((item) => (
-                    <li key={item.id}>
-                      <a
-                        href={`#${item.id}`}
-                        className="flex items-center gap-2 px-2 py-1.5 rounded text-sm text-blue-600 hover:underline"
-                        style={{ fontFamily: "var(--font-heading)" }}
-                      >
-                        {sectionTypeIcon(item.type)}
-                        {item.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
+              <div className="lg:hidden mb-8">
+                <InterventionSidebarNav items={navItems} collapsible />
+              </div>
             )}
 
             <div className="space-y-12">
