@@ -233,3 +233,31 @@ body {
   background: #ffffff;
   color: #111827;
 }
+
+/* ── Éditeur riche TipTap (admin) ── */
+.rich-editor .tiptap {
+  outline: none;
+}
+.rich-editor .tiptap p { margin: 0 0 0.5em; }
+.rich-editor .tiptap p:last-child { margin-bottom: 0; }
+.rich-editor .tiptap ul,
+.rich-editor .tiptap ol { padding-left: 1.4em; margin: 0.4em 0; }
+.rich-editor .tiptap li { margin: 0.2em 0; }
+.rich-editor .tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: #94A3B8;
+  pointer-events: none;
+  float: left;
+  height: 0;
+}
+
+/* ── Rendu HTML riche côté patient ── */
+.rich-text strong { font-weight: 700; }
+.rich-text em     { font-style: italic; }
+.rich-text u      { text-decoration: underline; }
+.rich-text s      { text-decoration: line-through; }
+.rich-text ul     { list-style: disc; padding-left: 1.4em; margin: 0.5em 0; }
+.rich-text ol     { list-style: decimal; padding-left: 1.4em; margin: 0.5em 0; }
+.rich-text li     { margin: 0.3em 0; }
+.rich-text p      { margin: 0 0 0.6em; }
+.rich-text p:last-child { margin-bottom: 0; }

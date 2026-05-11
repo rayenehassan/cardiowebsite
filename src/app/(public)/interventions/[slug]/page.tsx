@@ -45,7 +45,8 @@ function renderSection(section: Section, index: number): React.ReactNode {
   const anchor = sectionAnchor(section, index);
 
   switch (section.type) {
-    case "text":
+    case "text": {
+      const isHtml = (section.body || "").trimStart().startsWith("<");
       return (
         <div key={section.id} id={anchor} className="scroll-mt-36">
           <h2
@@ -54,11 +55,20 @@ function renderSection(section: Section, index: number): React.ReactNode {
           >
             {section.title}
           </h2>
-          <p className="leading-[1.8] text-[18px]" style={{ color: "#334155" }}>
-            <GlossaryText text={section.body || ""} />
-          </p>
+          {isHtml ? (
+            <div
+              className="rich-text leading-[1.8] text-[18px]"
+              style={{ color: "#334155" }}
+              dangerouslySetInnerHTML={{ __html: section.body || "" }}
+            />
+          ) : (
+            <p className="leading-[1.8] text-[18px]" style={{ color: "#334155" }}>
+              <GlossaryText text={section.body || ""} />
+            </p>
+          )}
         </div>
       );
+    }
 
     case "list": {
       const items = (section.items || []).filter((i) => i.trim());

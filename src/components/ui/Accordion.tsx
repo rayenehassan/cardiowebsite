@@ -51,7 +51,14 @@ export default function Accordion({ items }: Props) {
                 className="px-5 pb-5 leading-[1.8] text-[17px] border-t border-gray-100 pt-4"
                 style={{ color: "#334155" }}
               >
-                <GlossaryText text={item.answer} />
+                {item.answer.trimStart().startsWith("<") ? (
+                  <div
+                    className="rich-text"
+                    dangerouslySetInnerHTML={{ __html: item.answer }}
+                  />
+                ) : (
+                  <GlossaryText text={item.answer} />
+                )}
               </div>
             )}
           </div>

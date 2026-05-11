@@ -21,6 +21,7 @@ import {
   Folder,
 } from "lucide-react";
 import FileUpload from "./FileUpload";
+import RichTextEditor from "./RichTextEditor";
 
 interface Props {
   intervention?: Intervention;
@@ -286,7 +287,6 @@ export default function InterventionForm({ intervention, mode }: Props) {
 
   const inputClass =
     "w-full px-3 py-2.5 border border-border rounded-lg focus:ring-2 focus:ring-primary-light focus:border-primary-light outline-none transition-colors bg-white text-sm";
-  const textareaClass = `${inputClass} min-h-[120px] resize-y`;
   const labelClass = "block text-xs font-semibold text-muted mb-1.5 uppercase tracking-wider";
 
   function renderSectionEditor(section: Section, index: number) {
@@ -392,11 +392,10 @@ export default function InterventionForm({ intervention, mode }: Props) {
             {section.type === "text" && (
               <>
                 <label className={labelClass}>Contenu</label>
-                <textarea
+                <RichTextEditor
                   value={section.body || ""}
-                  onChange={(e) => updateSection(section.id, { body: e.target.value })}
-                  className={textareaClass}
-                  placeholder="Saisissez votre texte..."
+                  onChange={(html) => updateSection(section.id, { body: html })}
+                  placeholder="Saisissez votre texte…"
                 />
               </>
             )}
@@ -632,13 +631,11 @@ export default function InterventionForm({ intervention, mode }: Props) {
                       className={inputClass}
                       placeholder="Question"
                     />
-                    <textarea
+                    <RichTextEditor
                       value={faq.answer}
-                      onChange={(e) =>
-                        updateFaq(section.id, i, "answer", e.target.value)
-                      }
-                      className={`${inputClass} min-h-[80px] resize-y`}
-                      placeholder="Réponse"
+                      onChange={(html) => updateFaq(section.id, i, "answer", html)}
+                      placeholder="Réponse…"
+                      minHeight="80px"
                     />
                   </div>
                 ))}
