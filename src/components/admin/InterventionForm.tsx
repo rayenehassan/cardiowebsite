@@ -126,6 +126,7 @@ export default function InterventionForm({ intervention, mode }: Props) {
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const [showPicker, setShowPicker] = useState(false);
   const [confirmTemplate, setConfirmTemplate] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   function loadTemplate() {
     setSections(BASE_TEMPLATE.map((s) => ({ ...s, id: `t-${Date.now()}-${Math.random().toString(36).slice(2)}` })));
@@ -153,6 +154,7 @@ export default function InterventionForm({ intervention, mode }: Props) {
 
   function removeSection(id: string) {
     setSections((prev) => prev.filter((s) => s.id !== id));
+    setPendingDeleteId(null);
   }
 
   function moveSection(index: number, dir: "up" | "down") {
@@ -337,24 +339,51 @@ export default function InterventionForm({ intervention, mode }: Props) {
           />
 
           {/* Collapse + delete */}
-          <button
-            type="button"
-            onClick={() => toggleCollapse(section.id)}
-            className="p-1 text-muted hover:text-foreground transition-colors shrink-0"
-            title={isCollapsed ? "Développer" : "Réduire"}
-          >
-            <ChevronRight
-              className={`w-4 h-4 transition-transform ${isCollapsed ? "" : "rotate-90"}`}
-            />
-          </button>
-          <button
-            type="button"
-            onClick={() => removeSection(section.id)}
-            className="p-1 text-muted hover:text-danger transition-colors shrink-0"
-            title="Supprimer"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
+          {pendingDeleteId === section.id ? (
+            /* Confirmation inline */
+            <div className="flex items-center gap-1.5 shrink-0 animate-in fade-in duration-150">
+              <span className="text-xs font-medium text-danger whitespace-nowrap">
+                Supprimer ?
+              </span>
+              <button
+                type="button"
+                onClick={() => setPendingDeleteId(null)}
+                className="px-2.5 py-1 rounded-md text-xs font-medium text-muted bg-white border border-border hover:bg-surface transition-colors"
+              >
+                Annuler
+              </button>
+              <button
+                type="button"
+                onClick={() => removeSection(section.id)}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold text-white bg-danger hover:opacity-85 transition-opacity"
+                style={{ fontFamily: "var(--font-heading)" }}
+              >
+                <Trash2 className="w-3 h-3" />
+                Supprimer
+              </button>
+            </div>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={() => toggleCollapse(section.id)}
+                className="p-1 text-muted hover:text-foreground transition-colors shrink-0"
+                title={isCollapsed ? "Développer" : "Réduire"}
+              >
+                <ChevronRight
+                  className={`w-4 h-4 transition-transform ${isCollapsed ? "" : "rotate-90"}`}
+                />
+              </button>
+              <button
+                type="button"
+                onClick={() => setPendingDeleteId(section.id)}
+                className="p-1 text-muted hover:text-danger transition-colors shrink-0"
+                title="Supprimer"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </>
+          )}
         </div>
 
         {/* Section content */}
