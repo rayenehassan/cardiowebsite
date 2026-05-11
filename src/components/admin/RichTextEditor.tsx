@@ -1,6 +1,7 @@
 "use client";
 
 import { useEditor, EditorContent } from "@tiptap/react";
+import { useReducer } from "react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import {
@@ -52,10 +53,13 @@ function Divider() {
 }
 
 export default function RichTextEditor({ value, onChange, placeholder, minHeight = "120px" }: Props) {
+  // Force un re-render à chaque changement de sélection pour que
+  // editor.isActive() soit réévalué et la toolbar soit à jour
+  const [, rerender] = useReducer((x: number) => x + 1, 0);
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        // désactiver heading et code pour rester simple
         heading: false,
         code: false,
         codeBlock: false,
@@ -65,10 +69,13 @@ export default function RichTextEditor({ value, onChange, placeholder, minHeight
       Underline,
     ],
     content: value || "",
+    onSelectionUpdate() {
+      rerender();
+    },
     onUpdate({ editor }) {
       const html = editor.getHTML();
-      // TipTap retourne "<p></p>" pour un éditeur vide — on normalise en chaîne vide
       onChange(html === "<p></p>" ? "" : html);
+      rerender();
     },
     editorProps: {
       attributes: {
