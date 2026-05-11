@@ -21,7 +21,7 @@ export default async function AdminDashboard() {
         <div className="bg-white rounded-xl border border-border p-5">
           <div className="flex items-center gap-3 mb-2">
             <FileText className="w-5 h-5 text-primary" />
-            <span className="text-sm text-muted">Total des interventions</span>
+            <span className="text-base text-muted">Total des interventions</span>
           </div>
           <p className="text-3xl font-bold text-foreground">
             {interventions.length}
@@ -30,7 +30,7 @@ export default async function AdminDashboard() {
         <div className="bg-white rounded-xl border border-border p-5">
           <div className="flex items-center gap-3 mb-2">
             <Eye className="w-5 h-5 text-success" />
-            <span className="text-sm text-muted">Publiées</span>
+            <span className="text-base text-muted">Publiées</span>
           </div>
           <p className="text-3xl font-bold text-foreground">
             {published.length}
@@ -39,7 +39,7 @@ export default async function AdminDashboard() {
         <div className="bg-white rounded-xl border border-border p-5">
           <div className="flex items-center gap-3 mb-2">
             <EyeOff className="w-5 h-5 text-amber-500" />
-            <span className="text-sm text-muted">Brouillons</span>
+            <span className="text-base text-muted">Brouillons</span>
           </div>
           <p className="text-3xl font-bold text-foreground">
             {drafts.length}

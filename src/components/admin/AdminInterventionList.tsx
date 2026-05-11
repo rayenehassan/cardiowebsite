@@ -78,7 +78,7 @@ export default function AdminInterventionList({ interventions, archived }: Props
               <tr key={intervention.id} className="hover:bg-surface-alt/50">
                 <td className="px-4 py-3">
                   <p className="font-medium text-foreground">{intervention.title}</p>
-                  <p className="text-xs text-muted">{intervention.subtitle}</p>
+                  <p className="text-sm text-muted">{intervention.subtitle}</p>
                 </td>
                 <td className="px-4 py-3 hidden sm:table-cell">
                   <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
@@ -106,7 +106,7 @@ export default function AdminInterventionList({ interventions, archived }: Props
                     )}
                     <Link
                       href={`/admin/interventions/${intervention.id}`}
-                      className="p-2 text-muted hover:text-primary rounded-lg hover:bg-surface-alt transition-colors"
+                      className="p-2.5 text-muted hover:text-primary rounded-lg hover:bg-surface-alt transition-colors"
                       title="Modifier"
                     >
                       <Pencil className="w-4 h-4" />
@@ -114,7 +114,7 @@ export default function AdminInterventionList({ interventions, archived }: Props
                     <button
                       onClick={() => handleArchive(intervention.id, intervention.title)}
                       disabled={loadingId === intervention.id}
-                      className="p-2 text-muted hover:text-danger rounded-lg hover:bg-red-50 transition-colors disabled:opacity-40"
+                      className="p-2.5 text-muted hover:text-danger rounded-lg hover:bg-red-50 transition-colors disabled:opacity-40"
                       title="Archiver"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -146,7 +146,7 @@ export default function AdminInterventionList({ interventions, archived }: Props
                   <tr key={intervention.id} className="hover:bg-surface-alt/50">
                     <td className="px-4 py-3">
                       <p className="font-medium text-foreground">{intervention.title}</p>
-                      <p className="text-xs text-muted">{intervention.subtitle}</p>
+                      <p className="text-sm text-muted">{intervention.subtitle}</p>
                     </td>
                     <td className="px-4 py-3 hidden sm:table-cell">
                       <span className="text-xs px-2.5 py-1 rounded-full font-medium bg-gray-100 text-gray-500">
