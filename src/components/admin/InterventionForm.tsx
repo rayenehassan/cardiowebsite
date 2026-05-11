@@ -423,8 +423,8 @@ export default function InterventionForm({ intervention, mode }: Props) {
                 </div>
                 <div className="space-y-2">
                   {(section.items || []).map((item, i) => (
-                    <div key={i} className="flex gap-1.5 items-center">
-                      <div className="flex flex-col shrink-0">
+                    <div key={i} className="flex gap-1.5 items-start">
+                      <div className="flex flex-col shrink-0 mt-2">
                         <button
                           type="button"
                           onClick={() => moveListItem(section.id, i, "up")}
@@ -442,20 +442,21 @@ export default function InterventionForm({ intervention, mode }: Props) {
                           <ChevronDown className="w-3 h-3" />
                         </button>
                       </div>
-                      <span className="text-xs text-muted w-5 text-right shrink-0">
+                      <span className="text-xs text-muted w-5 text-right shrink-0 mt-3">
                         {section.ordered !== false ? `${i + 1}.` : "•"}
                       </span>
-                      <input
-                        type="text"
-                        value={item}
-                        onChange={(e) => updateListItem(section.id, i, e.target.value)}
-                        className={`${inputClass} flex-1`}
-                        placeholder="Élément..."
-                      />
+                      <div className="flex-1">
+                        <RichTextEditor
+                          inline
+                          value={item}
+                          onChange={(html) => updateListItem(section.id, i, html)}
+                          placeholder="Élément…"
+                        />
+                      </div>
                       <button
                         type="button"
                         onClick={() => removeListItem(section.id, i)}
-                        className="p-1 text-muted hover:text-danger transition-colors shrink-0"
+                        className="p-1 text-muted hover:text-danger transition-colors shrink-0 mt-2"
                       >
                         <X className="w-3.5 h-3.5" />
                       </button>

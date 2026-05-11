@@ -96,9 +96,17 @@ function renderSection(section: Section, index: number): React.ReactNode {
                     style={{ background: "#0369A1" }}
                   />
                 )}
-                <span className="leading-relaxed text-[18px]" style={{ color: "#334155" }}>
-                  <GlossaryText text={item} />
-                </span>
+                {item.includes("<") ? (
+                  <span
+                    className="rich-text leading-relaxed text-[18px]"
+                    style={{ color: "#334155" }}
+                    dangerouslySetInnerHTML={{ __html: item }}
+                  />
+                ) : (
+                  <span className="leading-relaxed text-[18px]" style={{ color: "#334155" }}>
+                    <GlossaryText text={item} />
+                  </span>
+                )}
               </li>
             ))}
           </ul>
