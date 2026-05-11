@@ -27,42 +27,34 @@ export default function InterventionSearch({ interventions }: Props) {
 
   return (
     <div
-      className="rounded-3xl overflow-hidden"
+      className="rounded-2xl overflow-hidden border bg-white"
       style={{
-        background: "rgba(255,255,255,0.82)",
-        backdropFilter: "blur(28px)",
-        WebkitBackdropFilter: "blur(28px)",
-        border: "1px solid rgba(255,255,255,0.95)",
-        boxShadow: "0 20px 60px rgba(2,132,199,0.12), 0 4px 20px rgba(0,0,0,0.07)",
+        borderColor: "rgba(15, 23, 42, 0.08)",
+        boxShadow: "0 12px 40px rgba(15, 23, 42, 0.06), 0 2px 8px rgba(15, 23, 42, 0.04)",
       }}
     >
-      {/* ── Header gradient ── */}
-      <div
-        className="px-7 pt-7 pb-6"
-        style={{
-          background: "linear-gradient(135deg, rgba(238,244,255,0.9) 0%, rgba(248,250,255,0.7) 100%)",
-        }}
-      >
+      {/* Header */}
+      <div className="px-6 sm:px-7 pt-6 pb-5 border-b" style={{ borderColor: "rgba(15, 23, 42, 0.06)" }}>
         <p
-          className="text-base font-bold text-foreground leading-tight"
+          className="text-lg font-semibold text-foreground leading-tight"
           style={{ fontFamily: "var(--font-heading)" }}
         >
           Trouvez votre intervention
         </p>
-        <p className="text-xs text-muted mt-0.5">
+        <p className="text-base mt-1" style={{ color: "#475569" }}>
           Tapez le nom indiqué par votre cardiologue
         </p>
-
       </div>
 
-      {/* ── Search input ── */}
-      <div className="px-7 py-5 border-y" style={{ borderColor: "rgba(2,132,199,0.08)" }}>
+      {/* Search input */}
+      <div className="px-6 sm:px-7 py-5">
         <div className="relative">
           <div
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg flex items-center justify-center pointer-events-none"
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-9 h-9 rounded-lg flex items-center justify-center pointer-events-none"
             style={{ background: "rgba(2,132,199,0.1)" }}
+            aria-hidden="true"
           >
-            <Search className="w-4 h-4" style={{ color: "#0284C7" }} />
+            <Search className="w-5 h-5" style={{ color: "#0369A1" }} />
           </div>
           <input
             ref={inputRef}
@@ -70,61 +62,64 @@ export default function InterventionSearch({ interventions }: Props) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Ex : coronarographie, pacemaker…"
-            className="w-full pl-14 pr-10 py-4 rounded-2xl border outline-none transition-all text-sm"
+            aria-label="Rechercher une intervention"
+            className="w-full pl-16 pr-14 py-4 rounded-xl border outline-none transition-all"
             style={{
               fontFamily: "var(--font-sans)",
               background: "#ffffff",
-              borderColor: q ? "rgba(2,132,199,0.5)" : "rgba(0,0,0,0.09)",
+              borderColor: q ? "rgba(2,132,199,0.5)" : "rgba(15,23,42,0.12)",
               color: "#0F172A",
               boxShadow: q
-                ? "0 0 0 4px rgba(2,132,199,0.09), 0 1px 4px rgba(0,0,0,0.05)"
-                : "0 1px 4px rgba(0,0,0,0.04)",
-              fontSize: "15px",
+                ? "0 0 0 4px rgba(2,132,199,0.08), 0 1px 4px rgba(0,0,0,0.04)"
+                : "0 1px 4px rgba(0,0,0,0.03)",
+              fontSize: "16px",
+              minHeight: "56px",
             }}
           />
           {query && (
             <button
               onClick={() => { setQuery(""); inputRef.current?.focus(); }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center transition-colors hover:bg-gray-100"
-              aria-label="Effacer"
-              style={{ color: "#94A3B8" }}
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-colors hover:bg-gray-100 focus-visible:bg-gray-100"
+              aria-label="Effacer la recherche"
+              style={{ color: "#475569" }}
             >
-              <X className="w-3.5 h-3.5" />
+              <X className="w-5 h-5" />
             </button>
           )}
         </div>
       </div>
 
-      {/* ── Résultats / Suggestions — fixed height to prevent box jumping ── */}
-      <div className="h-72 overflow-y-auto">
+      {/* Results / Suggestions — fixed height to prevent box jumping */}
+      <div className="h-80 overflow-y-auto border-t" style={{ borderColor: "rgba(15, 23, 42, 0.06)" }}>
         {showResults ? (
           <>
             {results.length > 0 ? (
-              <ul className="divide-y divide-black/[0.04]">
+              <ul className="divide-y" style={{ borderColor: "rgba(15, 23, 42, 0.05)" }}>
                 {results.map((intervention) => (
                   <li key={intervention.id}>
                     <Link
                       href={`/interventions/${intervention.slug}`}
-                      className="group flex items-center justify-between px-7 py-4 transition-colors hover:bg-blue-50"
+                      className="group flex items-center justify-between px-6 sm:px-7 py-4 transition-colors hover:bg-blue-50 focus-visible:bg-blue-50"
+                      style={{ minHeight: "60px" }}
                     >
                       <div className="min-w-0 pr-4">
                         <p
-                          className="text-[15px] font-semibold text-foreground group-hover:text-primary transition-colors leading-snug"
+                          className="text-base font-semibold text-foreground group-hover:text-primary transition-colors leading-snug"
                           style={{ fontFamily: "var(--font-heading)" }}
                         >
                           {intervention.title}
                         </p>
                         {intervention.subtitle && (
-                          <p className="text-sm text-muted mt-0.5 truncate">
+                          <p className="text-base mt-1 truncate" style={{ color: "#475569" }}>
                             {intervention.subtitle}
                           </p>
                         )}
                       </div>
                       <div
-                        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-all group-hover:scale-110"
+                        className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 transition-all"
                         style={{ background: "rgba(2,132,199,0.08)" }}
                       >
-                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" style={{ color: "#0284C7" }} />
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" style={{ color: "#0369A1" }} />
                       </div>
                     </Link>
                   </li>
@@ -132,29 +127,32 @@ export default function InterventionSearch({ interventions }: Props) {
               </ul>
             ) : (
               <div className="flex flex-col items-center justify-center h-full px-7 text-center">
-                <p className="text-sm font-medium text-foreground mb-1" style={{ fontFamily: "var(--font-heading)" }}>
+                <p
+                  className="text-base font-semibold text-foreground mb-1"
+                  style={{ fontFamily: "var(--font-heading)" }}
+                >
                   Aucun résultat
                 </p>
-                <p className="text-sm text-muted mb-4">
+                <p className="text-base mb-4" style={{ color: "#475569" }}>
                   Essayez un autre terme ou parcourez la liste complète.
                 </p>
                 <Link
                   href="/#interventions"
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
-                  style={{ fontFamily: "var(--font-heading)" }}
+                  className="inline-flex items-center gap-2 text-base font-medium text-primary hover:underline py-2"
+                  style={{ fontFamily: "var(--font-heading)", minHeight: "44px" }}
                 >
-                  Voir toutes les interventions <ArrowRight className="w-3.5 h-3.5" />
+                  Voir toutes les interventions <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
             )}
           </>
         ) : (
-          <div className="px-7 py-6">
+          <div className="px-6 sm:px-7 py-6">
             {suggestions.length > 0 && (
               <>
                 <p
-                  className="text-xs font-semibold uppercase tracking-widest text-muted mb-4"
-                  style={{ fontFamily: "var(--font-heading)" }}
+                  className="text-[13px] font-semibold uppercase tracking-wider mb-3"
+                  style={{ fontFamily: "var(--font-heading)", color: "#475569" }}
                 >
                   Suggestions
                 </p>
@@ -163,16 +161,20 @@ export default function InterventionSearch({ interventions }: Props) {
                     <Link
                       key={intervention.id}
                       href={`/interventions/${intervention.slug}`}
-                      className="group flex items-center justify-between px-4 py-3 rounded-xl border transition-all hover:border-blue-200 hover:bg-blue-50"
-                      style={{ borderColor: "rgba(0,0,0,0.07)", background: "rgba(248,250,255,0.6)" }}
+                      className="group flex items-center justify-between px-4 py-3 rounded-xl border transition-all hover:border-blue-200 hover:bg-blue-50 focus-visible:bg-blue-50"
+                      style={{
+                        borderColor: "rgba(15,23,42,0.08)",
+                        background: "rgba(248,250,255,0.6)",
+                        minHeight: "48px",
+                      }}
                     >
                       <span
-                        className="text-sm font-medium text-foreground group-hover:text-primary transition-colors"
+                        className="text-base font-medium text-foreground group-hover:text-primary transition-colors"
                         style={{ fontFamily: "var(--font-heading)" }}
                       >
                         {intervention.title}
                       </span>
-                      <ArrowRight className="w-3.5 h-3.5 text-muted group-hover:text-primary group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-all flex-shrink-0" style={{ color: "#475569" }} />
                     </Link>
                   ))}
                 </div>
@@ -180,11 +182,11 @@ export default function InterventionSearch({ interventions }: Props) {
             )}
             <Link
               href="/#interventions"
-              className="mt-5 flex items-center justify-center gap-1.5 text-xs text-muted hover:text-primary transition-colors"
-              style={{ fontFamily: "var(--font-heading)" }}
+              className="mt-5 flex items-center justify-center gap-2 text-sm hover:text-primary transition-colors py-2"
+              style={{ fontFamily: "var(--font-heading)", color: "#475569", minHeight: "44px" }}
             >
-              <ArrowRight className="w-3 h-3" />
               Voir toutes les fiches ({interventions.length})
+              <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
         )}

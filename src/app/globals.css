@@ -10,7 +10,8 @@
   --color-surface: #F8FAFF;
   --color-surface-alt: #EEF4FF;
   --color-foreground: #0F172A;
-  --color-muted: #64748B;
+  --color-muted: #475569;
+  --color-muted-soft: #64748B;
   --color-border: rgba(0, 0, 0, 0.07);
   --color-danger: #DC2626;
   --color-success: #059669;
@@ -89,16 +90,16 @@ body {
 .section-label {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 5px 14px;
+  gap: 8px;
+  padding: 6px 14px;
   background: rgba(2, 132, 199, 0.08);
-  border: 1px solid rgba(2, 132, 199, 0.16);
+  border: 1px solid rgba(2, 132, 199, 0.18);
   border-radius: 100px;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #0284C7;
+  color: #0369A1;
   font-family: var(--font-heading);
 }
 
@@ -174,12 +175,13 @@ body {
 .btn-primary {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 13px 28px;
+  gap: 10px;
+  padding: 15px 30px;
+  min-height: 48px;
   background: #0F172A;
   color: #ffffff;
-  font-weight: 700;
-  font-size: 14px;
+  font-weight: 600;
+  font-size: 16px;
   border-radius: 100px;
   font-family: var(--font-heading);
   letter-spacing: 0.01em;
@@ -187,21 +189,22 @@ body {
 }
 
 .btn-primary:hover {
-  opacity: 0.85;
+  opacity: 0.9;
   transform: translateY(-1px);
 }
 
 .btn-ghost {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 13px 28px;
+  gap: 10px;
+  padding: 15px 30px;
+  min-height: 48px;
   background: transparent;
   color: #0F172A;
   font-weight: 500;
-  font-size: 14px;
+  font-size: 16px;
   border-radius: 100px;
-  border: 1px solid rgba(15, 23, 42, 0.14);
+  border: 1px solid rgba(15, 23, 42, 0.18);
   font-family: var(--font-heading);
   transition: border-color 0.2s ease, background 0.2s ease;
 }

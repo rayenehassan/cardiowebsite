@@ -21,34 +21,46 @@ export default function InterventionSidebarNav({ items, collapsible = false }: P
 
   useEffect(() => {
     if (!items.length) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) setActiveId(entry.target.id);
+
+    // Offset = sticky header (64px) + sticky top-bar (~64px) + small buffer
+    const OFFSET = 148;
+
+    const update = () => {
+      let current = items[0].id;
+      for (const { id } of items) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        if (el.getBoundingClientRect().top <= OFFSET) {
+          current = id;
         }
-      },
-      { rootMargin: "-10% 0px -80% 0px" }
-    );
-    items.forEach(({ id }) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
-    return () => observer.disconnect();
+      }
+      setActiveId(current);
+    };
+
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
   }, [items]);
 
   const links = (
-    <ul className="space-y-0.5">
+    <ul className="space-y-1">
       {items.map((item) => (
         <li key={item.id}>
           <a
             href={`#${item.id}`}
             onClick={() => collapsible && setOpen(false)}
-            className={`block px-3 py-2 rounded-lg text-sm transition-colors ${
+            className={`block px-3 py-2.5 rounded-lg text-base transition-colors ${
               activeId === item.id
-                ? "text-blue-600 bg-blue-50 font-medium"
-                : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+                ? "bg-blue-50 font-semibold"
+                : "hover:bg-gray-100"
             }`}
-            style={{ fontFamily: "var(--font-heading)" }}
+            style={{
+              fontFamily: "var(--font-heading)",
+              minHeight: "44px",
+              display: "flex",
+              alignItems: "center",
+              color: activeId === item.id ? "#0369A1" : "#334155",
+            }}
           >
             {item.label}
           </a>
@@ -62,18 +74,22 @@ export default function InterventionSidebarNav({ items, collapsible = false }: P
       <div className="rounded-xl border border-gray-200 overflow-hidden">
         <button
           onClick={() => setOpen((v) => !v)}
-          className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors"
-          style={{ fontFamily: "var(--font-heading)" }}
+          className="w-full flex items-center justify-between px-4 py-3.5 bg-gray-50 hover:bg-gray-100 transition-colors"
+          style={{ fontFamily: "var(--font-heading)", minHeight: "48px" }}
+          aria-expanded={open}
         >
-          <span className="text-xs font-bold tracking-widest uppercase text-gray-400">
+          <span className="text-[13px] font-semibold tracking-wider uppercase" style={{ color: "#475569" }}>
             Sur cette page
           </span>
           <ChevronDown
-            className="w-4 h-4 text-gray-400 transition-transform duration-200"
-            style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
+            className="w-5 h-5 transition-transform duration-200"
+            style={{
+              color: "#475569",
+              transform: open ? "rotate(180deg)" : "rotate(0deg)",
+            }}
           />
         </button>
-        {open && <div className="px-3 py-2">{links}</div>}
+        {open && <div className="px-3 py-3">{links}</div>}
       </div>
     );
   }
@@ -81,8 +97,8 @@ export default function InterventionSidebarNav({ items, collapsible = false }: P
   return (
     <nav>
       <p
-        className="text-[11px] font-bold tracking-widest uppercase text-gray-400 mb-3"
-        style={{ fontFamily: "var(--font-heading)" }}
+        className="text-[13px] font-semibold tracking-wider uppercase mb-3"
+        style={{ fontFamily: "var(--font-heading)", color: "#475569" }}
       >
         Sur cette page
       </p>

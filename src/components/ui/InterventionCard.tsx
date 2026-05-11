@@ -9,107 +9,54 @@ interface Props {
   actionLabel?: string;
 }
 
-const PALETTES = [
-  {
-    bg: "linear-gradient(145deg, #EDF4FF 0%, #D6E8FF 100%)",
-    border: "rgba(99,158,230,0.3)",
-    cta: "rgba(59,130,246,0.09)",
-    ctaBorder: "rgba(59,130,246,0.2)",
-    ctaText: "#2563EB",
-    shadow: "rgba(59,130,246,0.1)",
-  },
-  {
-    bg: "linear-gradient(145deg, #EEF2FF 0%, #DDE5FF 100%)",
-    border: "rgba(129,140,248,0.3)",
-    cta: "rgba(99,102,241,0.09)",
-    ctaBorder: "rgba(99,102,241,0.2)",
-    ctaText: "#4F46E5",
-    shadow: "rgba(99,102,241,0.1)",
-  },
-  {
-    bg: "linear-gradient(145deg, #ECFAFB 0%, #D5F2F5 100%)",
-    border: "rgba(94,205,218,0.3)",
-    cta: "rgba(14,165,233,0.09)",
-    ctaBorder: "rgba(14,165,233,0.2)",
-    ctaText: "#0284C7",
-    shadow: "rgba(14,165,233,0.1)",
-  },
-  {
-    bg: "linear-gradient(145deg, #EDFBF4 0%, #D5F2E4 100%)",
-    border: "rgba(110,200,155,0.3)",
-    cta: "rgba(16,185,129,0.09)",
-    ctaBorder: "rgba(16,185,129,0.2)",
-    ctaText: "#059669",
-    shadow: "rgba(16,185,129,0.1)",
-  },
-  {
-    bg: "linear-gradient(145deg, #F5F0FF 0%, #EAE0FF 100%)",
-    border: "rgba(167,139,250,0.3)",
-    cta: "rgba(139,92,246,0.09)",
-    ctaBorder: "rgba(139,92,246,0.2)",
-    ctaText: "#7C3AED",
-    shadow: "rgba(139,92,246,0.1)",
-  },
-  {
-    bg: "linear-gradient(145deg, #FFF5ED 0%, #FFE8D5 100%)",
-    border: "rgba(251,165,100,0.3)",
-    cta: "rgba(249,115,22,0.09)",
-    ctaBorder: "rgba(249,115,22,0.2)",
-    ctaText: "#EA580C",
-    shadow: "rgba(249,115,22,0.1)",
-  },
-];
-
 export default function InterventionCard({
   intervention,
-  index = 0,
   href,
   actionLabel = "Voir la fiche",
 }: Props) {
-  const p = PALETTES[index % PALETTES.length];
-
   return (
     <Link
       href={href || `/interventions/${intervention.slug}`}
       className="intervention-card group flex flex-col rounded-2xl overflow-hidden h-full"
       style={{
-        background: p.bg,
-        borderColor: p.border,
-        "--card-accent-border": p.border,
-        "--card-accent-shadow": `0 8px 32px ${p.shadow}`,
+        background: "#ffffff",
+        borderColor: "rgba(2, 132, 199, 0.16)",
+        "--card-accent-border": "rgba(2, 132, 199, 0.4)",
+        "--card-accent-shadow": "0 8px 28px rgba(2, 132, 199, 0.12)",
       } as React.CSSProperties}
     >
-      <div className="flex flex-col flex-1 p-5 sm:p-7">
-        {/* Titre */}
+      <div className="flex flex-col flex-1 p-6 sm:p-7">
         <h3
-          className="text-[19px] font-bold leading-snug mb-3"
-          style={{ fontFamily: "var(--font-heading)", color: "#0F172A", letterSpacing: "-0.01em" }}
+          className="text-[20px] font-bold leading-snug mb-3 text-foreground"
+          style={{ fontFamily: "var(--font-heading)", letterSpacing: "-0.01em" }}
         >
           {intervention.title}
         </h3>
 
-        {/* Sous-titre */}
-        <p className="text-[15px] leading-relaxed flex-1 mb-6" style={{ color: "#475569" }}>
+        <p
+          className="text-base leading-relaxed flex-1 mb-6"
+          style={{ color: "#475569" }}
+        >
           {intervention.subtitle}
         </p>
 
-        {/* CTA */}
         <div
-          className="flex items-center justify-between rounded-xl px-4 py-3"
+          className="flex items-center justify-between rounded-xl px-4 py-3.5"
           style={{
-            background: p.cta,
-            border: `1px solid ${p.ctaBorder}`,
+            background: "rgba(2, 132, 199, 0.06)",
+            border: "1px solid rgba(2, 132, 199, 0.18)",
+            minHeight: "48px",
           }}
         >
           <span
-            className="text-sm font-semibold"
-            style={{ color: p.ctaText, fontFamily: "var(--font-heading)" }}
+            className="text-base font-semibold"
+            style={{ color: "#0369A1", fontFamily: "var(--font-heading)" }}
           >
             {actionLabel}
           </span>
           <ArrowRight
             className="w-4 h-4 group-hover:translate-x-1 transition-transform"
-            style={{ color: p.ctaText }}
+            style={{ color: "#0369A1" }}
           />
         </div>
       </div>

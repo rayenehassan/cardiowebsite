@@ -14,7 +14,7 @@ export default async function HomePage() {
   return (
     <>
       {/* ── Hero ── */}
-      <section className="relative min-h-[85svh] sm:min-h-screen flex items-center mesh-bg overflow-hidden">
+      <section id="accueil" className="relative min-h-[85svh] sm:min-h-screen flex items-center mesh-bg overflow-hidden">
         <div className="relative w-full max-w-[1440px] mx-auto px-5 sm:px-8 py-14 sm:py-24">
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,700px)_460px] gap-10 lg:gap-16 lg:justify-center items-center">
 
@@ -22,19 +22,19 @@ export default async function HomePage() {
             <div>
               <div className="anim-fade-up mb-5 sm:mb-6">
                 <span className="section-label">
-                  <MapPin className="w-3 h-3" />
+                  <MapPin className="w-3.5 h-3.5" />
                   Hôpital Privé de la Loire, Saint-Étienne
                 </span>
               </div>
               <h1
-                className="anim-fade-up delay-100 text-[2.1rem] sm:text-5xl lg:text-[64px] font-bold leading-[1.08] sm:leading-[1.05] tracking-[-0.03em] mb-4 sm:mb-5 text-foreground"
+                className="anim-fade-up delay-100 text-[2.2rem] sm:text-5xl lg:text-[60px] font-bold leading-[1.1] sm:leading-[1.05] tracking-[-0.02em] mb-5 text-foreground"
                 style={{ fontFamily: "var(--font-heading)" }}
               >
                 Comprendre votre{" "}
-                <span className="text-gradient">intervention&nbsp;cardiaque</span>
+                <span style={{ color: "#0369A1" }}>intervention&nbsp;cardiaque</span>
               </h1>
 
-              <p className="anim-fade-up delay-200 text-base sm:text-lg text-muted leading-relaxed mb-7 sm:mb-8 max-w-lg">
+              <p className="anim-fade-up delay-200 text-lg sm:text-xl text-muted leading-relaxed mb-8 max-w-lg">
                 Votre cardiologue vous a proposé un geste interventionnel. Trouvez ici
                 toutes les informations pour vous préparer sereinement.
               </p>
@@ -62,11 +62,12 @@ export default async function HomePage() {
       </section>
 
       {/* ── Interventions ── */}
-      <section id="interventions" className="py-14 sm:py-24 lg:py-32 scroll-mt-16" style={{ background: "#F8FAFF" }}>
+      <section className="py-14 sm:py-24 lg:py-32" style={{ background: "#F8FAFF" }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div id="interventions" className="scroll-mt-24" aria-hidden="true" />
           <AnimateIn className="mb-8 sm:mb-14">
             <span className="section-label mb-4 sm:mb-5 inline-flex">
-              <BookOpen className="w-3 h-3" />
+              <BookOpen className="w-3.5 h-3.5" />
               Votre intervention
             </span>
             <h2
@@ -75,16 +76,16 @@ export default async function HomePage() {
             >
               Quelle est votre intervention ?
             </h2>
-            <p className="text-muted text-lg mt-4">
+            <p className="text-muted text-lg sm:text-xl mt-4">
               Trouvez la fiche correspondant à l&apos;intervention que vous allez avoir.
             </p>
-            <div className="flex flex-col gap-1.5 mt-3">
-              <span className="flex items-center gap-1.5 text-sm text-muted">
-                <Heart className="w-3.5 h-3.5 shrink-0" style={{ color: "#6366F1" }} />
+            <div className="flex flex-col gap-2 mt-4">
+              <span className="flex items-center gap-2 text-base text-muted">
+                <Heart className="w-4 h-4 shrink-0" style={{ color: "#0369A1" }} />
                 Fiches rédigées par des spécialistes en cardiologie interventionnelle.
               </span>
-              <span className="flex items-center gap-1.5 text-sm text-muted">
-                <Lock className="w-3.5 h-3.5 shrink-0" style={{ color: "#0284C7" }} />
+              <span className="flex items-center gap-2 text-base text-muted">
+                <Lock className="w-4 h-4 shrink-0" style={{ color: "#0369A1" }} />
                 Ni compte, ni cookie, ni tracking — visite strictement anonyme.
               </span>
             </div>
@@ -126,11 +127,12 @@ export default async function HomePage() {
       </section>
 
       {/* ── Équipe ── */}
-      <section id="equipe" className="py-14 sm:py-24 lg:py-32 bg-white scroll-mt-16">
+      <section className="py-14 sm:py-24 lg:py-32 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div id="equipe" className="scroll-mt-24" aria-hidden="true" />
           <AnimateIn className="mb-8 sm:mb-14">
             <span className="section-label mb-4 sm:mb-5 inline-flex">
-              <Users className="w-3 h-3" />
+              <Users className="w-3.5 h-3.5" />
               Votre équipe médicale
             </span>
             <h2
@@ -139,7 +141,7 @@ export default async function HomePage() {
             >
               Vos cardiologues
             </h2>
-            <p className="text-muted text-base sm:text-lg max-w-lg">
+            <p className="text-muted text-lg sm:text-xl max-w-lg">
               Des spécialistes en cardiologie interventionnelle à votre écoute à l&apos;Hôpital privé de la Loire.
             </p>
           </AnimateIn>
@@ -151,7 +153,10 @@ export default async function HomePage() {
               { name: "Dr Jeremy TERREAUX", photo: "/Jeremy%20Terreaux.jpg", email: "antoine@gmail.com",   tel: "04 71 88 82 22" },
             ].map(({ name, photo, email, tel }, i) => (
               <AnimateIn key={name} delay={i * 100}>
-                <div className="glass glass-hover rounded-2xl overflow-hidden">
+                <div
+                  className="rounded-2xl overflow-hidden border bg-white transition-shadow duration-200 hover:shadow-[0_8px_28px_rgba(15,23,42,0.08)]"
+                  style={{ borderColor: "rgba(15,23,42,0.08)" }}
+                >
                   <div className="relative h-56 sm:h-72 w-full">
                     <Image
                       src={photo}
@@ -165,27 +170,27 @@ export default async function HomePage() {
                   </div>
                   <div className="p-5 sm:p-6">
                     <h3
-                      className="font-semibold text-lg text-foreground mb-0.5"
+                      className="font-semibold text-xl text-foreground mb-1"
                       style={{ fontFamily: "var(--font-heading)" }}
                     >
                       {name}
                     </h3>
-                    <p className="text-sm text-muted mb-4">Cardiologie interventionnelle</p>
-                    <div className="space-y-2">
+                    <p className="text-base text-muted mb-4">Cardiologie interventionnelle</p>
+                    <div className="space-y-1">
                       <a
                         href={`tel:${tel.replace(/\s/g, "")}`}
-                        className="flex items-center gap-2 text-sm hover:text-primary transition-colors"
-                        style={{ color: "rgba(15,23,42,0.6)" }}
+                        className="flex items-center gap-2.5 text-base text-foreground hover:text-primary transition-colors py-2"
+                        style={{ minHeight: "44px" }}
                       >
-                        <Phone className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#0284C7" }} />
+                        <Phone className="w-5 h-5 flex-shrink-0" style={{ color: "#0369A1" }} />
                         {tel}
                       </a>
                       <a
                         href={`mailto:${email}`}
-                        className="flex items-center gap-2 text-sm hover:text-primary transition-colors"
-                        style={{ color: "rgba(15,23,42,0.6)" }}
+                        className="flex items-center gap-2.5 text-base text-foreground hover:text-primary transition-colors py-2 break-all"
+                        style={{ minHeight: "44px" }}
                       >
-                        <Mail className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#0284C7" }} />
+                        <Mail className="w-5 h-5 flex-shrink-0" style={{ color: "#0369A1" }} />
                         {email}
                       </a>
                     </div>
@@ -203,20 +208,20 @@ export default async function HomePage() {
         <div className="max-w-2xl mx-auto px-4 sm:px-6">
           <AnimateIn>
             <div
-              className="rounded-2xl p-5 sm:p-8 text-center border"
-              style={{ background: "#F0F6FF", borderColor: "rgba(2,132,199,0.12)" }}
+              className="rounded-2xl p-6 sm:p-8 text-center border"
+              style={{ background: "#F0F6FF", borderColor: "rgba(2,132,199,0.14)" }}
             >
               <h2
-                className="font-semibold text-base text-foreground mb-3"
+                className="font-semibold text-lg text-foreground mb-3"
                 style={{ fontFamily: "var(--font-heading)" }}
               >
                 Information importante
               </h2>
-              <p className="text-muted text-sm leading-relaxed">
+              <p className="text-base leading-relaxed" style={{ color: "#475569" }}>
                 Ce site fournit des informations générales sur les procédures de cardiologie
                 interventionnelle. Il ne remplace pas les explications personnalisées de votre
                 cardiologue. Pour toute question concernant votre situation, contactez
-                directement votre équipe médicale.
+                directement votre équipe médicale. En cas d&apos;urgence, composez le 15.
               </p>
             </div>
           </AnimateIn>
