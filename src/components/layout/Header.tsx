@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import { SiteBrand } from "@/types/site";
 
 const navLinks = [
   { href: "/#accueil", label: "Accueil" },
@@ -10,7 +11,11 @@ const navLinks = [
   { href: "/#equipe", label: "Équipe" },
 ];
 
-export default function Header() {
+interface Props {
+  brand: SiteBrand;
+}
+
+export default function Header({ brand }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -34,13 +39,13 @@ export default function Header() {
                   className="text-[15px] font-bold text-white"
                   style={{ fontFamily: "var(--font-heading)" }}
                 >
-                  Ramsay Santé
+                  {brand.name}
                 </p>
                 <p
                   className="text-[13px] font-medium"
                   style={{ fontFamily: "var(--font-heading)", color: "rgba(255,255,255,0.85)" }}
                 >
-                  Hôpital privé de la Loire
+                  {brand.subtitle}
                 </p>
               </div>
             </Link>

@@ -69,3 +69,79 @@ CREATE POLICY "public_read_published" ON interventions
   USING (status = 'published');
 
 -- Service role bypasses RLS automatically — no additional policy needed for admin
+
+
+-- ============================================================================
+-- CardioInfo — contenu éditable de la page d'accueil (singleton JSONB)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS site_content (
+  id          TEXT        PRIMARY KEY DEFAULT 'singleton',
+  data        JSONB       NOT NULL DEFAULT '{}',
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT site_content_singleton CHECK (id = 'singleton')
+);
+
+DROP TRIGGER IF EXISTS site_content_updated_at ON site_content;
+CREATE TRIGGER site_content_updated_at
+  BEFORE UPDATE ON site_content
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+ALTER TABLE site_content ENABLE ROW LEVEL SECURITY;
+
+-- Public : lecture libre (contenu d'accueil non sensible)
+DROP POLICY IF EXISTS "public_read_site_content" ON site_content;
+CREATE POLICY "public_read_site_content" ON site_content
+  FOR SELECT TO anon
+  USING (true);
+
+-- Initialisation singleton vide (les valeurs par défaut sont injectées par l'app
+-- depuis src/lib/site-defaults.ts si la ligne n'existe pas).
+INSERT INTO site_content (id, data)
+VALUES ('singleton', '{}'::jsonb)
+ON CONFLICT (id) DO NOTHING;
+
+
+-- ============================================================================
+-- CardioInfo — équipe médicale (cardiologues)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS doctors (
+  id             UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  display_order  INT         NOT NULL DEFAULT 0,
+  name           TEXT        NOT NULL,
+  subtitle       TEXT        NOT NULL DEFAULT 'Cardiologie interventionnelle',
+  phone          TEXT        NOT NULL DEFAULT '',
+  email          TEXT        NOT NULL DEFAULT '',
+  photo_url      TEXT        NOT NULL DEFAULT '',
+  status         TEXT        NOT NULL DEFAULT 'active'
+                              CHECK (status IN ('active', 'archived')),
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS doctors_status_order_idx
+  ON doctors (status, display_order);
+
+DROP TRIGGER IF EXISTS doctors_updated_at ON doctors;
+CREATE TRIGGER doctors_updated_at
+  BEFORE UPDATE ON doctors
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+ALTER TABLE doctors ENABLE ROW LEVEL SECURITY;
+
+-- Public : lecture libre des cardiologues actifs uniquement
+DROP POLICY IF EXISTS "public_read_doctors_active" ON doctors;
+CREATE POLICY "public_read_doctors_active" ON doctors
+  FOR SELECT TO anon
+  USING (status = 'active');
+
+-- Seed initial : 3 cardiologues actuels (photos locales /public).
+-- Ne s'exécute que si la table doctors est vide → safe à re-runner.
+INSERT INTO doctors (display_order, name, subtitle, phone, email, photo_url)
+SELECT * FROM (VALUES
+  (0, 'Dr Mustapha HASSAN', 'Cardiologie interventionnelle', '04 78 22 91 12', 'moustapha@gmail.com', '/Mustapha%20Hassan.jpg'),
+  (1, 'Dr Antoine GERBAY',  'Cardiologie interventionnelle', '04 72 81 93 12', 'jeremy@gmail.com',    '/Antoine%20Gerbay.jpg'),
+  (2, 'Dr Jeremy TERREAUX', 'Cardiologie interventionnelle', '04 71 88 82 22', 'antoine@gmail.com',   '/Jeremy%20Terreaux.jpg')
+) AS seed(display_order, name, subtitle, phone, email, photo_url)
+WHERE NOT EXISTS (SELECT 1 FROM doctors);

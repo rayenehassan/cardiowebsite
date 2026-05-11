@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Phone } from "lucide-react";
+import { SiteBrand, SiteFooter } from "@/types/site";
 
 const navLinks = [
   { href: "/#accueil", label: "Accueil" },
@@ -7,13 +8,18 @@ const navLinks = [
   { href: "/#equipe", label: "Équipe" },
 ];
 
-export default function Footer() {
+interface Props {
+  brand: SiteBrand;
+  footer: SiteFooter;
+}
+
+export default function Footer({ brand, footer }: Props) {
   return (
     <footer
       className="mt-auto border-t"
       style={{ background: "#F8FAFF", borderColor: "rgba(0,0,0,0.08)" }}
     >
-      {/* Urgence band */}
+      {/* Urgence band — numéro 15 SAMU figé en dur (sécurité médicale) */}
       <div
         className="border-b"
         style={{ background: "#ffffff", borderColor: "rgba(0,0,0,0.06)" }}
@@ -63,19 +69,18 @@ export default function Footer() {
                   className="text-base font-bold text-foreground"
                   style={{ fontFamily: "var(--font-heading)" }}
                 >
-                  Ramsay Santé
+                  {brand.name}
                 </p>
                 <p
                   className="text-sm text-muted"
                   style={{ fontFamily: "var(--font-heading)" }}
                 >
-                  Hôpital Privé de la Loire
+                  {brand.subtitle}
                 </p>
               </div>
             </div>
             <p className="text-base text-muted leading-relaxed">
-              Plateforme d&apos;information sur les procédures pratiquées par l&apos;équipe
-              de cardiologie interventionnelle de l&apos;Hôpital Privé de la Loire.
+              {footer.description}
             </p>
           </div>
 
@@ -111,17 +116,20 @@ export default function Footer() {
               Contact
             </h3>
             <address className="not-italic text-base text-muted space-y-1.5">
-              <p>Hôpital Privé de la Loire</p>
-              <p>Saint-Étienne, France</p>
-              <p>
-                <a
-                  href="tel:0478229112"
-                  className="hover:text-foreground transition-colors"
-                  style={{ minHeight: "44px", display: "inline-flex", alignItems: "center" }}
-                >
-                  Tél. : 04 78 22 91 12
-                </a>
-              </p>
+              {footer.contact.lines.map((line, i) => (
+                <p key={i}>{line}</p>
+              ))}
+              {footer.contact.phoneLabel && (
+                <p>
+                  <a
+                    href={footer.contact.phoneHref || `tel:${footer.contact.phoneLabel.replace(/\D/g, "")}`}
+                    className="hover:text-foreground transition-colors"
+                    style={{ minHeight: "44px", display: "inline-flex", alignItems: "center" }}
+                  >
+                    {footer.contact.phoneLabel}
+                  </a>
+                </p>
+              )}
             </address>
           </div>
 
@@ -133,10 +141,10 @@ export default function Footer() {
           style={{ borderColor: "rgba(0,0,0,0.07)" }}
         >
           <p className="text-sm text-muted">
-            Ce site ne collecte aucune donnée, n&apos;utilise pas de cookies et ne suit pas les visiteurs.
+            {footer.bottomNote}
           </p>
           <p className="text-sm text-muted">
-            &copy; {new Date().getFullYear()} Ramsay Santé · Hôpital Privé de la Loire
+            &copy; {new Date().getFullYear()} {brand.name} · {brand.subtitle}
           </p>
         </div>
       </div>

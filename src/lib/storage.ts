@@ -3,7 +3,7 @@ import { supabaseAdmin } from "./supabase";
 const BUCKET = "intervention-media";
 const SUPABASE_URL = process.env.SUPABASE_URL!;
 
-export type UploadKind = "image" | "video" | "document";
+export type UploadKind = "image" | "video" | "document" | "doctor";
 
 const CONFIG: Record<
   UploadKind,
@@ -26,6 +26,12 @@ const CONFIG: Record<
     mimes: ["application/pdf"],
     folder: "documents",
     label: "20 Mo",
+  },
+  doctor: {
+    maxBytes: 10 * 1024 * 1024,
+    mimes: ["image/jpeg", "image/png", "image/webp"],
+    folder: "doctors",
+    label: "10 Mo",
   },
 };
 

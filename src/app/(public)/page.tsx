@@ -1,15 +1,32 @@
 export const dynamic = "force-dynamic";
 
-import { Users, ArrowRight, Phone, Mail, BookOpen, MapPin, Heart, Lock } from "lucide-react";
+import { Users, ArrowRight, Phone, Mail, BookOpen, MapPin, Heart, Lock, Shield, UserRound } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import InterventionCard from "@/components/ui/InterventionCard";
 import InterventionSearch from "@/components/ui/InterventionSearch";
 import AnimateIn from "@/components/ui/AnimateIn";
 import { getPublishedInterventions } from "@/lib/interventions";
+import { getPublicSiteContent } from "@/lib/site-content";
+import { getPublicDoctors } from "@/lib/doctors";
+import { BadgeIcon } from "@/types/site";
+
+const BADGE_ICONS: Record<BadgeIcon, React.ElementType> = {
+  heart: Heart,
+  lock: Lock,
+  shield: Shield,
+  book: BookOpen,
+  users: Users,
+};
 
 export default async function HomePage() {
-  const interventions = await getPublishedInterventions();
+  const [interventions, content, doctors] = await Promise.all([
+    getPublishedInterventions(),
+    getPublicSiteContent(),
+    getPublicDoctors(),
+  ]);
+
+  const { hero, interventionsSection, teamSection, importantInfo } = content;
 
   return (
     <>
@@ -23,25 +40,24 @@ export default async function HomePage() {
               <div className="anim-fade-up mb-5 sm:mb-6">
                 <span className="section-label">
                   <MapPin className="w-3.5 h-3.5" />
-                  Hôpital Privé de la Loire, Saint-Étienne
+                  {hero.locationLabel}
                 </span>
               </div>
               <h1
                 className="anim-fade-up delay-100 text-[2.2rem] sm:text-5xl lg:text-[60px] font-bold leading-[1.1] sm:leading-[1.05] tracking-[-0.02em] mb-5 text-foreground"
                 style={{ fontFamily: "var(--font-heading)" }}
               >
-                Comprendre votre{" "}
-                <span style={{ color: "#0369A1" }}>intervention&nbsp;cardiaque</span>
+                {hero.titleBefore}{" "}
+                <span style={{ color: "#0369A1" }}>{hero.titleHighlight}</span>
               </h1>
 
               <p className="anim-fade-up delay-200 text-lg sm:text-xl text-muted leading-relaxed mb-8 max-w-lg">
-                Votre cardiologue vous a proposé un geste interventionnel. Trouvez ici
-                toutes les informations pour vous préparer sereinement.
+                {hero.subtitle}
               </p>
 
               <div className="anim-fade-up delay-300 flex flex-wrap items-center gap-4">
                 <Link href="/#interventions" className="btn-primary glow-btn">
-                  Voir les interventions
+                  {hero.ctaLabel}
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
@@ -68,27 +84,33 @@ export default async function HomePage() {
           <AnimateIn className="mb-8 sm:mb-14">
             <span className="section-label mb-4 sm:mb-5 inline-flex">
               <BookOpen className="w-3.5 h-3.5" />
-              Votre intervention
+              {interventionsSection.kicker}
             </span>
             <h2
               className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] mb-3 sm:mb-4 text-foreground"
               style={{ fontFamily: "var(--font-heading)" }}
             >
-              Quelle est votre intervention ?
+              {interventionsSection.title}
             </h2>
             <p className="text-muted text-lg sm:text-xl mt-4">
-              Trouvez la fiche correspondant à l&apos;intervention que vous allez avoir.
+              {interventionsSection.subtitle}
             </p>
-            <div className="flex flex-col gap-2 mt-4">
-              <span className="flex items-center gap-2 text-base text-muted">
-                <Heart className="w-4 h-4 shrink-0" style={{ color: "#0369A1" }} />
-                Fiches rédigées par des spécialistes en cardiologie interventionnelle.
-              </span>
-              <span className="flex items-center gap-2 text-base text-muted">
-                <Lock className="w-4 h-4 shrink-0" style={{ color: "#0369A1" }} />
-                Ni compte, ni cookie, ni tracking — visite strictement anonyme.
-              </span>
-            </div>
+            {interventionsSection.badges.length > 0 && (
+              <div className="flex flex-col gap-2 mt-4">
+                {interventionsSection.badges.map((badge, i) => {
+                  const Icon = BADGE_ICONS[badge.icon] ?? Heart;
+                  return (
+                    <span
+                      key={i}
+                      className="flex items-center gap-2 text-base text-muted"
+                    >
+                      <Icon className="w-4 h-4 shrink-0" style={{ color: "#0369A1" }} />
+                      {badge.label}
+                    </span>
+                  );
+                })}
+              </div>
+            )}
           </AnimateIn>
 
           {interventions.length > 0 ? (
@@ -133,72 +155,89 @@ export default async function HomePage() {
           <AnimateIn className="mb-8 sm:mb-14">
             <span className="section-label mb-4 sm:mb-5 inline-flex">
               <Users className="w-3.5 h-3.5" />
-              Votre équipe médicale
+              {teamSection.kicker}
             </span>
             <h2
               className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] mb-3 sm:mb-4 text-foreground"
               style={{ fontFamily: "var(--font-heading)" }}
             >
-              Vos cardiologues
+              {teamSection.title}
             </h2>
             <p className="text-muted text-lg sm:text-xl max-w-lg">
-              Des spécialistes en cardiologie interventionnelle à votre écoute à l&apos;Hôpital privé de la Loire.
+              {teamSection.subtitle}
             </p>
           </AnimateIn>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-8">
-            {[
-              { name: "Dr Mustapha HASSAN", photo: "/Mustapha%20Hassan.jpg", email: "moustapha@gmail.com", tel: "04 78 22 91 12" },
-              { name: "Dr Antoine GERBAY",  photo: "/Antoine%20Gerbay.jpg",  email: "jeremy@gmail.com",    tel: "04 72 81 93 12" },
-              { name: "Dr Jeremy TERREAUX", photo: "/Jeremy%20Terreaux.jpg", email: "antoine@gmail.com",   tel: "04 71 88 82 22" },
-            ].map(({ name, photo, email, tel }, i) => (
-              <AnimateIn key={name} delay={i * 100}>
-                <div
-                  className="rounded-2xl overflow-hidden border bg-white transition-shadow duration-200 hover:shadow-[0_8px_28px_rgba(15,23,42,0.08)]"
-                  style={{ borderColor: "rgba(15,23,42,0.08)" }}
-                >
-                  <div className="relative h-56 sm:h-72 w-full">
-                    <Image
-                      src={photo}
-                      alt={name}
-                      fill
-                      quality={85}
-                      sizes="(max-width: 640px) 100vw, 33vw"
-                      className="object-cover"
-                      style={{ objectPosition: "50% 25%" }}
-                    />
-                  </div>
-                  <div className="p-5 sm:p-6">
-                    <h3
-                      className="font-semibold text-xl text-foreground mb-1"
-                      style={{ fontFamily: "var(--font-heading)" }}
-                    >
-                      {name}
-                    </h3>
-                    <p className="text-base text-muted mb-4">Cardiologie interventionnelle</p>
-                    <div className="space-y-1">
-                      <a
-                        href={`tel:${tel.replace(/\s/g, "")}`}
-                        className="flex items-center gap-2.5 text-base text-foreground hover:text-primary transition-colors py-2"
-                        style={{ minHeight: "44px" }}
+          {doctors.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
+              {doctors.map((doctor, i) => (
+                <AnimateIn key={doctor.id} delay={i * 100}>
+                  <div
+                    className="rounded-2xl overflow-hidden border bg-white transition-shadow duration-200 hover:shadow-[0_8px_28px_rgba(15,23,42,0.08)] h-full flex flex-col"
+                    style={{ borderColor: "rgba(15,23,42,0.08)" }}
+                  >
+                    <div className="relative h-56 sm:h-72 w-full bg-surface flex items-center justify-center">
+                      {doctor.photoUrl ? (
+                        <Image
+                          src={doctor.photoUrl}
+                          alt={doctor.name}
+                          fill
+                          quality={85}
+                          sizes="(max-width: 640px) 100vw, 33vw"
+                          className="object-cover"
+                          style={{ objectPosition: "50% 25%" }}
+                        />
+                      ) : (
+                        <UserRound className="w-16 h-16 text-muted" aria-hidden="true" />
+                      )}
+                    </div>
+                    <div className="p-5 sm:p-6 flex-1">
+                      <h3
+                        className="font-semibold text-xl text-foreground mb-1"
+                        style={{ fontFamily: "var(--font-heading)" }}
                       >
-                        <Phone className="w-5 h-5 flex-shrink-0" style={{ color: "#0369A1" }} />
-                        {tel}
-                      </a>
-                      <a
-                        href={`mailto:${email}`}
-                        className="flex items-center gap-2.5 text-base text-foreground hover:text-primary transition-colors py-2 break-all"
-                        style={{ minHeight: "44px" }}
-                      >
-                        <Mail className="w-5 h-5 flex-shrink-0" style={{ color: "#0369A1" }} />
-                        {email}
-                      </a>
+                        {doctor.name}
+                      </h3>
+                      <p className="text-base text-muted mb-4">{doctor.subtitle}</p>
+                      <div className="space-y-1">
+                        {doctor.phone && (
+                          <a
+                            href={`tel:${doctor.phone.replace(/\s/g, "")}`}
+                            className="flex items-center gap-2.5 text-base text-foreground hover:text-primary transition-colors py-2"
+                            style={{ minHeight: "44px" }}
+                          >
+                            <Phone className="w-5 h-5 flex-shrink-0" style={{ color: "#0369A1" }} />
+                            {doctor.phone}
+                          </a>
+                        )}
+                        {doctor.email && (
+                          <a
+                            href={`mailto:${doctor.email}`}
+                            className="flex items-center gap-2.5 text-base text-foreground hover:text-primary transition-colors py-2 break-all"
+                            style={{ minHeight: "44px" }}
+                          >
+                            <Mail className="w-5 h-5 flex-shrink-0" style={{ color: "#0369A1" }} />
+                            {doctor.email}
+                          </a>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </AnimateIn>
-            ))}
-          </div>
+                </AnimateIn>
+              ))}
+            </div>
+          ) : (
+            <AnimateIn>
+              <div
+                className="rounded-2xl p-10 text-center border"
+                style={{ background: "#F8FAFF", borderColor: "rgba(2,132,199,0.1)" }}
+              >
+                <p className="text-sm text-muted">
+                  L&apos;équipe médicale sera bientôt présentée ici.
+                </p>
+              </div>
+            </AnimateIn>
+          )}
         </div>
       </section>
 
@@ -215,13 +254,10 @@ export default async function HomePage() {
                 className="font-semibold text-lg text-foreground mb-3"
                 style={{ fontFamily: "var(--font-heading)" }}
               >
-                Information importante
+                {importantInfo.title}
               </h2>
-              <p className="text-base leading-relaxed" style={{ color: "#475569" }}>
-                Ce site fournit des informations générales sur les procédures de cardiologie
-                interventionnelle. Il ne remplace pas les explications personnalisées de votre
-                cardiologue. Pour toute question concernant votre situation, contactez
-                directement votre équipe médicale. En cas d&apos;urgence, composez le 15.
+              <p className="text-base leading-relaxed whitespace-pre-line" style={{ color: "#475569" }}>
+                {importantInfo.body}
               </p>
             </div>
           </AnimateIn>

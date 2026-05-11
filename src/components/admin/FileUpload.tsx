@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { Upload, X, FileText, Film, ImageIcon, RotateCcw, AlertCircle } from "lucide-react";
 
-export type UploadKind = "image" | "video" | "document";
+export type UploadKind = "image" | "video" | "document" | "doctor";
 
 interface Props {
   kind: UploadKind;
@@ -33,6 +33,12 @@ const CONFIG: Record<
     hint: "PDF — max 20 Mo",
     maxMb: 20,
     Icon: FileText,
+  },
+  doctor: {
+    accept: "image/jpeg,image/png,image/webp",
+    hint: "Photo portrait — JPG, PNG ou WebP — max 10 Mo",
+    maxMb: 10,
+    Icon: ImageIcon,
   },
 };
 
@@ -138,7 +144,7 @@ export default function FileUpload({ kind, value, onChange, onClear }: Props) {
   if (value && !uploading) {
     return (
       <div className="rounded-xl border border-border overflow-hidden bg-white">
-        {kind === "image" && (
+        {(kind === "image" || kind === "doctor") && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={value}

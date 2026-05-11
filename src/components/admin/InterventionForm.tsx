@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Intervention, InterventionStatus, Section, SectionType } from "@/types/intervention";
+import { useBeforeUnload, useFormDraft } from "@/lib/use-form-draft";
+import DraftBanner from "./DraftBanner";
 import {
   Save,
   Plus,
@@ -109,6 +111,14 @@ const BASE_TEMPLATE: Section[] = [
   }),
 ];
 
+interface FormSnapshot {
+  title: string;
+  slug: string;
+  subtitle: string;
+  status: InterventionStatus;
+  sections: Section[];
+}
+
 export default function InterventionForm({ intervention, mode }: Props) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
@@ -128,6 +138,41 @@ export default function InterventionForm({ intervention, mode }: Props) {
   const [showPicker, setShowPicker] = useState(false);
   const [confirmTemplate, setConfirmTemplate] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+
+  // ── Brouillon localStorage + garde fermeture ──
+  const draftKey = `cardio-draft:intervention:${intervention?.id ?? "new"}`;
+  const snapshot: FormSnapshot = useMemo(
+    () => ({ title, slug, subtitle, status, sections }),
+    [title, slug, subtitle, status, sections]
+  );
+  const initialSnapshot = useMemo<FormSnapshot>(
+    () => ({
+      title: intervention?.title || "",
+      slug: intervention?.slug || "",
+      subtitle: intervention?.subtitle || "",
+      status: intervention?.status || "draft",
+      sections: intervention?.sections || [],
+    }),
+    [intervention]
+  );
+  const dirty = useMemo(
+    () => JSON.stringify(snapshot) !== JSON.stringify(initialSnapshot),
+    [snapshot, initialSnapshot]
+  );
+  useBeforeUnload(dirty);
+  const { existingDraft, clear: clearDraft, dismiss: dismissDraft } =
+    useFormDraft<FormSnapshot>(draftKey, snapshot);
+
+  function restoreDraft() {
+    if (!existingDraft) return;
+    const v = existingDraft.value;
+    setTitle(v.title || "");
+    setSlug(v.slug || "");
+    setSubtitle(v.subtitle || "");
+    setStatus(v.status || "draft");
+    setSections(Array.isArray(v.sections) ? v.sections : []);
+    dismissDraft();
+  }
 
   function loadTemplate() {
     setSections(BASE_TEMPLATE.map((s) => ({ ...s, id: `t-${Date.now()}-${Math.random().toString(36).slice(2)}` })));
@@ -272,10 +317,17 @@ export default function InterventionForm({ intervention, mode }: Props) {
         body: JSON.stringify(body),
       });
       if (!res.ok) {
-        const data = await res.json();
-        setError(data.error || "Échec de l'enregistrement");
+        const data = await res.json().catch(() => ({}));
+        if (res.status === 401) {
+          setError(
+            "Votre session a expiré. Votre brouillon est sauvegardé localement : reconnectez-vous puis rouvrez cette fiche pour le restaurer."
+          );
+        } else {
+          setError(data.error || "Échec de l'enregistrement");
+        }
         return;
       }
+      clearDraft();
       router.push("/admin/interventions");
       router.refresh();
     } catch {
@@ -658,6 +710,13 @@ export default function InterventionForm({ intervention, mode }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
+      {existingDraft && (
+        <DraftBanner
+          savedAt={existingDraft.savedAt}
+          onRestore={restoreDraft}
+          onIgnore={dismissDraft}
+        />
+      )}
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg p-3">
           {error}
@@ -729,9 +788,23 @@ export default function InterventionForm({ intervention, mode }: Props) {
           {sections.length > 0 && (
             confirmTemplate ? (
               <span className="flex items-center gap-2 text-xs">
-                <span className="text-muted">Remplacer le contenu par le modèle ?</span>
-                <button type="button" onClick={loadTemplate} className="text-danger font-medium hover:underline">Oui</button>
-                <button type="button" onClick={() => setConfirmTemplate(false)} className="text-muted hover:underline">Non</button>
+                <span className="text-danger font-medium">
+                  Cela supprimera toutes vos sections actuelles. Continuer ?
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setConfirmTemplate(false)}
+                  className="px-2 py-1 rounded-md text-xs font-medium text-muted bg-white border border-border hover:bg-surface transition-colors"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="button"
+                  onClick={loadTemplate}
+                  className="px-2 py-1 rounded-md text-xs font-semibold text-white bg-danger hover:opacity-85 transition-opacity"
+                >
+                  Effacer et charger le modèle
+                </button>
               </span>
             ) : (
               <button
@@ -739,7 +812,7 @@ export default function InterventionForm({ intervention, mode }: Props) {
                 onClick={() => setConfirmTemplate(true)}
                 className="text-xs text-muted hover:text-primary transition-colors"
               >
-                Charger le modèle de base
+                Effacer et charger le modèle de base
               </button>
             )
           )}

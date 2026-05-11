@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, FileText, LogOut, ExternalLink } from "lucide-react";
+import { LayoutDashboard, FileText, LogOut, ExternalLink, Home, Users } from "lucide-react";
 
 const navItems = [
   { href: "/admin/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
   { href: "/admin/interventions", label: "Interventions", icon: FileText },
+  { href: "/admin/page-accueil", label: "Page d'accueil", icon: Home },
+  { href: "/admin/equipe", label: "Équipe médicale", icon: Users },
 ];
 
 export default function AdminSidebar() {
@@ -44,7 +46,8 @@ export default function AdminSidebar() {
       {/* Navigation */}
       <nav className="flex-1 p-3 space-y-1">
         {navItems.map((item) => {
-          const active = pathname === item.href;
+          const active =
+            pathname === item.href || pathname.startsWith(`${item.href}/`);
           return (
             <Link
               key={item.href}
