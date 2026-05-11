@@ -17,7 +17,10 @@ import {
   FileText,
   HelpCircle,
   X,
+  Link as LinkIcon,
+  Folder,
 } from "lucide-react";
+import FileUpload from "./FileUpload";
 
 interface Props {
   intervention?: Intervention;
@@ -444,47 +447,81 @@ export default function InterventionForm({ intervention, mode }: Props) {
 
             {section.type === "video" && (
               <>
-                <div>
-                  <label className={labelClass}>URL de la vidéo</label>
-                  <input
-                    type="text"
-                    value={section.videoUrl || ""}
-                    onChange={(e) => updateSection(section.id, { videoUrl: e.target.value })}
-                    className={inputClass}
-                    placeholder="https://www.youtube.com/watch?v=..."
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>Plateforme</label>
-                  <select
-                    value={section.videoType || "youtube"}
-                    onChange={(e) =>
-                      updateSection(section.id, {
-                        videoType: e.target.value as Section["videoType"],
-                      })
-                    }
-                    className={inputClass}
+                {/* Onglets Fichier / Lien */}
+                <div className="flex items-center gap-1 p-1 bg-surface rounded-lg border border-border w-fit mb-1">
+                  <button
+                    type="button"
+                    onClick={() => updateSection(section.id, { videoType: "file", videoUrl: "" })}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                      (section.videoType ?? "youtube") === "file"
+                        ? "bg-white text-foreground shadow-sm"
+                        : "text-muted hover:text-foreground"
+                    }`}
                   >
-                    <option value="youtube">YouTube</option>
-                    <option value="vimeo">Vimeo</option>
-                    <option value="file">Fichier vidéo direct</option>
-                  </select>
+                    <Folder className="w-3 h-3" />
+                    Fichier
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => updateSection(section.id, { videoType: "youtube", videoUrl: "" })}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                      (section.videoType ?? "youtube") !== "file"
+                        ? "bg-white text-foreground shadow-sm"
+                        : "text-muted hover:text-foreground"
+                    }`}
+                  >
+                    <LinkIcon className="w-3 h-3" />
+                    Lien YouTube / Vimeo
+                  </button>
                 </div>
+
+                {(section.videoType ?? "youtube") === "file" ? (
+                  <FileUpload
+                    kind="video"
+                    value={section.videoUrl || undefined}
+                    onChange={(url) => updateSection(section.id, { videoUrl: url, videoType: "file" })}
+                    onClear={() => updateSection(section.id, { videoUrl: "", videoType: "file" })}
+                  />
+                ) : (
+                  <div className="space-y-3">
+                    <div>
+                      <label className={labelClass}>URL YouTube ou Vimeo</label>
+                      <input
+                        type="text"
+                        value={section.videoUrl || ""}
+                        onChange={(e) => updateSection(section.id, { videoUrl: e.target.value })}
+                        className={inputClass}
+                        placeholder="https://www.youtube.com/watch?v=..."
+                      />
+                    </div>
+                    <div>
+                      <label className={labelClass}>Plateforme</label>
+                      <select
+                        value={section.videoType || "youtube"}
+                        onChange={(e) =>
+                          updateSection(section.id, {
+                            videoType: e.target.value as Section["videoType"],
+                          })
+                        }
+                        className={inputClass}
+                      >
+                        <option value="youtube">YouTube</option>
+                        <option value="vimeo">Vimeo</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
               </>
             )}
 
             {section.type === "image" && (
               <>
-                <div>
-                  <label className={labelClass}>URL de l&apos;image</label>
-                  <input
-                    type="text"
-                    value={section.imageUrl || ""}
-                    onChange={(e) => updateSection(section.id, { imageUrl: e.target.value })}
-                    className={inputClass}
-                    placeholder="https://..."
-                  />
-                </div>
+                <FileUpload
+                  kind="image"
+                  value={section.imageUrl || undefined}
+                  onChange={(url) => updateSection(section.id, { imageUrl: url })}
+                  onClear={() => updateSection(section.id, { imageUrl: "" })}
+                />
                 <div>
                   <label className={labelClass}>Texte alternatif (accessibilité)</label>
                   <input
@@ -492,35 +529,21 @@ export default function InterventionForm({ intervention, mode }: Props) {
                     value={section.imageAlt || ""}
                     onChange={(e) => updateSection(section.id, { imageAlt: e.target.value })}
                     className={inputClass}
-                    placeholder="Description de l'image"
+                    placeholder="Description de l'image pour les lecteurs d'écran"
                   />
                 </div>
-                {section.imageUrl && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={section.imageUrl}
-                    alt={section.imageAlt || section.title}
-                    className="mt-2 rounded-lg border border-border max-h-48 object-cover w-full"
-                  />
-                )}
               </>
             )}
 
             {section.type === "document" && (
               <>
-                <div>
-                  <label className={labelClass}>URL du document</label>
-                  <input
-                    type="text"
-                    value={section.documentUrl || ""}
-                    onChange={(e) =>
-                      updateSection(section.id, { documentUrl: e.target.value })
-                    }
-                    className={inputClass}
-                    placeholder="https://..."
-                  />
-                </div>
-                <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
+                <FileUpload
+                  kind="document"
+                  value={section.documentUrl || undefined}
+                  onChange={(url) => updateSection(section.id, { documentUrl: url })}
+                  onClear={() => updateSection(section.id, { documentUrl: "" })}
+                />
+                <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer mt-1">
                   <input
                     type="checkbox"
                     checked={section.isPublic !== false}
