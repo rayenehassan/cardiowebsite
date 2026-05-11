@@ -39,6 +39,7 @@ export async function POST(request: NextRequest) {
       subtitle: body.subtitle || "",
       status: body.status || "draft",
       sections: body.sections || [],
+      quickFacts: body.quickFacts || [],
     });
 
     revalidatePath("/");

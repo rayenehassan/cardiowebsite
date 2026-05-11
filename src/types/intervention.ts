@@ -58,6 +58,11 @@ export interface FAQ {
 
 export type InterventionStatus = "draft" | "published" | "archived";
 
+export interface QuickFact {
+  label: string;
+  value: string;
+}
+
 export interface Intervention {
   id: string;
   slug: string;
@@ -65,6 +70,7 @@ export interface Intervention {
   subtitle: string;
   status: InterventionStatus;
   sections: Section[];
+  quickFacts: QuickFact[];
   createdAt: string;
   updatedAt: string;
 }

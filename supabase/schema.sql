@@ -9,9 +9,13 @@ CREATE TABLE IF NOT EXISTS interventions (
   status           TEXT        NOT NULL DEFAULT 'draft'
                                 CHECK (status IN ('draft', 'published', 'archived')),
   sections         JSONB       NOT NULL DEFAULT '[]',
+  quick_facts      JSONB       NOT NULL DEFAULT '[]',
   created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Migration : ajout de la colonne quick_facts — run once if upgrading:
+-- ALTER TABLE interventions ADD COLUMN IF NOT EXISTS quick_facts JSONB NOT NULL DEFAULT '[]';
 
 -- Migration : ajout du statut 'archived' (soft delete) — run once:
 -- ALTER TABLE interventions DROP CONSTRAINT IF EXISTS interventions_status_check;

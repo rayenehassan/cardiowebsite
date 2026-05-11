@@ -6,7 +6,7 @@ import Accordion from "@/components/ui/Accordion";
 import VideoEmbed from "@/components/ui/VideoEmbed";
 import InterventionSidebarNav from "@/components/ui/InterventionSidebarNav";
 import NextImage from "next/image";
-import { Download, ArrowLeft, FileText } from "lucide-react";
+import { Download, ArrowLeft, FileText, Clock, Syringe, BedDouble, CalendarCheck } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
 import type { Section } from "@/types/intervention";
@@ -17,6 +17,15 @@ interface Props {
 
 function sectionAnchor(section: Section, index: number): string {
   return `s-${index}-${section.id.slice(0, 6)}`;
+}
+
+function quickFactIcon(label: string) {
+  const l = label.toLowerCase();
+  if (l.includes("durée") || l.includes("duree")) return <Clock className="w-4 h-4" style={{ color: "#0284C7" }} />;
+  if (l.includes("anesth")) return <Syringe className="w-4 h-4" style={{ color: "#0284C7" }} />;
+  if (l.includes("hospital")) return <BedDouble className="w-4 h-4" style={{ color: "#0284C7" }} />;
+  if (l.includes("reprise") || l.includes("retour")) return <CalendarCheck className="w-4 h-4" style={{ color: "#0284C7" }} />;
+  return null;
 }
 
 function sectionHasContent(section: Section): boolean {
@@ -219,6 +228,43 @@ export default async function InterventionPage({ params }: Props) {
                 <p className="text-lg text-gray-500 leading-relaxed">{intervention.subtitle}</p>
               )}
             </div>
+
+            {/* Quick facts strip — top-of-page reassurance */}
+            {intervention.quickFacts.length > 0 && (
+              <div className="mb-10 pb-10 border-b border-gray-100">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-gray-200 rounded-xl overflow-hidden border border-gray-200">
+                  {intervention.quickFacts.map((fact, i) => {
+                    const icon = quickFactIcon(fact.label);
+                    return (
+                      <div key={i} className="bg-white p-4 flex items-start gap-3">
+                        {icon && (
+                          <div
+                            className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
+                            style={{ background: "rgba(56,189,248,0.1)", border: "1px solid rgba(56,189,248,0.18)" }}
+                          >
+                            {icon}
+                          </div>
+                        )}
+                        <div className="min-w-0">
+                          <p
+                            className="text-[11px] font-bold tracking-widest uppercase text-gray-400"
+                            style={{ fontFamily: "var(--font-heading)" }}
+                          >
+                            {fact.label}
+                          </p>
+                          <p
+                            className="text-base font-semibold text-gray-900 mt-0.5"
+                            style={{ fontFamily: "var(--font-heading)" }}
+                          >
+                            {fact.value}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Mobile nav — collapsible, collapsed by default */}
             {navItems.length > 0 && (

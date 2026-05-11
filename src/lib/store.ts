@@ -4,7 +4,7 @@
  */
 
 import { supabaseAdmin, supabasePublic } from "@/lib/supabase";
-import { Intervention, InterventionStatus, Section } from "@/types/intervention";
+import { Intervention, InterventionStatus, QuickFact, Section } from "@/types/intervention";
 
 interface Row {
   id: string;
@@ -13,12 +13,13 @@ interface Row {
   subtitle: string;
   status: string;
   sections: unknown;
+  quick_facts?: unknown;
   created_at: string;
   updated_at: string;
 }
 
 const FULL_SELECT =
-  "id, slug, title, subtitle, status, sections, created_at, updated_at";
+  "id, slug, title, subtitle, status, sections, quick_facts, created_at, updated_at";
 
 export class StoreError extends Error {
   constructor(
@@ -43,14 +44,14 @@ function asArray<T>(value: unknown): T[] {
 
 
 function toModel(row: Row): Intervention {
-  const sections = asArray<Section>(row.sections);
   return {
     id: row.id,
     slug: row.slug,
     title: row.title,
     subtitle: row.subtitle,
     status: row.status as InterventionStatus,
-    sections,
+    sections: asArray<Section>(row.sections),
+    quickFacts: asArray<QuickFact>(row.quick_facts),
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -64,6 +65,7 @@ function toRow(i: Intervention) {
     subtitle: i.subtitle,
     status: i.status,
     sections: i.sections,
+    quick_facts: i.quickFacts ?? [],
     created_at: i.createdAt,
     updated_at: i.updatedAt,
   };
@@ -159,6 +161,7 @@ export async function updateOne(
   if (patch.subtitle !== undefined) rowPatch.subtitle = patch.subtitle;
   if (patch.status !== undefined) rowPatch.status = patch.status;
   if (patch.sections !== undefined) rowPatch.sections = patch.sections;
+  if (patch.quickFacts !== undefined) rowPatch.quick_facts = patch.quickFacts;
   if (patch.updatedAt !== undefined) rowPatch.updated_at = patch.updatedAt;
 
   const { data, error } = await supabaseAdmin

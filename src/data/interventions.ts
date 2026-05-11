@@ -9,6 +9,12 @@ export const interventions: Intervention[] = [
     title: "Coronarographie",
     subtitle: "Examen d'imagerie des artères coronaires",
     status: "published",
+    quickFacts: [
+      { label: "Durée", value: "30 – 60 min" },
+      { label: "Anesthésie", value: "Locale" },
+      { label: "Hospitalisation", value: "1 nuit" },
+      { label: "Reprise activité", value: "J+1" },
+    ],
     sections: [
       {
         id: "s-overview",

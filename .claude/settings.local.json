@@ -1,7 +1,31 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm --no-turbopack)"
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm --no-turbopack)",
+      "Bash(mkdir:*)",
+      "Bash(npm install:*)",
+      "Bash(npx next:*)",
+      "Bash(npm run:*)",
+      "WebFetch(domain:localhost)",
+      "Bash(curl:*)",
+      "Bash(ls \"C:/Users/rayen/OneDrive/Desktop/cardiologie-webpage/.env\"*)",
+      "Bash(npx tsc:*)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\rayen\\\\OneDrive\\\\Desktop\\\\cardiologie-webpage\\\\src\\\\app\\\\admin\" -Recurse -Directory)",
+      "Bash(Select-Object FullName)",
+      "Bash(node -e \"console.log\\('/[̀-ͯ]/g'\\)\")",
+      "Bash(node -e ' *)",
+      "WebSearch",
+      "WebFetch(domain:css-tricks.com)",
+      "WebFetch(domain:service-manual.nhs.uk)",
+      "WebFetch(domain:www.mayoclinic.org)",
+      "WebFetch(domain:www.nhs.uk)",
+      "WebFetch(domain:www.vidal.fr)",
+      "Bash(node scripts/migrate-legacy-sections.js)",
+      "WebFetch(domain:medium.com)",
+      "WebFetch(domain:payloadcms.com)",
+      "Bash(git fetch *)",
+      "Bash(git pull *)",
+      "Bash(git add *)"
     ]
   }
 }
