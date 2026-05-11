@@ -38,8 +38,8 @@ function ToolbarButton({ onClick, active, title, children }: ToolbarButtonProps)
       title={title}
       className={`p-1.5 rounded-md transition-colors ${
         active
-          ? "bg-foreground text-white"
-          : "text-muted hover:text-foreground hover:bg-surface-alt"
+          ? "bg-gray-200 text-gray-900"
+          : "text-muted hover:text-foreground hover:bg-gray-100"
       }`}
     >
       {children}
