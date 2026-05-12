@@ -88,10 +88,10 @@ function renderSection(section: Section, index: number): React.ReactNode {
       return (
         <SectionCard key={section.id} {...cardProps}>
           {isHtml ? (
-            <div className="rich-text leading-[1.85] text-[18px]" style={{ color: "#334155" }}
+            <div className="rich-text leading-[1.65] text-[18px]" style={{ color: "#334155" }}
               dangerouslySetInnerHTML={{ __html: section.body || "" }} />
           ) : (
-            <p className="leading-[1.7] text-[18px]" style={{ color: "#334155" }}>
+            <p className="leading-[1.65] text-[18px]" style={{ color: "#334155" }}>
               <GlossaryText text={section.body || ""} />
             </p>
           )}
@@ -103,9 +103,9 @@ function renderSection(section: Section, index: number): React.ReactNode {
       const items = (section.items || []).filter((i) => i.trim());
       return (
         <SectionCard key={section.id} {...cardProps}>
-          <ul className="space-y-0 divide-y divide-gray-100">
+          <ul className="space-y-3">
             {items.map((item, i) => (
-              <li key={i} className="flex items-start gap-4 py-3.5">
+              <li key={i} className="flex items-start gap-4">
                 {section.ordered !== false ? (
                   <span
                     className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-sm font-bold mt-0.5"
