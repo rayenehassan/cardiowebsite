@@ -49,7 +49,7 @@ export default function InterventionSidebarNav({ items, collapsible = false }: P
           <a
             href={`#${item.id}`}
             onClick={() => collapsible && setOpen(false)}
-            className={`block px-3 py-2.5 rounded-lg text-base transition-colors ${
+            className={`block pl-0 pr-3 py-2.5 rounded-lg text-base transition-colors ${
               activeId === item.id
                 ? "bg-blue-50 font-semibold"
                 : "hover:bg-gray-100"

@@ -56,8 +56,8 @@ export default function Header({ brand }: Props) {
         className="border-b"
         style={{ background: "#0F172A", borderColor: "rgba(255,255,255,0.08)" }}
       >
-        <div className="max-w-[1440px] mx-auto px-5 sm:px-8">
-          <div className="max-w-[1224px] mx-auto flex items-center justify-between h-[64px]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-[64px]">
             {/* Logo */}
             <Link href="/" onClick={handleLogoClick} className="flex items-center gap-2.5 py-2">
               <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
