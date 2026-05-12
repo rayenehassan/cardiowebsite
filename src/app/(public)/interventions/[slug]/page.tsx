@@ -232,7 +232,7 @@ export default async function InterventionPage({ params }: Props) {
       <div className="sticky top-[64px] z-40 bg-white border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3">
           <Link
-            href="/"
+            href="/#interventions"
             className="inline-flex items-center gap-2 text-base text-foreground hover:text-primary transition-colors py-2"
             style={{ fontFamily: "var(--font-heading)", minHeight: "44px" }}
           >

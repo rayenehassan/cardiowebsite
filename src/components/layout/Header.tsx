@@ -1,14 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { SiteBrand } from "@/types/site";
 
 const navLinks = [
-  { href: "/#accueil", label: "Accueil" },
-  { href: "/#interventions", label: "Interventions" },
-  { href: "/#equipe", label: "Équipe" },
+  { hash: "accueil", label: "Accueil" },
+  { hash: "interventions", label: "Interventions" },
+  { hash: "equipe", label: "Équipe" },
 ];
 
 interface Props {
@@ -17,6 +18,37 @@ interface Props {
 
 export default function Header({ brand }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
+
+  function handleNavClick(e: React.MouseEvent<HTMLAnchorElement>, hash: string) {
+    setMenuOpen(false);
+    if (pathname !== "/") {
+      return;
+    }
+    e.preventDefault();
+    if (hash === "accueil") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      const el = document.getElementById(hash);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+    if (typeof window !== "undefined") {
+      window.history.replaceState(null, "", `/#${hash}`);
+    }
+  }
+
+  function handleLogoClick(e: React.MouseEvent<HTMLAnchorElement>) {
+    if (pathname === "/") {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.history.replaceState(null, "", "/");
+    } else {
+      router.push("/");
+    }
+  }
 
   return (
     <header className="sticky top-0 z-50">
@@ -24,10 +56,10 @@ export default function Header({ brand }: Props) {
         className="border-b"
         style={{ background: "#0F172A", borderColor: "rgba(255,255,255,0.08)" }}
       >
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-[64px]">
+        <div className="max-w-[1440px] mx-auto px-5 sm:px-8">
+          <div className="max-w-[1224px] mx-auto flex items-center justify-between h-[64px]">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 py-2">
+            <Link href="/" onClick={handleLogoClick} className="flex items-center gap-2.5 py-2">
               <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
                 <rect x="0"  y="0"  width="13" height="13" rx="1" fill="white"/>
                 <rect x="17" y="0"  width="13" height="13" rx="1" fill="white"/>
@@ -54,10 +86,11 @@ export default function Header({ brand }: Props) {
             <div className="flex items-center gap-2 sm:gap-3">
               {/* Desktop nav */}
               <nav className="hidden md:flex items-center gap-1">
-                {navLinks.map(({ href, label }) => (
+                {navLinks.map(({ hash, label }) => (
                   <Link
-                    key={href}
-                    href={href}
+                    key={hash}
+                    href={`/#${hash}`}
+                    onClick={(e) => handleNavClick(e, hash)}
                     className="px-4 py-3 text-[15px] font-medium rounded-lg transition-colors hover:bg-white/10 focus-visible:bg-white/10"
                     style={{
                       fontFamily: "var(--font-heading)",
@@ -90,16 +123,16 @@ export default function Header({ brand }: Props) {
               className="md:hidden pb-3 pt-2 flex flex-col gap-1 border-t"
               style={{ borderColor: "rgba(255,255,255,0.1)" }}
             >
-              {navLinks.map(({ href, label }) => (
+              {navLinks.map(({ hash, label }) => (
                 <Link
-                  key={href}
-                  href={href}
+                  key={hash}
+                  href={`/#${hash}`}
                   className="px-4 py-3 text-[16px] font-medium rounded-lg transition-colors hover:bg-white/10"
                   style={{
                     fontFamily: "var(--font-heading)",
                     color: "rgba(255,255,255,0.92)",
                   }}
-                  onClick={() => setMenuOpen(false)}
+                  onClick={(e) => handleNavClick(e, hash)}
                 >
                   {label}
                 </Link>
