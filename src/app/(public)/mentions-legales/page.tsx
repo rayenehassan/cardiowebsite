@@ -16,6 +16,8 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function MentionsLegalesPage() {
   const content = await getPublicSiteContent();
   const { legalNotice } = content;
+  const body = legalNotice.body || "";
+  const isHtml = body.trimStart().startsWith("<");
 
   return (
     <div className="bg-white min-h-screen">
@@ -36,12 +38,20 @@ export default async function MentionsLegalesPage() {
           {legalNotice.title}
         </h1>
 
-        <div
-          className="text-base leading-relaxed whitespace-pre-line"
-          style={{ color: "#334155" }}
-        >
-          {legalNotice.body}
-        </div>
+        {isHtml ? (
+          <div
+            className="rich-text text-base leading-relaxed"
+            style={{ color: "#334155" }}
+            dangerouslySetInnerHTML={{ __html: body }}
+          />
+        ) : (
+          <div
+            className="text-base leading-relaxed whitespace-pre-line"
+            style={{ color: "#334155" }}
+          >
+            {body}
+          </div>
+        )}
       </div>
     </div>
   );

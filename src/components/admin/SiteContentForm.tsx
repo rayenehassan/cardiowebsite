@@ -24,6 +24,21 @@ import {
 import { DEFAULT_SITE_CONTENT } from "@/lib/site-defaults";
 import { useBeforeUnload, useFormDraft } from "@/lib/use-form-draft";
 import DraftBanner from "./DraftBanner";
+import RichTextEditor from "./RichTextEditor";
+
+/**
+ * Convertit un texte brut (legacy) en HTML basique pour Tiptap : double saut
+ * de ligne = paragraphe, saut simple = <br>. Si l'entrée est déjà du HTML
+ * (commence par `<`), retourne tel quel.
+ */
+function plainToHtml(text: string): string {
+  if (!text) return "";
+  if (text.trimStart().startsWith("<")) return text;
+  return text
+    .split(/\n{2,}/)
+    .map((para) => `<p>${para.trim().replace(/\n/g, "<br>")}</p>`)
+    .join("");
+}
 
 interface Props {
   initial: SiteContent;
@@ -778,18 +793,19 @@ export default function SiteContentForm({ initial }: Props) {
                 Contenu (obligatoire en France — éditeur, directeur de publication,
                 hébergeur, données personnelles, etc.)
               </label>
-              <textarea
-                value={content.legalNotice.body}
-                onChange={(e) =>
+              <RichTextEditor
+                value={plainToHtml(content.legalNotice.body)}
+                onChange={(html) =>
                   patch("legalNotice", {
                     ...content.legalNotice,
-                    body: e.target.value,
+                    body: html,
                   })
                 }
-                className={inputClass + " min-h-[300px] font-mono text-xs"}
+                placeholder="Saisissez les mentions légales…"
+                minHeight="320px"
               />
               <p className="text-xs text-muted mt-1.5">
-                Les sauts de ligne sont préservés. Page publique :{" "}
+                Gras, italique, listes disponibles. Page publique :{" "}
                 <a
                   href="/mentions-legales"
                   target="_blank"

@@ -58,36 +58,15 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
   },
   legalNotice: {
     title: "Mentions légales",
-    body: `Éditeur du site
-Hôpital Privé de la Loire — Ramsay Santé
-Adresse : [à compléter]
-Téléphone : 04 78 22 91 12
-Email : [à compléter]
-
-Directeur de la publication
-[Nom et titre du responsable médical à compléter]
-
-Hébergement
-Vercel Inc.
-340 S Lemon Ave #4133, Walnut, CA 91789, États-Unis
-https://vercel.com
-
-Base de données et stockage
-Supabase Inc.
-970 Toa Payoh North #07-04, Singapore 318992
-https://supabase.com
-
-Propriété intellectuelle
-L'ensemble des contenus présents sur ce site (textes, images, vidéos, documents) est protégé par le droit d'auteur. Toute reproduction, même partielle, est interdite sans autorisation préalable.
-
-Données personnelles
-Ce site ne collecte aucune donnée personnelle des visiteurs. Aucun cookie de traçage, aucune analyse de fréquentation, aucun fingerprinting n'est mis en œuvre. Les informations affichées sont identiques pour tous les visiteurs.
-
-Responsabilité
-Les informations diffusées sur ce site sont fournies à titre indicatif et ne se substituent pas à une consultation médicale. En cas d'urgence, composez le 15.
-
-Droit applicable
-Le présent site est soumis au droit français. En cas de litige, les tribunaux français seront seuls compétents.`,
+    body:
+      "<p><strong>Éditeur du site</strong><br>Hôpital Privé de la Loire — Ramsay Santé<br>Adresse : [à compléter]<br>Téléphone : 04 78 22 91 12<br>Email : [à compléter]</p>" +
+      "<p><strong>Directeur de la publication</strong><br>[Nom et titre du responsable médical à compléter]</p>" +
+      "<p><strong>Hébergement</strong><br>Vercel Inc.<br>340 S Lemon Ave #4133, Walnut, CA 91789, États-Unis<br>https://vercel.com</p>" +
+      "<p><strong>Base de données et stockage</strong><br>Supabase Inc.<br>970 Toa Payoh North #07-04, Singapore 318992<br>https://supabase.com</p>" +
+      "<p><strong>Propriété intellectuelle</strong><br>L'ensemble des contenus présents sur ce site (textes, images, vidéos, documents) est protégé par le droit d'auteur. Toute reproduction, même partielle, est interdite sans autorisation préalable.</p>" +
+      "<p><strong>Données personnelles</strong><br>Ce site ne collecte aucune donnée personnelle des visiteurs. Aucun cookie de traçage, aucune analyse de fréquentation, aucun fingerprinting n'est mis en œuvre. Les informations affichées sont identiques pour tous les visiteurs.</p>" +
+      "<p><strong>Responsabilité</strong><br>Les informations diffusées sur ce site sont fournies à titre indicatif et ne se substituent pas à une consultation médicale. En cas d'urgence, composez le 15.</p>" +
+      "<p><strong>Droit applicable</strong><br>Le présent site est soumis au droit français. En cas de litige, les tribunaux français seront seuls compétents.</p>",
   },
 };
 
