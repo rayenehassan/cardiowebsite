@@ -720,7 +720,7 @@ export default function InterventionForm({ intervention, mode }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-5xl">
       {existingDraft && (
         <DraftBanner
           savedAt={existingDraft.savedAt}

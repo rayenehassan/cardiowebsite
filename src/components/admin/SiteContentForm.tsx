@@ -317,7 +317,7 @@ export default function SiteContentForm({ initial }: Props) {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5 max-w-3xl">
+    <form onSubmit={handleSubmit} className="space-y-5 max-w-5xl">
       {existingDraft && (
         <DraftBanner
           savedAt={existingDraft.savedAt}

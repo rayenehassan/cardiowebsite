@@ -120,7 +120,7 @@ export default function DoctorForm({ doctor, mode }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl">
       {existingDraft && (
         <DraftBanner
           savedAt={existingDraft.savedAt}
