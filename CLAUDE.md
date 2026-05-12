@@ -59,7 +59,7 @@ Plateforme française d'information pré-interventionnelle en cardiologie. Le si
 - Public patient : `src/app/(public)`. Le layout charge `site_content` et passe `brand` au Header / `brand + footer` au Footer.
 - Accueil : recherche d'interventions, liste des fiches publiées, équipe médicale (lue depuis `doctors`), disclaimer.
 - Page intervention : rendu dynamique des sections, navigation latérale, `quickFacts`, glossaire médical, documents publics seulement.
-- Mentions légales : `src/app/(public)/mentions-legales` rend `legalNotice` du `site_content`. Lien dans le footer.
+- Mentions légales : `src/app/(public)/mentions-legales` rend `legalNotice.body` (HTML) du `site_content` via `dangerouslySetInnerHTML`. Lien dans le footer.
 - Admin : `src/app/admin/(protected)` avec vérification JWT dans le layout serveur.
   - Interventions : `interventions/` + `interventions/[id]` + `interventions/new`. API : `src/app/api/admin/interventions[/...]`.
   - Équipe : `equipe/` + `equipe/[id]` + `equipe/nouveau`. API : `src/app/api/admin/doctors[/...]` (`reorder`, `archived` inclus).
@@ -70,7 +70,7 @@ Plateforme française d'information pré-interventionnelle en cardiologie. Le si
 
 ## Admin Et Contenu
 
-- `InterventionForm` gère la création/édition avec constructeur de sections, réordonnancement, modèle de base et Tiptap. `DoctorForm` édite un cardiologue. `SiteContentForm` édite le singleton.
+- `InterventionForm` gère la création/édition avec constructeur de sections, réordonnancement, modèle de base et Tiptap (corps de section, items de liste, réponses FAQ). `DoctorForm` édite un cardiologue. `SiteContentForm` édite le singleton ; le champ `legalNotice.body` utilise Tiptap, helper `plainToHtml` convertit l'ancien texte brut à la volée pour les lignes historiques.
 - Les statuts admin sont `draft` et `published`; `archived` est utilisé pour la suppression douce (interventions et cardiologues).
 - Archive/restauration : `DELETE /api/admin/interventions/[id]` ou `/doctors/[id]` archive ; `PATCH` restaure.
 - Après mutation d'une intervention : revalider `/` et `/interventions/{slug}` concernées. Après mutation de `doctors` ou `site_content` : revalider `/`.
