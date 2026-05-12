@@ -22,7 +22,7 @@ export default function AdminSidebar() {
   }
 
   return (
-    <aside className="w-64 flex flex-col min-h-screen shrink-0" style={{ background: "#0F172A" }}>
+    <aside className="w-64 flex flex-col sticky top-0 h-screen shrink-0" style={{ background: "#0F172A" }}>
       {/* Logo */}
       <div className="p-5 border-b" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
         <Link href="/admin/dashboard" className="flex items-center gap-3">
