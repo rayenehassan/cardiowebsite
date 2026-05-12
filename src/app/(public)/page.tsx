@@ -83,7 +83,12 @@ export default async function HomePage() {
       </section>
 
       {/* ── Interventions ── */}
-      <section className="py-14 sm:py-24 lg:py-32" style={{ background: "#F8FAFF" }}>
+      <section
+        className="py-14 sm:py-24 lg:py-32"
+        style={{
+          background: "linear-gradient(to bottom, transparent 75%, #ffffff 100%), #F8FAFF",
+        }}
+      >
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div id="interventions" className="scroll-mt-24" aria-hidden="true" />
           <AnimateIn className="mb-8 sm:mb-14">
