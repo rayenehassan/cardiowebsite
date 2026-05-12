@@ -17,10 +17,10 @@ export default function InterventionCard({
   return (
     <Link
       href={href || `/interventions/${intervention.slug}`}
-      className="intervention-card group flex flex-col rounded-2xl overflow-hidden h-full"
+      className="intervention-card group flex flex-col rounded-2xl overflow-hidden h-full w-full"
       style={{
-        background: "#ffffff",
-        borderColor: "rgba(2, 132, 199, 0.16)",
+        background: "#EEF4FF",
+        borderColor: "rgba(2, 132, 199, 0.22)",
         "--card-accent-border": "rgba(2, 132, 199, 0.4)",
         "--card-accent-shadow": "0 8px 28px rgba(2, 132, 199, 0.12)",
       } as React.CSSProperties}
@@ -43,8 +43,8 @@ export default function InterventionCard({
         <div
           className="flex items-center justify-between rounded-xl px-4 py-3.5"
           style={{
-            background: "rgba(2, 132, 199, 0.06)",
-            border: "1px solid rgba(2, 132, 199, 0.18)",
+            background: "#ffffff",
+            border: "1px solid rgba(2, 132, 199, 0.22)",
             minHeight: "48px",
           }}
         >
