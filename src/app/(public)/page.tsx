@@ -48,7 +48,12 @@ export default async function HomePage() {
                 style={{ fontFamily: "var(--font-heading)" }}
               >
                 {hero.titleBefore}{" "}
-                <span style={{ color: "#0369A1" }}>{hero.titleHighlight}</span>
+                <span style={{
+                  background: "linear-gradient(135deg, #FB7185 0%, #F43F5E 50%, #E879A0 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}>{hero.titleHighlight}</span>
               </h1>
 
               <p className="anim-fade-up delay-200 text-lg sm:text-xl text-muted leading-relaxed mb-8 max-w-lg">
@@ -104,7 +109,7 @@ export default async function HomePage() {
                       key={i}
                       className="flex items-center gap-2 text-base text-muted"
                     >
-                      <Icon className="w-4 h-4 shrink-0" style={{ color: "#0369A1" }} />
+                      <Icon className="w-4 h-4 shrink-0" style={{ color: badge.icon === "heart" ? "#F43F5E" : "#0369A1" }} />
                       {badge.label}
                     </span>
                   );
@@ -248,7 +253,7 @@ export default async function HomePage() {
           <AnimateIn>
             <div
               className="rounded-2xl p-6 sm:p-8 text-center border"
-              style={{ background: "#F0F6FF", borderColor: "rgba(2,132,199,0.14)" }}
+              style={{ background: "#FFF5F7", borderColor: "rgba(244,63,94,0.12)" }}
             >
               <h2
                 className="font-semibold text-lg text-foreground mb-3"
