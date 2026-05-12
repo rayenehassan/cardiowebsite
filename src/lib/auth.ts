@@ -1,9 +1,27 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import bcrypt from "bcryptjs";
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "cardioinfo-dev-secret-change-in-production"
-);
+// ── Secrets serveur ─────────────────────────────────────────────────────────
+// JWT_SECRET et ADMIN_PASSWORD_HASH doivent impérativement être fournis en
+// variables d'environnement. Les fallbacks ont été supprimés : un secret par
+// défaut connu publiquement permettrait à n'importe qui de forger un JWT.
+
+const JWT_SECRET_RAW = process.env.JWT_SECRET;
+if (!JWT_SECRET_RAW) {
+  throw new Error(
+    "JWT_SECRET manquant. Définissez la variable d'environnement avant de démarrer l'application."
+  );
+}
+const JWT_SECRET = new TextEncoder().encode(JWT_SECRET_RAW);
+
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
+const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH;
+if (!ADMIN_USERNAME || !ADMIN_PASSWORD_HASH) {
+  throw new Error(
+    "ADMIN_USERNAME et ADMIN_PASSWORD_HASH (bcrypt) doivent être définis."
+  );
+}
 
 const ADMIN_PAGE_COOKIE_NAME = "cardioinfo-admin-page-token";
 const ADMIN_API_COOKIE_NAME = "cardioinfo-admin-api-token";
@@ -11,20 +29,16 @@ const LEGACY_COOKIE_NAME = "cardioinfo-admin-token";
 const ADMIN_PAGE_COOKIE_PATH = "/admin";
 const ADMIN_API_COOKIE_PATH = "/api/admin";
 
-// Identifiants admin mock ; à remplacer par une recherche en BDD plus tard
-const ADMIN_CREDENTIALS = {
-  username: "admin",
-  password: "cardio2025",
-};
-
 export async function verifyCredentials(
   username: string,
   password: string
 ): Promise<boolean> {
-  return (
-    username === ADMIN_CREDENTIALS.username &&
-    password === ADMIN_CREDENTIALS.password
-  );
+  if (username !== ADMIN_USERNAME) return false;
+  try {
+    return await bcrypt.compare(password, ADMIN_PASSWORD_HASH!);
+  } catch {
+    return false;
+  }
 }
 
 export async function createToken(username: string): Promise<string> {

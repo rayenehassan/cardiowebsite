@@ -10,6 +10,7 @@ Plateforme française d'information pré-interventionnelle en cardiologie. Le si
 - `npm run lint` : ESLint.
 - `npm run build` : build de production.
 - Avant livraison d'un changement de code, lancer `npm run lint` puis `npm run build` si l'environnement le permet.
+- Backups et restauration : voir `docs/BACKUPS.md`.
 
 ## Stack
 
@@ -42,7 +43,7 @@ Plateforme française d'information pré-interventionnelle en cardiologie. Le si
 - `status` intervention : `draft`, `published` ou `archived`. `sections` types : `text`, `list`, `video`, `image`, `document`, `faqs`.
 - `quickFacts` affiché publiquement mais non édité par le form actuel : préserver sauf changement explicite.
 - `Doctor` (`src/types/doctor.ts`) : équipe médicale éditable, soft delete via `status` (`active`/`archived`), ordre via `display_order`. RLS public filtre `status = 'active'`.
-- `SiteContent` (`src/types/site.ts`) : singleton JSONB (`id = 'singleton'`) pour textes éditables de la page d'accueil. Champs manquants comblés par `mergeSiteContent` depuis `src/lib/site-defaults.ts`.
+- `SiteContent` (`src/types/site.ts`) : singleton JSONB (`id = 'singleton'`) pour textes éditables de la page d'accueil (hero, sections, footer, mentions légales). Champs manquants comblés par `mergeSiteContent` depuis `src/lib/site-defaults.ts`.
 - `src/data/interventions.ts` est une fixture de référence seulement. Ne pas réintroduire de fallback runtime mock, JSON ou fichier si Supabase échoue.
 
 ## Accès Aux Données
@@ -58,6 +59,7 @@ Plateforme française d'information pré-interventionnelle en cardiologie. Le si
 - Public patient : `src/app/(public)`. Le layout charge `site_content` et passe `brand` au Header / `brand + footer` au Footer.
 - Accueil : recherche d'interventions, liste des fiches publiées, équipe médicale (lue depuis `doctors`), disclaimer.
 - Page intervention : rendu dynamique des sections, navigation latérale, `quickFacts`, glossaire médical, documents publics seulement.
+- Mentions légales : `src/app/(public)/mentions-legales` rend `legalNotice` du `site_content`. Lien dans le footer.
 - Admin : `src/app/admin/(protected)` avec vérification JWT dans le layout serveur.
   - Interventions : `interventions/` + `interventions/[id]` + `interventions/new`. API : `src/app/api/admin/interventions[/...]`.
   - Équipe : `equipe/` + `equipe/[id]` + `equipe/nouveau`. API : `src/app/api/admin/doctors[/...]` (`reorder`, `archived` inclus).
@@ -79,10 +81,12 @@ Plateforme française d'information pré-interventionnelle en cardiologie. Le si
 
 ## Variables D'environnement
 
-- Requises en production : `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `JWT_SECRET`.
+- Requises en production : `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `JWT_SECRET`, `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`.
 - Recommandée : `SUPABASE_ANON_KEY` pour que les lectures publiques bénéficient des policies RLS.
+- `JWT_SECRET` n'a plus de fallback : l'app refuse de démarrer si absente.
+- `ADMIN_PASSWORD_HASH` est un hash bcrypt généré avec `node -e "console.log(require('bcryptjs').hashSync('MOT_DE_PASSE', 10))"`. Le mot de passe en clair ne doit jamais être commité.
 - Le bucket Storage `intervention-media` doit exister et être compatible avec les URLs publiques utilisées par le rendu patient.
-- Les identifiants admin actuels sont centralisés dans `src/lib/auth.ts`; toute évolution auth doit partir de ce module.
+- Tout changement d'identifiant admin se fait via `ADMIN_USERNAME` / `ADMIN_PASSWORD_HASH` sur Vercel + `.env.local`; `src/lib/auth.ts` ne contient plus aucun secret.
 
 ## Conventions De Développement
 

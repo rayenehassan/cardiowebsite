@@ -48,6 +48,11 @@ export interface SiteFooter {
   bottomNote: string;
 }
 
+export interface SiteLegalNotice {
+  title: string;
+  body: string;
+}
+
 export interface SiteContent {
   brand: SiteBrand;
   hero: SiteHero;
@@ -55,4 +60,5 @@ export interface SiteContent {
   teamSection: SiteTeamSection;
   importantInfo: SiteImportantInfo;
   footer: SiteFooter;
+  legalNotice: SiteLegalNotice;
 }

@@ -143,9 +143,17 @@ export default function Footer({ brand, footer }: Props) {
           <p className="text-sm text-muted">
             {footer.bottomNote}
           </p>
-          <p className="text-sm text-muted">
-            &copy; {new Date().getFullYear()} {brand.name} · {brand.subtitle}
-          </p>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+            <Link
+              href="/mentions-legales"
+              className="text-sm text-muted hover:text-foreground transition-colors"
+            >
+              Mentions légales
+            </Link>
+            <p className="text-sm text-muted">
+              &copy; {new Date().getFullYear()} {brand.name} · {brand.subtitle}
+            </p>
+          </div>
         </div>
       </div>
     </footer>

@@ -56,7 +56,8 @@ type SectionKey =
   | "interventionsSection"
   | "teamSection"
   | "importantInfo"
-  | "footer";
+  | "footer"
+  | "legalNotice";
 
 const SECTION_LABEL: Record<SectionKey, string> = {
   brand: "Marque (en-tête et pied de page)",
@@ -65,6 +66,7 @@ const SECTION_LABEL: Record<SectionKey, string> = {
   teamSection: "Section équipe médicale",
   importantInfo: "Information importante",
   footer: "Pied de page",
+  legalNotice: "Mentions légales",
 };
 
 function moveItem<T>(arr: T[], index: number, dir: "up" | "down"): T[] {
@@ -747,6 +749,56 @@ export default function SiteContentForm({ initial }: Props) {
                 }
                 className={inputClass + " min-h-[60px]"}
               />
+            </div>
+          </div>
+        )}
+      </fieldset>
+
+      {/* Legal Notice */}
+      <fieldset className="bg-white rounded-xl border border-border overflow-hidden">
+        <SectionHeader {...headerProps("legalNotice")} />
+        {!collapsed.has("legalNotice") && (
+          <div className="p-5 space-y-4">
+            <div>
+              <label className={labelClass}>Titre de la page</label>
+              <input
+                type="text"
+                value={content.legalNotice.title}
+                onChange={(e) =>
+                  patch("legalNotice", {
+                    ...content.legalNotice,
+                    title: e.target.value,
+                  })
+                }
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className={labelClass}>
+                Contenu (obligatoire en France — éditeur, directeur de publication,
+                hébergeur, données personnelles, etc.)
+              </label>
+              <textarea
+                value={content.legalNotice.body}
+                onChange={(e) =>
+                  patch("legalNotice", {
+                    ...content.legalNotice,
+                    body: e.target.value,
+                  })
+                }
+                className={inputClass + " min-h-[300px] font-mono text-xs"}
+              />
+              <p className="text-xs text-muted mt-1.5">
+                Les sauts de ligne sont préservés. Page publique :{" "}
+                <a
+                  href="/mentions-legales"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-foreground"
+                >
+                  /mentions-legales ↗
+                </a>
+              </p>
             </div>
           </div>
         )}
