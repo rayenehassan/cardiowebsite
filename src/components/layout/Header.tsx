@@ -59,23 +59,25 @@ export default function Header({ brand }: Props) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-[64px]">
             {/* Logo */}
-            <Link href="/" onClick={handleLogoClick} className="flex items-center gap-2.5 py-2">
-              <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+            <Link href="/" onClick={handleLogoClick} className="flex items-center gap-2.5 py-2 min-w-0 flex-shrink">
+              <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true" className="shrink-0">
                 <rect x="0"  y="0"  width="13" height="13" rx="1" fill="white"/>
                 <rect x="17" y="0"  width="13" height="13" rx="1" fill="white"/>
                 <rect x="0"  y="17" width="13" height="13" rx="1" fill="white"/>
                 <polygon points="17,17 30,17 17,30" fill="white"/>
               </svg>
-              <div className="leading-tight">
+              <div className="leading-tight min-w-0">
                 <p
-                  className="text-[15px] font-bold text-white"
+                  className="text-[15px] font-bold text-white truncate"
                   style={{ fontFamily: "var(--font-heading)" }}
+                  title={brand.name}
                 >
                   {brand.name}
                 </p>
                 <p
-                  className="text-[13px] font-medium"
+                  className="text-[13px] font-medium truncate"
                   style={{ fontFamily: "var(--font-heading)", color: "rgba(255,255,255,0.85)" }}
+                  title={brand.subtitle}
                 >
                   {brand.subtitle}
                 </p>

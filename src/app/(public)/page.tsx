@@ -38,9 +38,9 @@ export default async function HomePage() {
             {/* ── Colonne gauche : texte ── */}
             <div>
               <div className="anim-fade-up mb-5 sm:mb-6">
-                <span className="section-label">
+                <span className="section-label" title={hero.locationLabel}>
                   <MapPin className="w-3.5 h-3.5" />
-                  {hero.locationLabel}
+                  <span className="section-label-text">{hero.locationLabel}</span>
                 </span>
               </div>
               <h1
@@ -87,9 +87,9 @@ export default async function HomePage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div id="interventions" className="scroll-mt-24" aria-hidden="true" />
           <AnimateIn className="mb-8 sm:mb-14">
-            <span className="section-label mb-4 sm:mb-5 inline-flex">
+            <span className="section-label mb-4 sm:mb-5 inline-flex" title={interventionsSection.kicker}>
               <BookOpen className="w-3.5 h-3.5" />
-              {interventionsSection.kicker}
+              <span className="section-label-text">{interventionsSection.kicker}</span>
             </span>
             <h2
               className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] mb-3 sm:mb-4 text-foreground"
@@ -97,11 +97,11 @@ export default async function HomePage() {
             >
               {interventionsSection.title}
             </h2>
-            <p className="text-muted text-lg sm:text-xl mt-4">
+            <p className="text-muted text-lg sm:text-xl mt-4 max-w-2xl">
               {interventionsSection.subtitle}
             </p>
             {interventionsSection.badges.length > 0 && (
-              <div className="flex flex-col gap-2 mt-4">
+              <div className="flex flex-col gap-2 mt-4 max-w-2xl">
                 {interventionsSection.badges.map((badge, i) => {
                   const Icon = BADGE_ICONS[badge.icon] ?? Heart;
                   return (
@@ -158,9 +158,9 @@ export default async function HomePage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div id="equipe" className="scroll-mt-24" aria-hidden="true" />
           <AnimateIn className="mb-8 sm:mb-14">
-            <span className="section-label mb-4 sm:mb-5 inline-flex">
+            <span className="section-label mb-4 sm:mb-5 inline-flex" title={teamSection.kicker}>
               <Users className="w-3.5 h-3.5" />
-              {teamSection.kicker}
+              <span className="section-label-text">{teamSection.kicker}</span>
             </span>
             <h2
               className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] mb-3 sm:mb-4 text-foreground"
@@ -174,7 +174,17 @@ export default async function HomePage() {
           </AnimateIn>
 
           {doctors.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
+            <div
+              className={`grid gap-5 sm:gap-8 ${
+                doctors.length === 1
+                  ? "grid-cols-1 max-w-md mx-auto"
+                  : doctors.length === 2
+                  ? "grid-cols-1 sm:grid-cols-2 max-w-3xl mx-auto"
+                  : doctors.length === 4
+                  ? "grid-cols-1 sm:grid-cols-2 max-w-4xl mx-auto"
+                  : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+              }`}
+            >
               {doctors.map((doctor, i) => (
                 <AnimateIn key={doctor.id} delay={i * 100}>
                   <div

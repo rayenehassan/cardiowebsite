@@ -93,6 +93,7 @@ body {
   align-items: center;
   gap: 8px;
   padding: 6px 14px;
+  max-width: 100%;
   background: rgba(2, 132, 199, 0.08);
   border: 1px solid rgba(2, 132, 199, 0.18);
   border-radius: 100px;
@@ -102,6 +103,15 @@ body {
   text-transform: uppercase;
   color: #0369A1;
   font-family: var(--font-heading);
+}
+.section-label > svg {
+  flex-shrink: 0;
+}
+.section-label > .section-label-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ── Glow effects ── */
