@@ -163,13 +163,16 @@ export default function SiteContentForm({ initial }: Props) {
     [content, initial]
   );
   useBeforeUnload(dirty);
-  const { existingDraft, clear: clearDraft, dismiss: dismissDraft } =
-    useFormDraft<SiteContent>(draftKey, content);
+  const { existingDraft, clear: clearDraft } = useFormDraft<SiteContent>(
+    draftKey,
+    content,
+    initial
+  );
 
   function restoreDraft() {
     if (!existingDraft) return;
     setContent(existingDraft.value);
-    dismissDraft();
+    clearDraft();
   }
 
   function toggle(key: SectionKey) {
@@ -319,7 +322,7 @@ export default function SiteContentForm({ initial }: Props) {
         <DraftBanner
           savedAt={existingDraft.savedAt}
           onRestore={restoreDraft}
-          onIgnore={dismissDraft}
+          onIgnore={clearDraft}
         />
       )}
       {error && (

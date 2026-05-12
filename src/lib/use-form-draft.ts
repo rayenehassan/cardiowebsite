@@ -6,7 +6,6 @@ import {
   useMemo,
   useRef,
   useState,
-  useSyncExternalStore,
 } from "react";
 
 interface Draft<T> {
@@ -14,50 +13,66 @@ interface Draft<T> {
   savedAt: number;
 }
 
-function subscribe(callback: () => void) {
-  if (typeof window === "undefined") return () => {};
-  window.addEventListener("storage", callback);
-  return () => window.removeEventListener("storage", callback);
-}
-
 /**
- * Brouillon localStorage auto-sauvegardé toutes les `debounceMs`.
- * - Sur reload / session expirée / refresh accidentel, le brouillon survit.
- * - Sur enregistrement réussi, appeler `clear()` pour purger.
- * - `existingDraft` est null après `dismiss()` ou `clear()`.
+ * Brouillon localStorage auto-sauvegardé pendant l'édition.
  *
- * Le hook ne réapplique JAMAIS automatiquement le brouillon : c'est au form
- * de proposer un bandeau "Restaurer / Ignorer" et de hydrater son state.
+ * Principe :
+ * - Le brouillon stocké est lu UNE SEULE FOIS au montage (pas d'observation
+ *   en continu) → nos propres écritures ne déclenchent pas le bandeau.
+ * - Pendant la session, on persiste l'état actuel toutes les `debounceMs`.
+ * - À la fermeture / refresh, on flush synchronement la valeur la plus récente.
+ * - Le brouillon n'est exposé via `existingDraft` que s'il diffère réellement
+ *   de la valeur initiale du form (sinon aucun intérêt).
+ * - Après que l'utilisateur a cliqué Restaurer ou Ignorer (ou après un save
+ *   réussi), `clear()` masque le bandeau et purge le localStorage.
  */
 export function useFormDraft<T>(
   key: string,
   currentValue: T,
+  initialValue: T,
   debounceMs = 1000
 ) {
-  const [dismissed, setDismissed] = useState(false);
+  // Lecture unique du brouillon existant. `didRead` est passé à `true` lors
+  // de la première render client : c'est ce qui permet de schedule un setState
+  // pendant le rendu sans boucler (pattern React-endorsé d'ajustement d'état).
+  const [rawDraft, setRawDraft] = useState<Draft<T> | null>(null);
+  const [didRead, setDidRead] = useState(false);
+  const [acknowledged, setAcknowledged] = useState(false);
 
-  // Lecture SSR-safe du brouillon existant.
-  const draftJSON = useSyncExternalStore(
-    subscribe,
-    () => (typeof window === "undefined" ? null : localStorage.getItem(key)),
-    () => null
-  );
-
-  const existingDraft = useMemo<Draft<T> | null>(() => {
-    if (!draftJSON || dismissed) return null;
+  if (!didRead && typeof window !== "undefined") {
+    setDidRead(true);
     try {
-      return JSON.parse(draftJSON) as Draft<T>;
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const parsed = JSON.parse(raw) as Draft<T>;
+        if (parsed && typeof parsed === "object" && "value" in parsed) {
+          setRawDraft(parsed);
+        }
+      }
+    } catch {
+      // localStorage indisponible / contenu corrompu : ignorer.
+    }
+  }
+
+  // Le brouillon n'est "significatif" que s'il diffère de l'état initial du form.
+  // Sans ça, ouvrir une fiche, ne rien toucher, attendre 1s, puis revenir
+  // afficherait un bandeau pour rien (l'état initial a été persisté).
+  const existingDraft = useMemo<Draft<T> | null>(() => {
+    if (!rawDraft || acknowledged) return null;
+    try {
+      if (JSON.stringify(rawDraft.value) === JSON.stringify(initialValue)) {
+        return null;
+      }
     } catch {
       return null;
     }
-  }, [draftJSON, dismissed]);
+    return rawDraft;
+  }, [rawDraft, initialValue, acknowledged]);
 
-  // Timer ref pour pouvoir annuler le persist en cours depuis `clear()`,
-  // sinon un debounce déjà programmé peut firer après submit et réécrire.
+  // Persist debounced à chaque changement de currentValue.
   const timerRef = useRef<number | null>(null);
-
-  // Persist debounced à chaque changement de `currentValue`.
   useEffect(() => {
+    if (!didRead) return; // pas d'écriture tant qu'on n'a pas lu l'existant
     if (typeof window === "undefined") return;
     if (timerRef.current !== null) {
       window.clearTimeout(timerRef.current);
@@ -71,7 +86,7 @@ export function useFormDraft<T>(
         };
         localStorage.setItem(key, JSON.stringify(payload));
       } catch {
-        // Quota dépassé ou mode privé : ignorer silencieusement.
+        // Quota dépassé / mode privé strict : silencieux.
       }
     }, debounceMs);
     return () => {
@@ -80,7 +95,24 @@ export function useFormDraft<T>(
         timerRef.current = null;
       }
     };
-  }, [key, currentValue, debounceMs]);
+  }, [key, currentValue, debounceMs, didRead]);
+
+  // Flush synchrone à la fermeture / refresh / navigation : couvre le cas
+  // où l'utilisateur quitte avant que le debounce ait fini.
+  useEffect(() => {
+    if (!didRead) return;
+    if (typeof window === "undefined") return;
+    function flush() {
+      try {
+        localStorage.setItem(
+          key,
+          JSON.stringify({ value: currentValue, savedAt: Date.now() })
+        );
+      } catch {}
+    }
+    window.addEventListener("beforeunload", flush);
+    return () => window.removeEventListener("beforeunload", flush);
+  }, [key, currentValue, didRead]);
 
   const clear = useCallback(() => {
     if (timerRef.current !== null) {
@@ -89,17 +121,12 @@ export function useFormDraft<T>(
     }
     try {
       localStorage.removeItem(key);
-    } catch {
-      // Ignorer.
-    }
+    } catch {}
+    setRawDraft(null);
+    setAcknowledged(true);
   }, [key]);
 
-  const dismiss = useCallback(() => {
-    setDismissed(true);
-    clear();
-  }, [clear]);
-
-  return { existingDraft, clear, dismiss };
+  return { existingDraft, clear };
 }
 
 /**
@@ -118,7 +145,7 @@ export function useBeforeUnload(dirty: boolean) {
 }
 
 /**
- * Formatte un timestamp en "il y a X min/h" (FR).
+ * Formatte un timestamp en "à l'instant" / "il y a X min/h/j" (FR).
  */
 export function formatRelativeTime(timestamp: number): string {
   const diffMs = Date.now() - timestamp;

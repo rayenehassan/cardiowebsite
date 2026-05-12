@@ -60,8 +60,11 @@ export default function DoctorForm({ doctor, mode }: Props) {
     [snapshot, initialSnapshot]
   );
   useBeforeUnload(dirty);
-  const { existingDraft, clear: clearDraft, dismiss: dismissDraft } =
-    useFormDraft<DoctorSnapshot>(draftKey, snapshot);
+  const { existingDraft, clear: clearDraft } = useFormDraft<DoctorSnapshot>(
+    draftKey,
+    snapshot,
+    initialSnapshot
+  );
 
   function restoreDraft() {
     if (!existingDraft) return;
@@ -71,7 +74,7 @@ export default function DoctorForm({ doctor, mode }: Props) {
     setPhone(v.phone || "");
     setEmail(v.email || "");
     setPhotoUrl(v.photoUrl || "");
-    dismissDraft();
+    clearDraft();
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -122,7 +125,7 @@ export default function DoctorForm({ doctor, mode }: Props) {
         <DraftBanner
           savedAt={existingDraft.savedAt}
           onRestore={restoreDraft}
-          onIgnore={dismissDraft}
+          onIgnore={clearDraft}
         />
       )}
       {error && (

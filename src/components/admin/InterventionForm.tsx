@@ -140,6 +140,10 @@ export default function InterventionForm({ intervention, mode }: Props) {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   // ── Brouillon localStorage + garde fermeture ──
+  // `restoreVersion` est incrémenté à chaque restauration pour forcer
+  // le remount des `RichTextEditor` (Tiptap n'observe pas la prop `content`
+  // après initialisation : sans nouveau key, le contenu visible ne change pas).
+  const [restoreVersion, setRestoreVersion] = useState(0);
   const draftKey = `cardio-draft:intervention:${intervention?.id ?? "new"}`;
   const snapshot: FormSnapshot = useMemo(
     () => ({ title, slug, subtitle, status, sections }),
@@ -160,8 +164,11 @@ export default function InterventionForm({ intervention, mode }: Props) {
     [snapshot, initialSnapshot]
   );
   useBeforeUnload(dirty);
-  const { existingDraft, clear: clearDraft, dismiss: dismissDraft } =
-    useFormDraft<FormSnapshot>(draftKey, snapshot);
+  const { existingDraft, clear: clearDraft } = useFormDraft<FormSnapshot>(
+    draftKey,
+    snapshot,
+    initialSnapshot
+  );
 
   function restoreDraft() {
     if (!existingDraft) return;
@@ -171,7 +178,8 @@ export default function InterventionForm({ intervention, mode }: Props) {
     setSubtitle(v.subtitle || "");
     setStatus(v.status || "draft");
     setSections(Array.isArray(v.sections) ? v.sections : []);
-    dismissDraft();
+    setRestoreVersion((n) => n + 1);
+    clearDraft();
   }
 
   function loadTemplate() {
@@ -445,6 +453,7 @@ export default function InterventionForm({ intervention, mode }: Props) {
               <>
                 <label className={labelClass}>Contenu</label>
                 <RichTextEditor
+                  key={`${section.id}-body-${restoreVersion}`}
                   value={section.body || ""}
                   onChange={(html) => updateSection(section.id, { body: html })}
                   placeholder="Saisissez votre texte…"
@@ -499,6 +508,7 @@ export default function InterventionForm({ intervention, mode }: Props) {
                       </span>
                       <div className="flex-1">
                         <RichTextEditor
+                          key={`${section.id}-item-${i}-${restoreVersion}`}
                           inline
                           value={item}
                           onChange={(html) => updateListItem(section.id, i, html)}
@@ -685,6 +695,7 @@ export default function InterventionForm({ intervention, mode }: Props) {
                       placeholder="Question"
                     />
                     <RichTextEditor
+                      key={`${faq.id}-${restoreVersion}`}
                       value={faq.answer}
                       onChange={(html) => updateFaq(section.id, i, "answer", html)}
                       placeholder="Réponse…"
@@ -714,7 +725,7 @@ export default function InterventionForm({ intervention, mode }: Props) {
         <DraftBanner
           savedAt={existingDraft.savedAt}
           onRestore={restoreDraft}
-          onIgnore={dismissDraft}
+          onIgnore={clearDraft}
         />
       )}
       {error && (

@@ -17,10 +17,10 @@ export default function DraftBanner({ savedAt, onRestore, onIgnore }: Props) {
     >
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-amber-900">
-          Brouillon non sauvegardé détecté
+          Modifications non enregistrées retrouvées
         </p>
         <p className="text-xs text-amber-800 mt-0.5">
-          Vos modifications précédentes ont été enregistrées localement {formatRelativeTime(savedAt)}.
+          Vous aviez commencé à modifier cette fiche {formatRelativeTime(savedAt)} sans sauvegarder. Vous pouvez reprendre où vous en étiez ou repartir de la version actuelle.
         </p>
       </div>
       <div className="flex items-center gap-2 shrink-0">
@@ -30,7 +30,7 @@ export default function DraftBanner({ savedAt, onRestore, onIgnore }: Props) {
           className="flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium text-amber-900 hover:bg-amber-100 transition-colors"
         >
           <X className="w-3.5 h-3.5" />
-          Ignorer
+          Repartir à zéro
         </button>
         <button
           type="button"
@@ -38,7 +38,7 @@ export default function DraftBanner({ savedAt, onRestore, onIgnore }: Props) {
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold text-white bg-amber-700 hover:bg-amber-800 transition-colors"
         >
           <Save className="w-3.5 h-3.5" />
-          Restaurer le brouillon
+          Reprendre mes modifications
         </button>
       </div>
     </div>
