@@ -22,15 +22,13 @@ export default function InterventionSidebarNav({ items, collapsible = false }: P
   useEffect(() => {
     if (!items.length) return;
 
-    // Offset = sticky header (64px) + sticky top-bar (~64px) + small buffer
-    const OFFSET = 148;
-
     const update = () => {
+      const midY = window.innerHeight / 2;
       let current = items[0].id;
       for (const { id } of items) {
         const el = document.getElementById(id);
         if (!el) continue;
-        if (el.getBoundingClientRect().top <= OFFSET) {
+        if (el.getBoundingClientRect().top <= midY) {
           current = id;
         }
       }
@@ -39,7 +37,11 @@ export default function InterventionSidebarNav({ items, collapsible = false }: P
 
     update();
     window.addEventListener("scroll", update, { passive: true });
-    return () => window.removeEventListener("scroll", update);
+    window.addEventListener("resize", update, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
   }, [items]);
 
   const links = (
@@ -49,7 +51,7 @@ export default function InterventionSidebarNav({ items, collapsible = false }: P
           <a
             href={`#${item.id}`}
             onClick={() => collapsible && setOpen(false)}
-            className={`block pl-0 pr-3 py-2.5 rounded-lg text-base transition-colors ${
+            className={`block px-3 py-2.5 rounded-lg text-base transition-colors ${
               activeId === item.id
                 ? "bg-blue-50 font-semibold"
                 : "hover:bg-gray-100"
