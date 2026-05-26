@@ -32,7 +32,7 @@ export default async function HomePage() {
     <>
       {/* ── Hero ── */}
       <section id="accueil" className="relative min-h-[85svh] sm:min-h-screen flex items-center mesh-bg overflow-hidden">
-        <div className="relative w-full max-w-[1440px] mx-auto px-5 sm:px-8 py-14 sm:py-24">
+<div className="relative w-full max-w-[1440px] mx-auto px-5 sm:px-8 py-14 sm:py-24">
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,700px)_460px] gap-10 lg:gap-16 lg:justify-center items-center">
 
             {/* ── Colonne gauche : texte ── */}
@@ -49,7 +49,7 @@ export default async function HomePage() {
               >
                 {hero.titleBefore}{" "}
                 <span style={{
-                  background: "linear-gradient(90deg, #3B82F6 0%, #1D4ED8 100%)",
+                  background: "linear-gradient(90deg, #FB7185 0%, #E11D48 100%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
