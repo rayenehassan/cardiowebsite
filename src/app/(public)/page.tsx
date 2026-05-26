@@ -49,7 +49,7 @@ export default async function HomePage() {
               >
                 {hero.titleBefore}{" "}
                 <span style={{
-                  background: "linear-gradient(90deg, #FB7185 0%, #E11D48 100%)",
+                  background: "linear-gradient(90deg, #3B82F6 0%, #1D4ED8 100%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
