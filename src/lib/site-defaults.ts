@@ -15,6 +15,10 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     locationLabel: "Hôpital Privé de la Loire, Saint-Étienne",
     titleBefore: "Comprendre votre",
     titleHighlight: "intervention cardiaque",
+    titleAfter: "",
+    highlightColor1: "#FB7185",
+    highlightColor2: "#E11D48",
+    highlightGradient: true,
     subtitle:
       "Votre cardiologue vous a proposé un geste interventionnel. Trouvez ici toutes les informations pour vous préparer sereinement.",
     ctaLabel: "Voir les interventions",

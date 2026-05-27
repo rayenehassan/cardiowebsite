@@ -14,6 +14,10 @@ export interface SiteHero {
   locationLabel: string;
   titleBefore: string;
   titleHighlight: string;
+  titleAfter: string;
+  highlightColor1: string;
+  highlightColor2: string;
+  highlightGradient: boolean;
   subtitle: string;
   ctaLabel: string;
 }

@@ -47,13 +47,16 @@ export default async function HomePage() {
                 className="anim-fade-up delay-100 text-[2.2rem] sm:text-5xl lg:text-[60px] font-bold leading-[1.1] sm:leading-[1.05] tracking-[-0.02em] mb-5 text-foreground"
                 style={{ fontFamily: "var(--font-heading)" }}
               >
-                {hero.titleBefore}{" "}
+                {hero.titleBefore}{hero.titleBefore ? " " : ""}
                 <span style={{
-                  background: "linear-gradient(90deg, #FB7185 0%, #E11D48 100%)",
+                  background: hero.highlightGradient
+                    ? `linear-gradient(90deg, ${hero.highlightColor1} 0%, ${hero.highlightColor2} 100%)`
+                    : hero.highlightColor1,
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
                 }}>{hero.titleHighlight}</span>
+                {hero.titleAfter ? " " + hero.titleAfter : ""}
               </h1>
 
               <p className="anim-fade-up delay-200 text-lg sm:text-xl text-muted leading-relaxed mb-8 max-w-lg">
