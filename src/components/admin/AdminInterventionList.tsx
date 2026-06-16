@@ -79,6 +79,13 @@ export default function AdminInterventionList({ interventions, archived }: Props
                 <td className="px-4 py-3">
                   <p className="font-medium text-foreground">{intervention.title}</p>
                   <p className="text-sm text-muted">{intervention.subtitle}</p>
+                  <span className={`sm:hidden mt-1 inline-block text-xs px-2 py-0.5 rounded-full font-medium ${
+                    intervention.status === "published"
+                      ? "bg-green-100 text-green-700"
+                      : "bg-amber-100 text-amber-700"
+                  }`}>
+                    {intervention.status === "published" ? "Publiée" : "Brouillon"}
+                  </span>
                 </td>
                 <td className="px-4 py-3 hidden sm:table-cell">
                   <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${

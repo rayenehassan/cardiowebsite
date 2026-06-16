@@ -11,7 +11,7 @@ const navItems = [
   { href: "/admin/equipe", label: "Équipe médicale", icon: Users },
 ];
 
-export default function AdminSidebar() {
+export default function AdminSidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -22,7 +22,7 @@ export default function AdminSidebar() {
   }
 
   return (
-    <aside className="w-64 flex flex-col sticky top-0 h-screen shrink-0" style={{ background: "#0F172A" }}>
+    <aside className="w-64 flex flex-col h-screen shrink-0" style={{ background: "#0F172A" }}>
       {/* Logo */}
       <div className="p-5 border-b" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
         <Link href="/admin/dashboard" className="flex items-center gap-3">
@@ -52,6 +52,7 @@ export default function AdminSidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onClose}
               className={`flex items-center gap-3 px-3 py-3 rounded-lg text-[15px] font-medium transition-colors ${
                 active
                   ? "bg-white/15 text-white"
@@ -70,6 +71,7 @@ export default function AdminSidebar() {
       <div className="p-3 border-t space-y-1" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
         <Link
           href="/"
+          onClick={onClose}
           className="flex items-center gap-3 px-3 py-3 rounded-lg text-[15px] font-medium hover:bg-white/10 hover:text-white transition-colors"
           style={{ color: "rgba(255,255,255,0.82)", fontFamily: "var(--font-heading)" }}
         >
