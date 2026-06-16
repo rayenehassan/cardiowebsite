@@ -142,9 +142,10 @@ function renderSection(section: Section, index: number): React.ReactNode {
       return (
         <SectionCard key={section.id} {...cardProps}>
           <div className="rounded-xl overflow-hidden border border-gray-100">
-            <div className="relative aspect-video bg-gray-50">
-              <NextImage src={section.imageUrl!} alt={section.imageAlt || section.title} fill
-                sizes="(min-width: 640px) 672px, 100vw" className="object-cover" unoptimized />
+            <div className="bg-gray-50">
+              <NextImage src={section.imageUrl!} alt={section.imageAlt || section.title}
+                width={0} height={0} sizes="(min-width: 640px) 672px, 100vw"
+                className="w-full h-auto block" unoptimized />
             </div>
             {section.imageAlt && (
               <p className="px-4 py-3 text-sm text-center border-t border-gray-100" style={{ color: "#475569" }}>
