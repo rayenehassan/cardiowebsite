@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Intervention, InterventionStatus, Section, SectionType } from "@/types/intervention";
+import { Intervention, InterventionStatus, QuickFact, Section, SectionType } from "@/types/intervention";
 import { useBeforeUnload, useFormDraft } from "@/lib/use-form-draft";
+import { deleteUpload, collectSectionMedia, orphanedUploads } from "@/lib/uploads-client";
 import DraftBanner from "./DraftBanner";
 import {
   Save,
@@ -117,6 +118,7 @@ interface FormSnapshot {
   subtitle: string;
   status: InterventionStatus;
   sections: Section[];
+  quickFacts: QuickFact[];
 }
 
 export default function InterventionForm({ intervention, mode }: Props) {
@@ -133,6 +135,9 @@ export default function InterventionForm({ intervention, mode }: Props) {
   const [sections, setSections] = useState<Section[]>(
     intervention?.sections || []
   );
+  const [quickFacts, setQuickFacts] = useState<QuickFact[]>(
+    intervention?.quickFacts || []
+  );
 
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const [showPicker, setShowPicker] = useState(false);
@@ -146,8 +151,8 @@ export default function InterventionForm({ intervention, mode }: Props) {
   const [restoreVersion, setRestoreVersion] = useState(0);
   const draftKey = `cardio-draft:intervention:${intervention?.id ?? "new"}`;
   const snapshot: FormSnapshot = useMemo(
-    () => ({ title, slug, subtitle, status, sections }),
-    [title, slug, subtitle, status, sections]
+    () => ({ title, slug, subtitle, status, sections, quickFacts }),
+    [title, slug, subtitle, status, sections, quickFacts]
   );
   const initialSnapshot = useMemo<FormSnapshot>(
     () => ({
@@ -156,6 +161,7 @@ export default function InterventionForm({ intervention, mode }: Props) {
       subtitle: intervention?.subtitle || "",
       status: intervention?.status || "draft",
       sections: intervention?.sections || [],
+      quickFacts: intervention?.quickFacts || [],
     }),
     [intervention]
   );
@@ -170,6 +176,13 @@ export default function InterventionForm({ intervention, mode }: Props) {
     initialSnapshot
   );
 
+  // ── Suivi des médias uploadés cette session (cf. uploads-client.ts) ──
+  // Sert à supprimer, APRÈS un enregistrement réussi, les fichiers remplacés ou
+  // retirés qui ne sont plus référencés. On ne supprime jamais avant le save ni
+  // à l'abandon : un brouillon restaurable peut encore pointer vers ces fichiers,
+  // et un média encore référencé par la fiche publiée ne doit pas disparaître.
+  const sessionUploads = useRef<Set<string>>(new Set());
+
   function restoreDraft() {
     if (!existingDraft) return;
     const v = existingDraft.value;
@@ -178,6 +191,7 @@ export default function InterventionForm({ intervention, mode }: Props) {
     setSubtitle(v.subtitle || "");
     setStatus(v.status || "draft");
     setSections(Array.isArray(v.sections) ? v.sections : []);
+    setQuickFacts(Array.isArray(v.quickFacts) ? v.quickFacts : []);
     setRestoreVersion((n) => n + 1);
     clearDraft();
   }
@@ -308,11 +322,30 @@ export default function InterventionForm({ intervention, mode }: Props) {
     );
   }
 
+  // QuickFacts helpers (encadrés "Durée / Anesthésie / …" en haut de la fiche)
+  function addQuickFact() {
+    setQuickFacts((prev) => [...prev, { label: "", value: "" }]);
+  }
+  function updateQuickFact(index: number, field: "label" | "value", value: string) {
+    setQuickFacts((prev) =>
+      prev.map((qf, i) => (i === index ? { ...qf, [field]: value } : qf))
+    );
+  }
+  function removeQuickFact(index: number) {
+    setQuickFacts((prev) => prev.filter((_, i) => i !== index));
+  }
+  function moveQuickFact(index: number, dir: "up" | "down") {
+    setQuickFacts((prev) => moveItem(prev, index, dir));
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setSaving(true);
-    const body = { title, slug, subtitle, status, sections };
+    const cleanedQuickFacts = quickFacts.filter(
+      (qf) => qf.label.trim() || qf.value.trim()
+    );
+    const body = { title, slug, subtitle, status, sections, quickFacts: cleanedQuickFacts };
     try {
       const url =
         mode === "create"
@@ -335,6 +368,15 @@ export default function InterventionForm({ intervention, mode }: Props) {
         }
         return;
       }
+      // Enregistré : supprimer les médias désormais non référencés (anciens
+      // fichiers remplacés/retirés + uploads de session inutilisés).
+      const used = collectSectionMedia(sections);
+      const initialMedia = collectSectionMedia(intervention?.sections || []);
+      orphanedUploads([...sessionUploads.current, ...initialMedia], used).forEach(
+        (u) => void deleteUpload(u)
+      );
+      sessionUploads.current.clear();
+
       clearDraft();
       router.push("/admin/interventions");
       router.refresh();
@@ -572,6 +614,7 @@ export default function InterventionForm({ intervention, mode }: Props) {
                     value={section.videoUrl || undefined}
                     onChange={(url) => updateSection(section.id, { videoUrl: url, videoType: "file" })}
                     onClear={() => updateSection(section.id, { videoUrl: "", videoType: "file" })}
+                    onUploaded={(url) => sessionUploads.current.add(url)}
                   />
                 ) : (
                   <div className="space-y-3">
@@ -612,6 +655,7 @@ export default function InterventionForm({ intervention, mode }: Props) {
                   value={section.imageUrl || undefined}
                   onChange={(url) => updateSection(section.id, { imageUrl: url })}
                   onClear={() => updateSection(section.id, { imageUrl: "" })}
+                  onUploaded={(url) => sessionUploads.current.add(url)}
                 />
                 <div>
                   <label className={labelClass}>Texte alternatif (accessibilité)</label>
@@ -633,6 +677,7 @@ export default function InterventionForm({ intervention, mode }: Props) {
                   value={section.documentUrl || undefined}
                   onChange={(url) => updateSection(section.id, { documentUrl: url })}
                   onClear={() => updateSection(section.id, { documentUrl: "" })}
+                  onUploaded={(url) => sessionUploads.current.add(url)}
                 />
                 <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer mt-1">
                   <input
@@ -787,6 +832,85 @@ export default function InterventionForm({ intervention, mode }: Props) {
           />
         </div>
 
+      </fieldset>
+
+      {/* Informations clés (quick facts) — encadrés en haut de la fiche */}
+      <fieldset className="bg-white rounded-xl border border-border p-5 space-y-3">
+        <legend
+          className="text-lg font-semibold text-foreground px-1"
+          style={{ fontFamily: "var(--font-heading)" }}
+        >
+          Informations clés
+        </legend>
+        <p className="text-xs text-muted -mt-1">
+          Encadrés affichés en haut de la fiche. Les libellés « Durée »,
+          « Anesthésie », « Hospitalisation » et « Reprise » reçoivent une icône
+          automatiquement.
+        </p>
+
+        {quickFacts.length > 0 && (
+          <div className="space-y-2">
+            {quickFacts.map((qf, i) => (
+              <div key={i} className="flex gap-1.5 items-start">
+                <div className="flex flex-col shrink-0 mt-2">
+                  <button
+                    type="button"
+                    onClick={() => moveQuickFact(i, "up")}
+                    disabled={i === 0}
+                    className="p-0.5 text-muted hover:text-foreground disabled:opacity-20 transition-colors"
+                    title="Monter"
+                  >
+                    <ChevronUp className="w-3 h-3" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => moveQuickFact(i, "down")}
+                    disabled={i === quickFacts.length - 1}
+                    className="p-0.5 text-muted hover:text-foreground disabled:opacity-20 transition-colors"
+                    title="Descendre"
+                  >
+                    <ChevronDown className="w-3 h-3" />
+                  </button>
+                </div>
+                <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-1.5 min-w-0">
+                  <input
+                    type="text"
+                    value={qf.label}
+                    onChange={(e) => updateQuickFact(i, "label", e.target.value)}
+                    className={inputClass}
+                    placeholder="Libellé (ex. Durée)"
+                    aria-label="Libellé de l'information clé"
+                  />
+                  <input
+                    type="text"
+                    value={qf.value}
+                    onChange={(e) => updateQuickFact(i, "value", e.target.value)}
+                    className={inputClass}
+                    placeholder="Valeur (ex. 30 à 45 min)"
+                    aria-label="Valeur de l'information clé"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removeQuickFact(i)}
+                  className="p-1 text-muted hover:text-danger transition-colors shrink-0 mt-2"
+                  title="Retirer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <button
+          type="button"
+          onClick={addQuickFact}
+          className="flex items-center gap-1 text-sm text-primary hover:text-primary-dark font-medium"
+        >
+          <Plus className="w-3.5 h-3.5" />
+          Ajouter une information clé
+        </button>
       </fieldset>
 
       {/* Content blocks */}

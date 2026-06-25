@@ -2,7 +2,7 @@
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import { Extension } from "@tiptap/core";
-import { useReducer } from "react";
+import { useEffect, useReducer } from "react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import {
@@ -115,6 +115,23 @@ export default function RichTextEditor({
     },
     immediatelyRender: false,
   });
+
+  // Resynchronise l'éditeur quand `value` change depuis l'EXTÉRIEUR (réordre /
+  // suppression d'un élément de liste, restauration de brouillon). Tiptap
+  // n'observe pas `content` après l'initialisation : sans ce garde-fou, déplacer
+  // ou supprimer un élément de liste laisse l'éditeur afficher l'ancien contenu
+  // (les éléments sont keyés par index), ce qui publie un contenu erroné.
+  // On ne touche jamais à l'éditeur pendant la frappe (focus) pour préserver le
+  // curseur ; on utilise emitUpdate:false pour ne pas redéclencher onChange.
+  useEffect(() => {
+    if (!editor || editor.isFocused) return;
+    const html = editor.getHTML();
+    const current = html === "<p></p>" ? "" : inline ? stripParagraph(html) : html;
+    const incoming = value || "";
+    if (incoming !== current) {
+      editor.commands.setContent(incoming, { emitUpdate: false });
+    }
+  }, [value, editor, inline]);
 
   if (!editor) return null;
 

@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Save } from "lucide-react";
 import { Doctor } from "@/types/doctor";
 import FileUpload from "./FileUpload";
 import DraftBanner from "./DraftBanner";
 import { useBeforeUnload, useFormDraft } from "@/lib/use-form-draft";
+import { deleteUpload, orphanedUploads } from "@/lib/uploads-client";
 
 interface Props {
   doctor?: Doctor;
@@ -38,6 +39,11 @@ export default function DoctorForm({ doctor, mode }: Props) {
   const [phone, setPhone] = useState(doctor?.phone || "");
   const [email, setEmail] = useState(doctor?.email || "");
   const [photoUrl, setPhotoUrl] = useState(doctor?.photoUrl || "");
+
+  // ── Suivi des médias uploadés cette session (cf. uploads-client.ts) ──
+  // Sert à supprimer, après un enregistrement réussi, l'ancienne photo remplacée
+  // qui n'est plus référencée. Jamais avant le save ni à l'abandon.
+  const sessionUploads = useRef<Set<string>>(new Set());
 
   // ── Brouillon localStorage + garde fermeture ──
   const draftKey = `cardio-draft:doctor:${doctor?.id ?? "new"}`;
@@ -109,6 +115,13 @@ export default function DoctorForm({ doctor, mode }: Props) {
         }
         return;
       }
+      // Enregistré : nettoyer l'ancienne photo désormais non référencée.
+      const used = new Set<string>(photoUrl ? [photoUrl] : []);
+      orphanedUploads([...sessionUploads.current, doctor?.photoUrl ?? ""], used).forEach(
+        (u) => void deleteUpload(u)
+      );
+      sessionUploads.current.clear();
+
       clearDraft();
       router.push("/admin/equipe");
       router.refresh();
@@ -216,6 +229,7 @@ export default function DoctorForm({ doctor, mode }: Props) {
           value={photoUrl || undefined}
           onChange={(url) => setPhotoUrl(url)}
           onClear={() => setPhotoUrl("")}
+          onUploaded={(url) => sessionUploads.current.add(url)}
         />
       </fieldset>
 

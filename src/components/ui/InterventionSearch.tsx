@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import Link from "next/link";
 import { Search, ArrowRight, X } from "lucide-react";
 import type { Intervention } from "@/types/intervention";
+import { normalizeForSearch } from "@/lib/text";
 
 interface Props {
   interventions: Intervention[];
@@ -13,12 +14,12 @@ export default function InterventionSearch({ interventions }: Props) {
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const q = query.trim().toLowerCase();
+  const q = normalizeForSearch(query);
   const results = q.length > 0
     ? interventions.filter(
         (i) =>
-          i.title.toLowerCase().includes(q) ||
-          i.subtitle?.toLowerCase().includes(q)
+          normalizeForSearch(i.title).includes(q) ||
+          (i.subtitle ? normalizeForSearch(i.subtitle).includes(q) : false)
       )
     : [];
 

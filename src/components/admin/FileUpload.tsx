@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Upload, X, FileText, Film, ImageIcon, RotateCcw, AlertCircle } from "lucide-react";
+import PhotoCropModal from "./PhotoCropModal";
 
 export type UploadKind = "image" | "video" | "document" | "doctor";
 
@@ -10,6 +11,12 @@ interface Props {
   value?: string;
   onChange: (publicUrl: string) => void;
   onClear: () => void;
+  /**
+   * Notifie le parent qu'un nouveau fichier a été uploadé dans le bucket pendant
+   * cette session. Le parent s'en sert pour nettoyer les orphelins (à l'abandon
+   * du formulaire ou après enregistrement). Voir src/lib/uploads-client.ts.
+   */
+  onUploaded?: (publicUrl: string) => void;
 }
 
 const CONFIG: Record<
@@ -42,13 +49,19 @@ const CONFIG: Record<
   },
 };
 
-export default function FileUpload({ kind, value, onChange, onClear }: Props) {
+export default function FileUpload({ kind, value, onChange, onClear, onUploaded }: Props) {
   const cfg = CONFIG[kind];
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState("");
   const [dragOver, setDragOver] = useState(false);
+
+  /* ── Recadrage (kind === "doctor" uniquement) ──
+   * On stocke l'objectURL directement (créé dans le handler événement,
+   * pas dans un effet React — safe vis-à-vis du Strict Mode double-mount).
+   */
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
 
   async function upload(file: File) {
     setError("");
@@ -97,16 +110,12 @@ export default function FileUpload({ kind, value, onChange, onClear }: Props) {
         xhr.send(file);
       });
 
-      // 3. Supprimer l'ancien fichier s'il existait (fire and forget)
-      if (value) {
-        fetch("/api/admin/uploads", {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: value }),
-        }).catch(() => {});
-      }
-
+      // L'ancien fichier n'est PAS supprimé ici : la suppression est différée au
+      // parent (après enregistrement réussi ou à l'abandon), pour ne jamais
+      // casser un média encore référencé par la fiche publiée. Voir
+      // src/lib/uploads-client.ts.
       onChange(publicUrl);
+      onUploaded?.(publicUrl);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erreur lors de l'upload");
     } finally {
@@ -115,9 +124,25 @@ export default function FileUpload({ kind, value, onChange, onClear }: Props) {
     }
   }
 
+  /* ── Sélection de fichier → crop pour doctor, upload direct sinon ── */
+  function pickFile(file: File) {
+    setError("");
+    if (kind === "doctor") {
+      if (file.size > 50 * 1024 * 1024) {
+        setError("Fichier trop volumineux. Réduisez la photo avant l'import.");
+        return;
+      }
+      // Créer l'objectURL ici (handler événement, hors cycle React)
+      // → pas de problème avec le Strict Mode double-mount
+      setCropSrc(URL.createObjectURL(file));
+    } else {
+      upload(file);
+    }
+  }
+
   function handleFileInput(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (file) upload(file);
+    if (file) pickFile(file);
     e.target.value = "";
   }
 
@@ -125,17 +150,28 @@ export default function FileUpload({ kind, value, onChange, onClear }: Props) {
     e.preventDefault();
     setDragOver(false);
     const file = e.dataTransfer.files[0];
-    if (file) upload(file);
+    if (file) pickFile(file);
+  }
+
+  /* ── Callbacks du modal de recadrage ── */
+  async function handleCropConfirm(blob: Blob) {
+    if (cropSrc) URL.revokeObjectURL(cropSrc);
+    setCropSrc(null);
+    const croppedFile = new File(
+      [blob],
+      `photo-medecin-${Date.now()}.jpg`,
+      { type: "image/jpeg" },
+    );
+    await upload(croppedFile);
+  }
+
+  function handleCropCancel() {
+    if (cropSrc) URL.revokeObjectURL(cropSrc);
+    setCropSrc(null);
   }
 
   function handleClear() {
-    if (value) {
-      fetch("/api/admin/uploads", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: value }),
-      }).catch(() => {});
-    }
+    // Pas de suppression immédiate : le parent nettoie au bon moment (cf. upload).
     setError("");
     onClear();
   }
@@ -143,60 +179,147 @@ export default function FileUpload({ kind, value, onChange, onClear }: Props) {
   // ── Aperçu si fichier déjà uploadé ──
   if (value && !uploading) {
     return (
-      <div className="rounded-xl border border-border overflow-hidden bg-white">
-        {(kind === "image" || kind === "doctor") && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={value}
-            alt="Aperçu"
-            className="w-full max-h-56 object-cover"
+      <>
+        {/* Modal de recadrage (via "Remplacer") */}
+        {cropSrc && (
+          <PhotoCropModal
+            src={cropSrc}
+            onConfirm={handleCropConfirm}
+            onCancel={handleCropCancel}
           />
         )}
-        {kind === "video" && (
-          <video
-            src={value}
-            controls
-            className="w-full max-h-56 bg-black"
-            preload="metadata"
+        <div className="rounded-xl border border-border overflow-hidden bg-white">
+          {(kind === "image" || kind === "doctor") && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={value}
+              alt="Aperçu"
+              className="w-full max-h-56 object-cover"
+            />
+          )}
+          {kind === "video" && (
+            <video
+              src={value}
+              controls
+              className="w-full max-h-56 bg-black"
+              preload="metadata"
+            />
+          )}
+          {kind === "document" && (
+            <div className="flex items-center gap-3 px-4 py-4 bg-amber-50">
+              <FileText className="w-8 h-8 text-amber-600 shrink-0" />
+              <span className="text-sm text-foreground flex-1 truncate">
+                {decodeURIComponent(value.split("/").pop() ?? "document.pdf")}
+              </span>
+              <a
+                href={value}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-primary hover:underline shrink-0"
+              >
+                Ouvrir
+              </a>
+            </div>
+          )}
+          <div className="flex items-center justify-between px-3 py-2 bg-surface border-t border-border">
+            <span className="text-xs text-muted">Fichier uploadé</span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => inputRef.current?.click()}
+                className="flex items-center gap-1 text-xs text-muted hover:text-foreground transition-colors"
+              >
+                <RotateCcw className="w-3 h-3" />
+                Remplacer
+              </button>
+              <button
+                type="button"
+                onClick={handleClear}
+                className="flex items-center gap-1 text-xs text-danger hover:opacity-75 transition-opacity"
+              >
+                <X className="w-3 h-3" />
+                Supprimer
+              </button>
+            </div>
+          </div>
+          <input
+            ref={inputRef}
+            type="file"
+            accept={cfg.accept}
+            onChange={handleFileInput}
+            className="hidden"
           />
-        )}
-        {kind === "document" && (
-          <div className="flex items-center gap-3 px-4 py-4 bg-amber-50">
-            <FileText className="w-8 h-8 text-amber-600 shrink-0" />
-            <span className="text-sm text-foreground flex-1 truncate">
-              {decodeURIComponent(value.split("/").pop() ?? "document.pdf")}
-            </span>
-            <a
-              href={value}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs text-primary hover:underline shrink-0"
-            >
-              Ouvrir
-            </a>
-          </div>
-        )}
-        <div className="flex items-center justify-between px-3 py-2 bg-surface border-t border-border">
-          <span className="text-xs text-muted">Fichier uploadé</span>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => inputRef.current?.click()}
-              className="flex items-center gap-1 text-xs text-muted hover:text-foreground transition-colors"
-            >
-              <RotateCcw className="w-3 h-3" />
-              Remplacer
-            </button>
-            <button
-              type="button"
-              onClick={handleClear}
-              className="flex items-center gap-1 text-xs text-danger hover:opacity-75 transition-opacity"
-            >
-              <X className="w-3 h-3" />
-              Supprimer
-            </button>
-          </div>
         </div>
+      </>
+    );
+  }
+
+  // ── Zone de dépôt / progression ──
+  return (
+    <>
+      {/* Modal de recadrage (upload initial ou drag-and-drop) */}
+      {cropSrc && (
+        <PhotoCropModal
+          src={cropSrc}
+          onConfirm={handleCropConfirm}
+          onCancel={handleCropCancel}
+        />
+      )}
+      <div className="space-y-2">
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => !uploading && inputRef.current?.click()}
+          onKeyDown={(e) => e.key === "Enter" && !uploading && inputRef.current?.click()}
+          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={handleDrop}
+          className={`relative flex flex-col items-center justify-center gap-3 p-8 rounded-xl border-2 border-dashed transition-colors cursor-pointer text-center select-none ${
+            dragOver
+              ? "border-primary bg-blue-50"
+              : uploading
+              ? "border-border bg-surface cursor-not-allowed"
+              : "border-border hover:border-primary hover:bg-surface"
+          }`}
+        >
+          {uploading ? (
+            <>
+              <div className="w-full bg-gray-200 rounded-full h-2 max-w-xs">
+                <div
+                  className="bg-primary h-2 rounded-full transition-all duration-200"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              <p className="text-sm text-muted">{progress}% — envoi en cours…</p>
+            </>
+          ) : (
+            <>
+              <div className="w-12 h-12 rounded-xl bg-surface-alt flex items-center justify-center">
+                <cfg.Icon className="w-6 h-6 text-muted" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground">
+                  Glissez un fichier ici ou{" "}
+                  <span className="text-primary">parcourez</span>
+                </p>
+                <p className="text-xs text-muted mt-0.5">{cfg.hint}</p>
+              </div>
+              {dragOver && (
+                <div className="absolute inset-0 rounded-xl bg-blue-50/80 flex items-center justify-center pointer-events-none">
+                  <Upload className="w-8 h-8 text-primary" />
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        {error && (
+          <div className="flex items-start gap-2 text-sm text-danger bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            {error}
+          </div>
+        )}
+
         <input
           ref={inputRef}
           type="file"
@@ -205,73 +328,6 @@ export default function FileUpload({ kind, value, onChange, onClear }: Props) {
           className="hidden"
         />
       </div>
-    );
-  }
-
-  // ── Zone de dépôt / progression ──
-  return (
-    <div className="space-y-2">
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={() => !uploading && inputRef.current?.click()}
-        onKeyDown={(e) => e.key === "Enter" && !uploading && inputRef.current?.click()}
-        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-        onDragLeave={() => setDragOver(false)}
-        onDrop={handleDrop}
-        className={`relative flex flex-col items-center justify-center gap-3 p-8 rounded-xl border-2 border-dashed transition-colors cursor-pointer text-center select-none ${
-          dragOver
-            ? "border-primary bg-blue-50"
-            : uploading
-            ? "border-border bg-surface cursor-not-allowed"
-            : "border-border hover:border-primary hover:bg-surface"
-        }`}
-      >
-        {uploading ? (
-          <>
-            <div className="w-full bg-gray-200 rounded-full h-2 max-w-xs">
-              <div
-                className="bg-primary h-2 rounded-full transition-all duration-200"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            <p className="text-sm text-muted">{progress}% — envoi en cours…</p>
-          </>
-        ) : (
-          <>
-            <div className="w-12 h-12 rounded-xl bg-surface-alt flex items-center justify-center">
-              <cfg.Icon className="w-6 h-6 text-muted" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-foreground">
-                Glissez un fichier ici ou{" "}
-                <span className="text-primary">parcourez</span>
-              </p>
-              <p className="text-xs text-muted mt-0.5">{cfg.hint}</p>
-            </div>
-            {dragOver && (
-              <div className="absolute inset-0 rounded-xl bg-blue-50/80 flex items-center justify-center pointer-events-none">
-                <Upload className="w-8 h-8 text-primary" />
-              </div>
-            )}
-          </>
-        )}
-      </div>
-
-      {error && (
-        <div className="flex items-start gap-2 text-sm text-danger bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-          {error}
-        </div>
-      )}
-
-      <input
-        ref={inputRef}
-        type="file"
-        accept={cfg.accept}
-        onChange={handleFileInput}
-        className="hidden"
-      />
-    </div>
+    </>
   );
 }
