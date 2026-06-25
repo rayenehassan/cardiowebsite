@@ -50,22 +50,27 @@ encore pointer vers ces fichiers).
 |---|---|
 | `npm run lint` | ✅ propre |
 | `npm run build` (compile + types) | ✅ exit 0 |
-| Tests logique Node (`scratchpad/verify.mjs`) | ✅ 10/10 (recherche accents + diff orphelins) |
+| Tests logique Node (recherche accents + diff orphelins) | ✅ 10/10 |
 | Conformité API Tiptap 3 `setContent` | ✅ vérifiée dans node_modules |
+| **#1 en navigateur réel (Playwright + Chromium)** | ✅ test positif **et** négatif |
 
-### Reste à confirmer en navigateur (non automatisable ici)
-L'environnement n'a pas d'outil de pilotage navigateur et l'admin exige un login.
-À valider manuellement (≈ 3 min, voir checklist) :
-1. **#1** : éditer une fiche → section Liste de 3 éléments A/B/C → « descendre »
-   sur A → l'éditeur doit afficher B, A, C (et non plus rester figé). Supprimer
-   l'élément du milieu → le bon élément disparaît. Enregistrer → la fiche publique
-   correspond.
-2. **#3** : ajouter des « Informations clés » → enregistrer → vérifier les
+**#1 — vérifié en navigateur réel.** Un harnais temporaire montant le vrai
+`RichTextEditor` dans le motif exact de la liste (keyé par index) a été piloté via
+Playwright/Chromium :
+- avec le correctif : « descendre » donne B, A, C ; suppression du milieu donne
+  B, C ; édition puis suppression = pas de contenu fantôme — tout correct ;
+- **test négatif** (correctif désactivé) : « descendre » reste figé sur A, B, C ;
+  suppression du milieu retire à tort le dernier élément (A, B) ; édition laisse
+  un fantôme — reproduit exactement la corruption décrite. Le correctif est donc
+  bien la cause de la résolution. Harnais supprimé après vérification.
+
+### Reste à confirmer en navigateur (admin requiert un login non disponible ici)
+1. **#3** : ajouter des « Informations clés » → enregistrer → vérifier les
    encadrés en haut de la fiche publique (icône auto pour Durée/Anesthésie/
-   Hospitalisation/Reprise).
-3. **#4** : remplacer une image puis **annuler** → l'image d'origine doit rester
-   visible sur le site (plus de suppression prématurée). Remplacer puis
-   enregistrer → l'ancien fichier est nettoyé.
+   Hospitalisation/Reprise). Flux de données tracé en code + build OK.
+2. **#4** : remplacer une image puis **annuler** → l'image d'origine doit rester
+   visible (plus de suppression prématurée). Remplacer puis enregistrer →
+   l'ancien fichier est nettoyé. Logique de diff testée (10/10).
 
 ## Limite résiduelle connue
 Un fichier uploadé puis **jamais** enregistré (abandon total, brouillon ignoré)
