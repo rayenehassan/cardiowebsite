@@ -41,7 +41,7 @@ Plateforme française d'information pré-interventionnelle en cardiologie. Le si
 - Sources de vérité : tables Supabase `interventions`, `doctors`, `site_content`. Schéma dans `supabase/schema.sql`.
 - `Intervention` (`src/types/intervention.ts`) : `id`, `slug`, `title`, `subtitle`, `status`, `sections`, `quickFacts`, `createdAt`, `updatedAt`.
 - `status` intervention : `draft`, `published` ou `archived`. `sections` types : `text`, `list`, `video`, `image`, `document`, `faqs`.
-- `quickFacts` affiché publiquement mais non édité par le form actuel : préserver sauf changement explicite.
+- `quickFacts` affiché publiquement et éditable via `InterventionForm` (section « Informations clés ») : libellés `Durée`/`Anesthésie`/`Hospitalisation`/`Reprise` reçoivent une icône automatique côté patient.
 - `Doctor` (`src/types/doctor.ts`) : équipe médicale éditable, soft delete via `status` (`active`/`archived`), ordre via `display_order`. RLS public filtre `status = 'active'`.
 - `SiteContent` (`src/types/site.ts`) : singleton JSONB (`id = 'singleton'`) pour textes éditables de la page d'accueil (hero, sections, footer, mentions légales). Champs manquants comblés par `mergeSiteContent` depuis `src/lib/site-defaults.ts`.
 - `src/data/interventions.ts` est une fixture de référence seulement. Ne pas réintroduire de fallback runtime mock, JSON ou fichier si Supabase échoue.
@@ -64,13 +64,13 @@ Plateforme française d'information pré-interventionnelle en cardiologie. Le si
   - Interventions : `interventions/` + `interventions/[id]` + `interventions/new`. API : `src/app/api/admin/interventions[/...]`.
   - Équipe : `equipe/` + `equipe/[id]` + `equipe/nouveau`. API : `src/app/api/admin/doctors[/...]` (`reorder`, `archived` inclus).
   - Page d'accueil : `page-accueil/`. API : `src/app/api/admin/site-content`.
-- Login/logout : `src/app/api/auth/login` et `src/app/api/auth/logout`.
+- Login/logout : `src/app/api/auth/login` et `src/app/api/auth/logout`. Le login est limité par IP (`src/lib/rate-limit.ts`, 5 échecs/15 min → 429, réinitialisé au succès) ; compteur en mémoire (mono-instance).
 - Uploads admin : `src/app/api/admin/uploads` signe les uploads directs vers Supabase Storage.
 - Glossaire patient : `src/lib/glossary.ts`, `GlossaryText`, `MedicalTerm`.
 
 ## Admin Et Contenu
 
-- `InterventionForm` gère la création/édition avec constructeur de sections, réordonnancement, modèle de base et Tiptap (corps de section, items de liste, réponses FAQ). `DoctorForm` édite un cardiologue. `SiteContentForm` édite le singleton ; le champ `legalNotice.body` utilise Tiptap, helper `plainToHtml` convertit l'ancien texte brut à la volée pour les lignes historiques.
+- `InterventionForm` gère la création/édition avec constructeur de sections, réordonnancement, `quickFacts` (« Informations clés »), modèle de base et Tiptap (corps de section, items de liste, réponses FAQ). `DoctorForm` édite un cardiologue. `SiteContentForm` édite le singleton ; le champ `legalNotice.body` utilise Tiptap, helper `plainToHtml` convertit l'ancien texte brut à la volée pour les lignes historiques.
 - Les statuts admin sont `draft` et `published`; `archived` est utilisé pour la suppression douce (interventions et cardiologues).
 - Archive/restauration : `DELETE /api/admin/interventions/[id]` ou `/doctors/[id]` archive ; `PATCH` restaure.
 - Après mutation d'une intervention : revalider `/` et `/interventions/{slug}` concernées. Après mutation de `doctors` ou `site_content` : revalider `/`.
