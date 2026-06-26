@@ -161,8 +161,15 @@ function escapeRegex(input: string): string {
   return input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+const LETTER = "A-Za-zÀ-ÖØ-öø-ÿ";
+
+// Frontière de mot SANS lookbehind : on capture le séparateur de gauche dans un
+// groupe (group 1). Raison : le lookbehind `(?<!…)` fait planter le module au
+// chargement sur iOS Safari < 16.4 (iPhones anciens fréquents chez les 60+), ce
+// qui casserait le glossaire/les FAQ. Group 2 = terme de base, group 3 = suffixe
+// pluriel optionnel (« stent » → « stents », « pacemaker » → « pacemakers »).
 const PATTERN = new RegExp(
-  `(?<![A-Za-zÀ-ÖØ-öø-ÿ])(${TERMS_BY_LENGTH.map((t) => escapeRegex(t.term)).join("|")})(?![A-Za-zÀ-ÖØ-öø-ÿ])`,
+  `(^|[^${LETTER}])(${TERMS_BY_LENGTH.map((t) => escapeRegex(t.term)).join("|")})(s|x)?(?![${LETTER}])`,
   "gi"
 );
 
@@ -175,7 +182,7 @@ export interface TextSegment {
 /**
  * Découpe un texte en segments simples (texte brut + termes médicaux).
  * Un terme n'est jamais surligné deux fois dans le même bloc, pour ne pas alourdir
- * la lecture — on garde le premier occurrence et on laisse les suivantes en clair.
+ * la lecture — on garde la première occurrence et on laisse les suivantes en clair.
  */
 export function segmentMedicalText(text: string): TextSegment[] {
   if (!text) return [{ type: "text", value: "" }];
@@ -188,22 +195,29 @@ export function segmentMedicalText(text: string): TextSegment[] {
   let match: RegExpExecArray | null;
 
   while ((match = PATTERN.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      segments.push({ type: "text", value: text.slice(lastIndex, match.index) });
+    const lead = match[1] ?? ""; // séparateur de gauche capturé (hors terme)
+    const base = match[2]; // terme du glossaire
+    const suffix = match[3] ?? ""; // pluriel éventuel
+    const whole = base + suffix;
+    const termStart = match.index + lead.length;
+
+    // Texte avant le terme (séparateur capturé inclus).
+    if (termStart > lastIndex) {
+      segments.push({ type: "text", value: text.slice(lastIndex, termStart) });
     }
 
-    const matched = match[0];
-    const key = matched.toLowerCase();
+    const key = base.toLowerCase();
     const entry = glossary.find((g) => g.term.toLowerCase() === key);
 
     if (entry && !seen.has(key)) {
       seen.add(key);
-      segments.push({ type: "term", value: matched, definition: entry.definition });
+      segments.push({ type: "term", value: whole, definition: entry.definition });
     } else {
-      segments.push({ type: "text", value: matched });
+      segments.push({ type: "text", value: whole });
     }
 
-    lastIndex = match.index + matched.length;
+    lastIndex = termStart + whole.length;
+    if (PATTERN.lastIndex <= match.index) PATTERN.lastIndex = lastIndex; // sécurité anti-boucle
   }
 
   if (lastIndex < text.length) {

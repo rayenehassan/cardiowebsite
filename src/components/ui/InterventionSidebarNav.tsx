@@ -32,6 +32,13 @@ export default function InterventionSidebarNav({ items, collapsible = false }: P
           current = id;
         }
       }
+      // En bas de page, la dernière section (souvent courte) ne franchit jamais
+      // le milieu de l'écran : on force le dernier item actif pour éviter qu'il
+      // reste impossible à atteindre.
+      const atBottom =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 2;
+      if (atBottom) current = items[items.length - 1].id;
       setActiveId(current);
     };
 

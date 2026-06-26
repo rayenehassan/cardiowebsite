@@ -24,19 +24,27 @@ export default function DoctorList({ doctors, archived }: Props) {
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [reordering, setReordering] = useState(false);
-  // La liste affichée vient directement des props serveur ; après reorder/archive,
-  // router.refresh() pousse les nouvelles props et React re-rendu.
-  const list = doctors;
+  // Ordre affiché en état local pour un retour visuel immédiat (optimiste).
+  const [list, setList] = useState(doctors);
+  // Resynchronise sur les nouvelles props serveur (après router.refresh()) par
+  // ajustement d'état pendant le rendu — motif React recommandé, sans useEffect.
+  const [syncedDoctors, setSyncedDoctors] = useState(doctors);
+  if (syncedDoctors !== doctors) {
+    setSyncedDoctors(doctors);
+    setList(doctors);
+  }
 
   async function move(index: number, dir: "up" | "down") {
     if (reordering) return;
     const target = dir === "up" ? index - 1 : index + 1;
     if (target < 0 || target >= list.length) return;
+    const previous = list;
     const next = [...list];
     [next[index], next[target]] = [next[target], next[index]];
 
     setError("");
     setReordering(true);
+    setList(next); // optimiste : la ligne bouge immédiatement
     try {
       const res = await fetch("/api/admin/doctors/reorder", {
         method: "PUT",
@@ -44,12 +52,14 @@ export default function DoctorList({ doctors, archived }: Props) {
         body: JSON.stringify({ ids: next.map((d) => d.id) }),
       });
       if (!res.ok) {
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
+        setList(previous); // échec : retour à l'ordre précédent
         setError(data.error || "Impossible de réordonner.");
         return;
       }
       router.refresh();
     } catch {
+      setList(previous);
       setError("Une erreur est survenue.");
     } finally {
       setReordering(false);

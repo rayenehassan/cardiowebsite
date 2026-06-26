@@ -22,6 +22,7 @@ import {
   X,
   Link as LinkIcon,
   Folder,
+  AlertTriangle,
 } from "lucide-react";
 import FileUpload from "./FileUpload";
 import RichTextEditor from "./RichTextEditor";
@@ -816,6 +817,20 @@ export default function InterventionForm({ intervention, mode }: Props) {
           <p className="text-xs text-muted mt-1">
             URL : /interventions/{slug || "..."}
           </p>
+          {mode === "edit" && intervention && slug !== intervention.slug && (
+            <p
+              className="text-xs mt-1.5 flex items-start gap-1.5 rounded-md p-2"
+              style={{ color: "#92400E", background: "rgba(217,119,6,0.08)" }}
+            >
+              <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+              <span>
+                Changer l&apos;URL cassera les liens et QR codes déjà transmis aux
+                patients : l&apos;ancienne adresse{" "}
+                <code className="font-mono">/interventions/{intervention.slug}</code>{" "}
+                ne fonctionnera plus.
+              </span>
+            </p>
+          )}
         </div>
 
         <div>
