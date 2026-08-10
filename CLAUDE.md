@@ -20,6 +20,7 @@ Plateforme française d'information pré-interventionnelle en cardiologie. Le si
 - Auth admin par JWT avec `jose`.
 - Editeur riche admin avec Tiptap 3.
 - Icônes via `lucide-react`.
+- Chatbot patient via le SDK `openai` (modèle `gpt-4o`) avec RAG sur des documents GACI (embeddings `text-embedding-3-small` + `pgvector`).
 
 ## Règles Next.js 16
 
@@ -42,6 +43,8 @@ Plateforme française d'information pré-interventionnelle en cardiologie. Le si
 - `Intervention` (`src/types/intervention.ts`) : `id`, `slug`, `title`, `subtitle`, `status`, `sections`, `quickFacts`, `createdAt`, `updatedAt`.
 - `status` intervention : `draft`, `published` ou `archived`. `sections` types : `text`, `list`, `video`, `image`, `document`, `faqs`.
 - `quickFacts` affiché publiquement et éditable via `InterventionForm` (section « Informations clés ») : libellés `Durée`/`Anesthésie`/`Hospitalisation`/`Reprise` reçoivent une icône automatique côté patient.
+- Chaque `Section` peut être `collapsible` (repliée par défaut, volet « voir plus » via `<details>`) et porter une `subsection?: SubSection` (un seul niveau, repliable, rendue en bas du contenu principal). Éditées dans `InterventionForm`, rendues sur la page intervention. Persistées dans le JSONB `sections` (pas de migration).
+- Chatbot (tables séparées) : `chat_logs` (analytics des échanges), `chat_custom_answers` (questions hors-sujet + réponses médecin), `documents` (chunks GACI + embeddings). Schémas dans `supabase/add-chat-tables.sql` et `supabase/add-rag-documents.sql`.
 - `Doctor` (`src/types/doctor.ts`) : équipe médicale éditable, soft delete via `status` (`active`/`archived`), ordre via `display_order`. RLS public filtre `status = 'active'`.
 - `SiteContent` (`src/types/site.ts`) : singleton JSONB (`id = 'singleton'`) pour textes éditables de la page d'accueil (hero, sections, footer, mentions légales). Champs manquants comblés par `mergeSiteContent` depuis `src/lib/site-defaults.ts`.
 - `src/data/interventions.ts` est une fixture de référence seulement. Ne pas réintroduire de fallback runtime mock, JSON ou fichier si Supabase échoue.
@@ -51,6 +54,7 @@ Plateforme française d'information pré-interventionnelle en cardiologie. Le si
 - Interventions : `src/lib/interventions.ts` → `src/lib/store.ts`. Public via `getPublishedInterventions()` et `getPublishedInterventionBySlug()`. Admin via `getAllInterventions()` (exclut `archived`) et `getArchivedInterventions()`.
 - Cardiologues : `src/lib/doctors.ts` → `src/lib/doctors-store.ts`. Public via `getPublicDoctors()` (actifs). Admin via `getActiveDoctors()` et `getArchivedDoctors()`.
 - Contenu d'accueil : `src/lib/site-content.ts` → `src/lib/site-store.ts`. `getPublicSiteContent()` est dédupliqué par `React.cache()` (consommé par le layout public et la page d'accueil).
+- Chatbot : `src/lib/chat-store.ts` (`insertChatLog`, `insertCustomAnswer` dédup sur `pending`, `getAnsweredCustomAnswers` injectées dans le system prompt). Ingestion GACI : `scripts/ingest-gaci-pdfs.js`.
 - `src/lib/supabase.ts` expose `supabasePublic` et `supabaseAdmin`; `supabaseAdmin` est serveur uniquement.
 - Si `SUPABASE_ANON_KEY` existe, les lectures publiques passent aussi par RLS Supabase; sinon elles gardent le filtre serveur explicite.
 
@@ -58,19 +62,21 @@ Plateforme française d'information pré-interventionnelle en cardiologie. Le si
 
 - Public patient : `src/app/(public)`. Le layout charge `site_content` et passe `brand` au Header / `brand + footer` au Footer.
 - Accueil : recherche d'interventions, liste des fiches publiées, équipe médicale (lue depuis `doctors`), disclaimer.
-- Page intervention : rendu dynamique des sections, navigation latérale, `quickFacts`, glossaire médical, documents publics seulement.
+- Page intervention : rendu dynamique des sections (repliables et sous-sections `<details>` en option), navigation latérale, `quickFacts`, glossaire médical, bouton Imprimer (`PrintButton`, ouvre les `<details>` avant impression), documents publics seulement.
 - Mentions légales : `src/app/(public)/mentions-legales` rend `legalNotice.body` (HTML) du `site_content` via `dangerouslySetInnerHTML`. Lien dans le footer.
 - Admin : `src/app/admin/(protected)` avec vérification JWT dans le layout serveur.
   - Interventions : `interventions/` + `interventions/[id]` + `interventions/new`. API : `src/app/api/admin/interventions[/...]`.
   - Équipe : `equipe/` + `equipe/[id]` + `equipe/nouveau`. API : `src/app/api/admin/doctors[/...]` (`reorder`, `archived` inclus).
   - Page d'accueil : `page-accueil/`. API : `src/app/api/admin/site-content`.
+  - Chatbot : `chatbot/` (`ChatbotAdmin` : échanges + questions à traiter). API admin : `src/app/api/admin/chat/logs` et `unanswered[/[id]]`.
 - Login/logout : `src/app/api/auth/login` et `src/app/api/auth/logout`. Le login est limité par IP (`src/lib/rate-limit.ts`, 5 échecs/15 min → 429, réinitialisé au succès) ; compteur en mémoire (mono-instance).
 - Uploads admin : `src/app/api/admin/uploads` signe les uploads directs vers Supabase Storage.
-- Glossaire patient : `src/lib/glossary.ts`, `GlossaryText`, `MedicalTerm`.
+- Glossaire patient : `src/lib/glossary.ts`, `GlossaryText`, `MedicalTerm` (tooltip au survol/focus via `createPortal`).
+- Chatbot patient : `ChatWidget` monté dans le layout public (ouvert par la bulle flottante ou le bouton « Questions ? » du header via l'event `cardio:open-chat`). API publique `POST /api/chat` (rate-limit 15 req/min par IP ; contexte = fiches publiées + RAG GACI ; réponses hors-sujet routées vers le médecin ; logs anonymisés RGPD, rétention 30 j). Sans `OPENAI_API_KEY`, l'API renvoie 503 et le widget affiche un message d'indisponibilité.
 
 ## Admin Et Contenu
 
-- `InterventionForm` gère la création/édition avec constructeur de sections, réordonnancement, `quickFacts` (« Informations clés »), modèle de base et Tiptap (corps de section, items de liste, réponses FAQ). `DoctorForm` édite un cardiologue. `SiteContentForm` édite le singleton ; le champ `legalNotice.body` utilise Tiptap, helper `plainToHtml` convertit l'ancien texte brut à la volée pour les lignes historiques.
+- `InterventionForm` gère la création/édition avec constructeur de sections (option « repliée par défaut » et sous-section repliable par section), réordonnancement, `quickFacts` (« Informations clés »), modèle de base et Tiptap (corps de section, items de liste, réponses FAQ). `DoctorForm` édite un cardiologue. `SiteContentForm` édite le singleton ; le champ `legalNotice.body` utilise Tiptap, helper `plainToHtml` convertit l'ancien texte brut à la volée pour les lignes historiques.
 - Les statuts admin sont `draft` et `published`; `archived` est utilisé pour la suppression douce (interventions et cardiologues).
 - Archive/restauration : `DELETE /api/admin/interventions/[id]` ou `/doctors/[id]` archive ; `PATCH` restaure.
 - Après mutation d'une intervention : revalider `/` et `/interventions/{slug}` concernées. Après mutation de `doctors` ou `site_content` : revalider `/`.
@@ -81,8 +87,9 @@ Plateforme française d'information pré-interventionnelle en cardiologie. Le si
 
 ## Variables D'environnement
 
-- Requises en production : `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `JWT_SECRET`, `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`.
+- Requises en production : `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `JWT_SECRET`, `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, `OPENAI_API_KEY` (chatbot ; inactif et dégradé proprement si absente).
 - Recommandée : `SUPABASE_ANON_KEY` pour que les lectures publiques bénéficient des policies RLS.
+- RAG GACI (optionnel) : exécuter `supabase/add-rag-documents.sql`, déposer les PDF dans `public/`, puis `node scripts/ingest-gaci-pdfs.js` (nécessite `python` + `pdfminer.six`). Sans ça, le chatbot répond depuis les fiches seules.
 - `JWT_SECRET` n'a plus de fallback : l'app refuse de démarrer si absente.
 - `ADMIN_PASSWORD_HASH` est un hash bcrypt généré avec `node -e "console.log(require('bcryptjs').hashSync('MOT_DE_PASSE', 10))"`. Le mot de passe en clair ne doit jamais être commité.
 - Le bucket Storage `intervention-media` doit exister et être compatible avec les URLs publiques utilisées par le rendu patient.

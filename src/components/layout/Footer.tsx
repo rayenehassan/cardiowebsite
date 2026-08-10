@@ -16,7 +16,7 @@ interface Props {
 export default function Footer({ brand, footer }: Props) {
   return (
     <footer
-      className="mt-auto border-t"
+      className="mt-auto border-t print:hidden"
       style={{ background: "#F8FAFF", borderColor: "rgba(0,0,0,0.08)" }}
     >
       {/* Urgence band — numéro 15 SAMU figé en dur (sécurité médicale) */}

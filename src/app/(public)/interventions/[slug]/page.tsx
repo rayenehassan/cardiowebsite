@@ -6,11 +6,12 @@ import Accordion from "@/components/ui/Accordion";
 import VideoEmbed from "@/components/ui/VideoEmbed";
 import InterventionSidebarNav from "@/components/ui/InterventionSidebarNav";
 import GlossaryText from "@/components/ui/GlossaryText";
+import PrintButton from "@/components/ui/PrintButton";
 import NextImage from "next/image";
-import { Download, ArrowLeft, FileText, Clock, Syringe, BedDouble, CalendarCheck, Phone } from "lucide-react";
+import { Download, ArrowLeft, FileText, Clock, Syringe, BedDouble, CalendarCheck, Phone, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
-import type { Section } from "@/types/intervention";
+import type { Section, SubSection } from "@/types/intervention";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -48,30 +49,152 @@ function sectionAccent(section: Section, index: number): { color: string; header
   return { color: "#E11D48", headerBg: "rgba(225,29,72,0.05)", dotBg: "rgba(225,29,72,0.1)" };
 }
 
+function renderSubSection(sub: SubSection, accentColor: string): React.ReactNode {
+  if (!sub.title?.trim()) return null;
+  const items = sub.type === "list" ? (sub.items || []).filter((i) => i.trim()) : [];
+  const hasContent = sub.type === "text" ? Boolean(sub.body?.trim()) : items.length > 0;
+  if (!hasContent) return null;
+
+  return (
+    <details className="group/sub mt-6">
+      <summary
+        className="flex items-center gap-3 cursor-pointer list-none select-none rounded-xl border-2 px-4 py-3.5 transition-[filter] hover:brightness-[0.97]"
+        style={{ borderColor: `${accentColor}40`, background: `${accentColor}0F` }}
+      >
+        <span
+          className="print:hidden w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-transform group-open/sub:rotate-180"
+          style={{ background: accentColor }}
+        >
+          <ChevronDown className="w-5 h-5 text-white" />
+        </span>
+        <span className="flex-1 min-w-0">
+          <span
+            className="block text-[17px] font-semibold leading-snug"
+            style={{ color: accentColor, fontFamily: "var(--font-heading)" }}
+          >
+            {sub.title}
+          </span>
+          <span className="print:hidden block text-sm text-gray-500 mt-0.5">
+            <span className="group-open/sub:hidden">Cliquez pour afficher</span>
+            <span className="hidden group-open/sub:inline">Cliquez pour masquer</span>
+          </span>
+        </span>
+      </summary>
+      <div className="mt-4 px-1">
+        {sub.type === "text" && sub.body && (
+          <div
+            className="rich-text leading-[1.65] text-[17px]"
+            style={{ color: "#334155" }}
+            dangerouslySetInnerHTML={{ __html: sub.body }}
+          />
+        )}
+        {sub.type === "list" && (
+          <ul className="space-y-2">
+            {items.map((item, i) => (
+              <li key={i} className="flex items-start gap-3">
+                {sub.ordered !== false ? (
+                  <span
+                    className="text-sm font-bold shrink-0 mt-0.5"
+                    style={{ color: accentColor, fontFamily: "var(--font-heading)" }}
+                  >
+                    {i + 1}.
+                  </span>
+                ) : (
+                  <span
+                    className="w-2 h-2 rounded-full shrink-0 mt-2.5"
+                    style={{ background: accentColor }}
+                  />
+                )}
+                {item.includes("<") ? (
+                  <span
+                    className="rich-text leading-relaxed text-[17px]"
+                    style={{ color: "#334155" }}
+                    dangerouslySetInnerHTML={{ __html: item }}
+                  />
+                ) : (
+                  <span className="leading-relaxed text-[17px]" style={{ color: "#334155" }}>
+                    {item}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </details>
+  );
+}
+
 function SectionCard({
-  id, title, accentColor, headerBg, children,
+  id, title, accentColor, headerBg, collapsible, appendix, className, children,
 }: {
-  id: string; title: string; accentColor: string; headerBg: string; children: React.ReactNode;
+  id: string; title: string; accentColor: string; headerBg: string;
+  collapsible?: boolean; appendix?: React.ReactNode; className?: string; children: React.ReactNode;
 }) {
+  const headerInner = (
+    <>
+      <span className="w-1 h-5 rounded-full shrink-0" style={{ background: accentColor }} />
+      <h2
+        className="text-lg sm:text-xl font-bold text-gray-900 flex-1"
+        style={{ fontFamily: "var(--font-heading)" }}
+      >
+        {title}
+      </h2>
+      {collapsible && (
+        <span className="print:hidden flex items-center gap-2 shrink-0">
+          <span className="hidden sm:inline text-sm font-semibold" style={{ color: accentColor }}>
+            <span className="group-open:hidden">Afficher</span>
+            <span className="hidden group-open:inline">Masquer</span>
+          </span>
+          <span
+            className="w-8 h-8 rounded-full flex items-center justify-center transition-transform group-open:rotate-180"
+            style={{ background: accentColor }}
+          >
+            <ChevronDown className="w-5 h-5 text-white" />
+          </span>
+        </span>
+      )}
+    </>
+  );
+
+  const body = (
+    <div className="px-6 sm:px-8 py-6 sm:py-8">
+      {children}
+      {appendix}
+    </div>
+  );
+
+  if (collapsible) {
+    return (
+      <details
+        id={id}
+        className={`group scroll-mt-36 rounded-2xl overflow-hidden bg-white${className ? ` ${className}` : ""}`}
+        style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}
+      >
+        <summary
+          className="flex items-center gap-3 px-5 sm:px-7 py-4 cursor-pointer list-none"
+          style={{ background: headerBg }}
+        >
+          {headerInner}
+        </summary>
+        {body}
+      </details>
+    );
+  }
+
   return (
     <div
       id={id}
-      className="scroll-mt-36 rounded-2xl overflow-hidden bg-white"
+      className={`scroll-mt-36 rounded-2xl overflow-hidden bg-white${className ? ` ${className}` : ""}`}
       style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}
     >
       <div
         className="flex items-center gap-3 px-5 sm:px-7 py-4"
         style={{ background: headerBg }}
       >
-        <span className="w-1 h-5 rounded-full shrink-0" style={{ background: accentColor }} />
-        <h2
-          className="text-lg sm:text-xl font-bold text-gray-900"
-          style={{ fontFamily: "var(--font-heading)" }}
-        >
-          {title}
-        </h2>
+        {headerInner}
       </div>
-      <div className="px-6 sm:px-8 py-6 sm:py-8">{children}</div>
+      {body}
     </div>
   );
 }
@@ -80,7 +203,8 @@ function renderSection(section: Section, index: number): React.ReactNode {
   if (!sectionHasContent(section)) return null;
   const anchor = sectionAnchor(section, index);
   const { color, headerBg, dotBg } = sectionAccent(section, index);
-  const cardProps = { id: anchor, title: section.title, accentColor: color, headerBg };
+  const appendix = section.subsection ? renderSubSection(section.subsection, color) : undefined;
+  const cardProps = { id: anchor, title: section.title, accentColor: color, headerBg, collapsible: section.collapsible, appendix };
 
   switch (section.type) {
     case "text": {
@@ -132,8 +256,9 @@ function renderSection(section: Section, index: number): React.ReactNode {
     }
 
     case "video":
+      // Une vidéo ne s'imprime pas : la section entière est masquée sur papier.
       return (
-        <SectionCard key={section.id} {...cardProps}>
+        <SectionCard key={section.id} {...cardProps} className="print:hidden">
           <VideoEmbed video={{ id: section.id, title: section.title, url: section.videoUrl!, type: section.videoType || "youtube" }} />
         </SectionCard>
       );
@@ -222,8 +347,8 @@ export default async function InterventionPage({ params }: Props) {
     <div className="light-content min-h-screen smooth-scroll">
 
       {/* Top bar — sticky below global header */}
-      <div className="sticky top-[64px] z-40 border-b border-gray-100" style={{ background: "linear-gradient(135deg, #EEF4FF 0%, #F8FAFF 55%, #FFF5F7 100%)" }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
+      <div className="print:hidden sticky top-[64px] z-40 border-b border-gray-100" style={{ background: "linear-gradient(135deg, #EEF4FF 0%, #F8FAFF 55%, #FFF5F7 100%)" }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
           <Link
             href="/#interventions"
             className="inline-flex items-center gap-2 text-base text-foreground hover:text-primary transition-colors py-2"
@@ -232,6 +357,7 @@ export default async function InterventionPage({ params }: Props) {
             <ArrowLeft className="w-4 h-4" />
             Toutes les procédures
           </Link>
+          <PrintButton />
         </div>
       </div>
 
@@ -292,14 +418,14 @@ export default async function InterventionPage({ params }: Props) {
         <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr] gap-6 lg:gap-8 items-start">
 
           {/* ── Sidebar ── */}
-          <aside className="hidden lg:block sticky top-[144px]">
+          <aside className="hidden lg:block print:hidden sticky top-[144px]">
             <InterventionSidebarNav items={navItems} />
           </aside>
 
           {/* ── Contenu sections ── */}
           <main className="min-w-0">
             {navItems.length > 0 && (
-              <div className="mb-6 lg:hidden">
+              <div className="mb-6 lg:hidden print:hidden">
                 <InterventionSidebarNav items={navItems} collapsible />
               </div>
             )}

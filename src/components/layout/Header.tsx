@@ -56,7 +56,7 @@ export default function Header({ brand }: Props) {
   }
 
   return (
-    <header className="sticky top-0 z-50">
+    <header className="sticky top-0 z-50 print:hidden">
       <div
         className="border-b"
         style={{ background: "#0F172A", borderColor: "rgba(255,255,255,0.08)" }}

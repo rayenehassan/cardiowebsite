@@ -6,6 +6,14 @@ export type SectionType =
   | "document"
   | "faqs";
 
+export interface SubSection {
+  title: string;
+  type: "text" | "list";
+  body?: string;
+  items?: string[];
+  ordered?: boolean;
+}
+
 export interface Section {
   id: string;
   type: SectionType;
@@ -26,6 +34,10 @@ export interface Section {
   // document
   documentUrl?: string;
   isPublic?: boolean;
+  // commun : affiche la section repliée (volet « voir plus » via <details>)
+  collapsible?: boolean;
+  // sous-section repliable affichée en bas du contenu principal
+  subsection?: SubSection;
 }
 
 // Kept for VideoEmbed / DocumentList / Accordion components

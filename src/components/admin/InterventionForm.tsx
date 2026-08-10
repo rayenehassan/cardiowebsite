@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Intervention, InterventionStatus, QuickFact, Section, SectionType } from "@/types/intervention";
+import { Intervention, InterventionStatus, QuickFact, Section, SectionType, SubSection } from "@/types/intervention";
 import { useBeforeUnload, useFormDraft } from "@/lib/use-form-draft";
 import { deleteUpload, collectSectionMedia, orphanedUploads } from "@/lib/uploads-client";
 import DraftBanner from "./DraftBanner";
@@ -388,6 +388,54 @@ export default function InterventionForm({ intervention, mode }: Props) {
     }
   }
 
+  // SubSection helpers
+  function updateSubSection(sectionId: string, patch: Partial<SubSection>) {
+    setSections((prev) =>
+      prev.map((s) =>
+        s.id === sectionId && s.subsection
+          ? { ...s, subsection: { ...s.subsection, ...patch } }
+          : s
+      )
+    );
+  }
+  function addSubListItem(sectionId: string) {
+    setSections((prev) =>
+      prev.map((s) =>
+        s.id === sectionId && s.subsection?.type === "list"
+          ? { ...s, subsection: { ...s.subsection, items: [...(s.subsection.items || []), ""] } }
+          : s
+      )
+    );
+  }
+  function updateSubListItem(sectionId: string, index: number, value: string) {
+    setSections((prev) =>
+      prev.map((s) => {
+        if (s.id !== sectionId || !s.subsection || s.subsection.type !== "list") return s;
+        const items = [...(s.subsection.items || [])];
+        items[index] = value;
+        return { ...s, subsection: { ...s.subsection, items } };
+      })
+    );
+  }
+  function removeSubListItem(sectionId: string, index: number) {
+    setSections((prev) =>
+      prev.map((s) =>
+        s.id === sectionId && s.subsection?.type === "list"
+          ? { ...s, subsection: { ...s.subsection, items: (s.subsection.items || []).filter((_, i) => i !== index) } }
+          : s
+      )
+    );
+  }
+  function moveSubListItem(sectionId: string, index: number, dir: "up" | "down") {
+    setSections((prev) =>
+      prev.map((s) =>
+        s.id === sectionId && s.subsection?.type === "list"
+          ? { ...s, subsection: { ...s.subsection, items: moveItem(s.subsection.items || [], index, dir) } }
+          : s
+      )
+    );
+  }
+
   const inputClass =
     "w-full px-3 py-2.5 border border-border rounded-lg focus:ring-2 focus:ring-primary-light focus:border-primary-light outline-none transition-colors bg-white text-sm";
   const labelClass = "block text-xs font-semibold text-muted mb-1.5 uppercase tracking-wider";
@@ -759,6 +807,160 @@ export default function InterventionForm({ intervention, mode }: Props) {
                 </button>
               </div>
             )}
+
+            {/* Option commune à tous les types de section */}
+            <div className="pt-2 border-t border-border space-y-3">
+              <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={section.collapsible === true}
+                  onChange={(e) =>
+                    updateSection(section.id, { collapsible: e.target.checked })
+                  }
+                  className="w-4 h-4 rounded"
+                />
+                Section repliée par défaut{" "}
+                <span className="text-xs text-muted">(volet « voir plus » pour le patient)</span>
+              </label>
+
+              {/* Sous-section repliable */}
+              <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={!!section.subsection}
+                  onChange={(e) =>
+                    updateSection(section.id, {
+                      subsection: e.target.checked
+                        ? { title: "", type: "list", items: [""], ordered: false }
+                        : undefined,
+                    })
+                  }
+                  className="w-4 h-4 rounded"
+                />
+                Ajouter une sous-section repliable en bas{" "}
+                <span className="text-xs text-muted">(ex. liste complète des risques)</span>
+              </label>
+
+              {section.subsection && (
+                <div className="ml-6 border border-border rounded-lg p-3 space-y-3 bg-surface">
+                  <div>
+                    <label className={labelClass}>Titre de la sous-section</label>
+                    <input
+                      type="text"
+                      value={section.subsection.title}
+                      onChange={(e) => updateSubSection(section.id, { title: e.target.value })}
+                      className={inputClass}
+                      placeholder="ex. Voir la liste complète des risques"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <label className={labelClass + " mb-0"}>Type de contenu</label>
+                    <label className="flex items-center gap-1.5 text-sm text-foreground cursor-pointer">
+                      <input
+                        type="radio"
+                        checked={section.subsection.type === "text"}
+                        onChange={() => updateSubSection(section.id, { type: "text", body: "", items: undefined })}
+                      />
+                      Texte
+                    </label>
+                    <label className="flex items-center gap-1.5 text-sm text-foreground cursor-pointer">
+                      <input
+                        type="radio"
+                        checked={section.subsection.type === "list"}
+                        onChange={() => updateSubSection(section.id, { type: "list", items: [""], ordered: false, body: undefined })}
+                      />
+                      Liste
+                    </label>
+                  </div>
+
+                  {section.subsection.type === "text" && (
+                    <RichTextEditor
+                      key={`${section.id}-sub-body-${restoreVersion}`}
+                      value={section.subsection.body || ""}
+                      onChange={(html) => updateSubSection(section.id, { body: html })}
+                      placeholder="Contenu de la sous-section…"
+                    />
+                  )}
+
+                  {section.subsection.type === "list" && (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3 mb-1">
+                        <label className={labelClass + " mb-0"}>Type de liste</label>
+                        <label className="flex items-center gap-1.5 text-sm text-foreground cursor-pointer">
+                          <input
+                            type="radio"
+                            checked={section.subsection.ordered !== false}
+                            onChange={() => updateSubSection(section.id, { ordered: true })}
+                          />
+                          Numérotée
+                        </label>
+                        <label className="flex items-center gap-1.5 text-sm text-foreground cursor-pointer">
+                          <input
+                            type="radio"
+                            checked={section.subsection.ordered === false}
+                            onChange={() => updateSubSection(section.id, { ordered: false })}
+                          />
+                          À puces
+                        </label>
+                      </div>
+                      <div className="space-y-1.5">
+                        {(section.subsection.items || []).map((item, i) => {
+                          const subItems = section.subsection!.items || [];
+                          return (
+                            <div key={i} className="flex gap-1.5 items-center">
+                              <div className="flex flex-col shrink-0">
+                                <button
+                                  type="button"
+                                  onClick={() => moveSubListItem(section.id, i, "up")}
+                                  disabled={i === 0}
+                                  className="p-0.5 text-muted hover:text-foreground disabled:opacity-20 transition-colors"
+                                >
+                                  <ChevronUp className="w-3 h-3" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => moveSubListItem(section.id, i, "down")}
+                                  disabled={i === subItems.length - 1}
+                                  className="p-0.5 text-muted hover:text-foreground disabled:opacity-20 transition-colors"
+                                >
+                                  <ChevronDown className="w-3 h-3" />
+                                </button>
+                              </div>
+                              <span className="text-xs text-muted w-5 text-right shrink-0">
+                                {section.subsection!.ordered !== false ? `${i + 1}.` : "•"}
+                              </span>
+                              <input
+                                type="text"
+                                value={item}
+                                onChange={(e) => updateSubListItem(section.id, i, e.target.value)}
+                                className={inputClass + " flex-1"}
+                                placeholder="Élément…"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => removeSubListItem(section.id, i)}
+                                className="p-1 text-muted hover:text-danger transition-colors shrink-0"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          );
+                        })}
+                        <button
+                          type="button"
+                          onClick={() => addSubListItem(section.id)}
+                          className="flex items-center gap-1 text-sm text-primary hover:text-primary-dark font-medium mt-1"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          Ajouter un élément
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>

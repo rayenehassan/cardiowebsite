@@ -291,3 +291,14 @@ body {
   .ecg-run { animation: none; visibility: hidden; }
   .ecg-ghost { stroke: rgba(3, 105, 161, 0.55); }
 }
+
+/* ── Impression : version papier des fiches ── */
+/* Les éléments d'interface sont masqués via la variante Tailwind print:hidden ;
+   ici, uniquement la mise en page du document imprimé. */
+@media print {
+  @page { margin: 14mm 12mm; }
+  /* Titres de section jamais orphelins en bas de page */
+  h1, h2, h3, summary { break-after: avoid; }
+  /* Un item de liste ne se coupe pas en deux */
+  li { break-inside: avoid-page; }
+}
