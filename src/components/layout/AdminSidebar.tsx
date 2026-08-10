@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, FileText, LogOut, ExternalLink, Home, Users } from "lucide-react";
+import { LayoutDashboard, FileText, LogOut, ExternalLink, Home, Users, Bot } from "lucide-react";
 
 const navItems = [
   { href: "/admin/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
   { href: "/admin/interventions", label: "Interventions", icon: FileText },
   { href: "/admin/page-accueil", label: "Page d'accueil", icon: Home },
   { href: "/admin/equipe", label: "Équipe médicale", icon: Users },
+  { href: "/admin/chatbot", label: "Chatbot", icon: Bot },
 ];
 
 export default function AdminSidebar({ onClose }: { onClose?: () => void }) {
@@ -22,7 +23,7 @@ export default function AdminSidebar({ onClose }: { onClose?: () => void }) {
   }
 
   return (
-    <aside className="w-64 flex flex-col h-screen shrink-0" style={{ background: "#0F172A" }}>
+    <aside className="w-64 flex flex-col h-full shrink-0" style={{ background: "#0F172A" }}>
       {/* Logo */}
       <div className="p-5 border-b" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
         <Link href="/admin/dashboard" className="flex items-center gap-3">

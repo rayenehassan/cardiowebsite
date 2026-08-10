@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, MessageSquare } from "lucide-react";
 import { SiteBrand } from "@/types/site";
 
 const navLinks = [
@@ -38,6 +38,11 @@ export default function Header({ brand }: Props) {
     if (typeof window !== "undefined") {
       window.history.replaceState(null, "", `/#${hash}`);
     }
+  }
+
+  function openChat() {
+    setMenuOpen(false);
+    window.dispatchEvent(new CustomEvent("cardio:open-chat"));
   }
 
   function handleLogoClick(e: React.MouseEvent<HTMLAnchorElement>) {
@@ -107,6 +112,19 @@ export default function Header({ brand }: Props) {
                 ))}
               </nav>
 
+              {/* Bouton assistant (desktop) */}
+              <button
+                onClick={openChat}
+                className="hidden md:inline-flex items-center gap-2 px-4 rounded-lg text-[14px] font-medium text-white border border-white/35 bg-transparent transition-all hover:bg-white/10 hover:border-white/60 active:scale-95 cursor-pointer"
+                style={{
+                  fontFamily: "var(--font-heading)",
+                  minHeight: "44px",
+                }}
+              >
+                <MessageSquare className="w-4 h-4" />
+                Questions ?
+              </button>
+
               {/* Mobile toggle */}
               <button
                 className="md:hidden p-3 rounded-lg transition-colors hover:bg-white/10"
@@ -139,6 +157,14 @@ export default function Header({ brand }: Props) {
                   {label}
                 </Link>
               ))}
+              <button
+                onClick={openChat}
+                className="mt-2 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-[15px] font-medium text-white cursor-pointer hover:opacity-90 transition-opacity"
+                style={{ fontFamily: "var(--font-heading)", background: "linear-gradient(135deg, #0284C7 0%, #38BDF8 100%)" }}
+              >
+                <MessageSquare className="w-4 h-4" />
+                Questions ?
+              </button>
             </nav>
           )}
         </div>

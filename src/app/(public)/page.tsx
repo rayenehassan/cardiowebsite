@@ -19,6 +19,37 @@ const BADGE_ICONS: Record<BadgeIcon, React.ElementType> = {
   users: Users,
 };
 
+// Onde ECG du hero (4 cycles P-QRS-T sur 1200 unités, ligne de base à y=42).
+const ECG_PATH =
+  "M0,36 H90 q6,-10 12,0 H130 l6,4 8,-44 8,52 6,-12 H205 q12,-16 24,0 H390 q6,-10 12,0 H430 l6,4 8,-44 8,52 6,-12 H505 q12,-16 24,0 H690 q6,-10 12,0 H730 l6,4 8,-44 8,52 6,-12 H805 q12,-16 24,0 H990 q6,-10 12,0 H1030 l6,4 8,-44 8,52 6,-12 H1105 q12,-16 24,0 H1200";
+
+function CathLabCard() {
+  return (
+    <div className="max-w-sm sm:max-w-md rounded-2xl overflow-hidden glass">
+      <div className="relative w-full aspect-[4/3]">
+        <Image
+          src="/cath-lab.jpeg"
+          alt="Salle de cathétérisme"
+          fill
+          sizes="(max-width: 640px) 384px, 448px"
+          className="object-cover"
+        />
+      </div>
+      <div className="p-4 sm:p-5">
+        <p
+          className="text-sm sm:text-base font-semibold text-foreground leading-snug"
+          style={{ fontFamily: "var(--font-heading)" }}
+        >
+          Notre salle de cathétérisme
+        </p>
+        <p className="text-xs sm:text-sm text-muted leading-snug mt-0.5">
+          L&apos;environnement où se déroulera votre intervention
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default async function HomePage() {
   const [interventions, content, doctors] = await Promise.all([
     getPublishedInterventions(),
@@ -32,17 +63,18 @@ export default async function HomePage() {
     <>
       {/* ── Hero ── */}
       <section id="accueil" className="relative min-h-[85svh] sm:min-h-screen flex items-center mesh-bg overflow-hidden">
-<div className="relative w-full max-w-[1440px] mx-auto px-5 sm:px-8 py-14 sm:py-24">
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,700px)_460px] gap-10 lg:gap-16 lg:justify-center items-center">
+<div className="relative w-full max-w-[1440px] mx-auto px-5 sm:px-8 py-14 sm:py-24 pb-24 sm:pb-32">
+          <div className="anim-fade-up mb-5 sm:mb-6">
+            <span className="section-label" title={hero.locationLabel}>
+              <MapPin className="w-3.5 h-3.5" />
+              <span className="section-label-text">{hero.locationLabel}</span>
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,700px)_460px] gap-10 lg:gap-16 lg:justify-center items-start">
 
             {/* ── Colonne gauche : texte ── */}
             <div>
-              <div className="anim-fade-up mb-5 sm:mb-6">
-                <span className="section-label" title={hero.locationLabel}>
-                  <MapPin className="w-3.5 h-3.5" />
-                  <span className="section-label-text">{hero.locationLabel}</span>
-                </span>
-              </div>
               <h1
                 className="anim-fade-up delay-100 text-[2.2rem] sm:text-5xl lg:text-[60px] font-bold leading-[1.1] sm:leading-[1.05] tracking-[-0.02em] mb-5 text-foreground"
                 style={{ fontFamily: "var(--font-heading)" }}
@@ -74,13 +106,77 @@ export default async function HomePage() {
               <div className="lg:hidden mt-8 anim-fade-up delay-400">
                 <InterventionSearch interventions={interventions} />
               </div>
+
+              {/* ── Photo salle de cathétérisme (mobile) ── */}
+              <div className="lg:hidden mt-6 anim-fade-up delay-500">
+                <CathLabCard />
+              </div>
             </div>
 
-            {/* ── Colonne droite : recherche desktop ── */}
-            <div className="anim-fade-up delay-400 hidden lg:block">
-              <InterventionSearch interventions={interventions} />
+            {/* ── Colonne droite : recherche desktop + photo ── */}
+            <div className="hidden lg:block">
+              <div className="anim-fade-up delay-400">
+                <InterventionSearch interventions={interventions} />
+              </div>
+              <div className="anim-fade-up delay-500 mt-6 sm:mt-7">
+                <CathLabCard />
+              </div>
             </div>
 
+          </div>
+        </div>
+
+        {/* ECG animé posé directement sur le fond bleu du hero */}
+        <div className="absolute inset-x-0 bottom-0 h-16 sm:h-24 pointer-events-none" aria-hidden="true">
+          <div
+            className="absolute inset-0"
+            style={{
+              maskImage: "linear-gradient(to right, transparent, black 12%, black 88%, transparent)",
+              WebkitMaskImage: "linear-gradient(to right, transparent, black 12%, black 88%, transparent)",
+            }}
+          >
+            <svg viewBox="0 0 1200 100" preserveAspectRatio="none" className="w-full h-full">
+              {/* Dégradé repris de la palette bleue du hero */}
+              <defs>
+                <linearGradient id="ecgGrad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#0284C7" />
+                  <stop offset="100%" stopColor="#38BDF8" />
+                </linearGradient>
+              </defs>
+              {/* rémanence : la trace complète, très discrète */}
+              <path
+                className="ecg-ghost"
+                d={ECG_PATH}
+                fill="none"
+                stroke="url(#ecgGrad)"
+                strokeOpacity={0.22}
+                strokeWidth="1.5"
+                vectorEffect="non-scaling-stroke"
+                pathLength={1}
+              />
+              {/* halo diffus du segment en mouvement */}
+              <path
+                className="ecg-run"
+                d={ECG_PATH}
+                fill="none"
+                stroke="url(#ecgGrad)"
+                strokeOpacity={0.36}
+                strokeWidth="8"
+                vectorEffect="non-scaling-stroke"
+                pathLength={1}
+                style={{ filter: "blur(7px)" }}
+              />
+              {/* segment lumineux qui parcourt le tracé */}
+              <path
+                className="ecg-run"
+                d={ECG_PATH}
+                fill="none"
+                stroke="url(#ecgGrad)"
+                strokeWidth="2.1"
+                vectorEffect="non-scaling-stroke"
+                pathLength={1}
+              />
+            </svg>
           </div>
         </div>
       </section>

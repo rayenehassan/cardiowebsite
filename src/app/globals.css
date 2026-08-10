@@ -272,3 +272,22 @@ body {
 .rich-text li     { margin: 0.3em 0; }
 .rich-text p      { margin: 0 0 1.3em; }
 .rich-text p:last-child { margin-bottom: 0; }
+
+/* ── Bande ECG du hero ── */
+/* Tracé ECG du hero : un segment lumineux (16 % du tracé) parcourt la ligne
+   en boucle, comme le balayage d'un moniteur ; la trace complète reste
+   en rémanence discrète (.ecg-ghost, sans animation). */
+@keyframes ecgRun {
+  from { stroke-dashoffset: 1; }
+  to   { stroke-dashoffset: -1; }
+}
+.ecg-run {
+  stroke-dasharray: 0.16 0.84;
+  animation: ecgRun 16s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* moniteur figé : segment masqué, rémanence renforcée */
+  .ecg-run { animation: none; visibility: hidden; }
+  .ecg-ghost { stroke: rgba(3, 105, 161, 0.55); }
+}
