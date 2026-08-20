@@ -423,3 +423,72 @@ cookies.
 - [Why your vibe-coded designs look generic](https://medium.com/design-bootcamp/why-your-vibe-coded-designs-look-generic-the-fix-isnt-better-prompts-09e2fda26591) — Jola Gil, Bootcamp
 - [Typography](https://service-manual.nhs.uk/design-system/styles/typography) et [Design principles](https://service-manual.nhs.uk/design-system/design-principles) — NHS digital service manual
 - [Healthcare Website Design: Patient-Centric UX](https://www.easternstandard.com/blog/healthcare-website-agency/) — Eastern Standard
+
+---
+
+## 11. Journal d'application — 20 août 2026
+
+Appliqué sur la branche `refonte-ui-humaine` (base : `cbf8ba4`, état
+« avant » conservé sur `fix/audit-6-7-8-9-11` et sur `main`).
+
+| Lot | Commit | État |
+|---|---|---|
+| 1 + 2 — Fondations + accueil | `b9e4ea4` | fait |
+| 3 — Fiche intervention | `b68a23c` | fait |
+| 4 — Chrome | `43660d4` | fait |
+| 5 — Voix + admin | `085d173` | fait |
+
+`npm run lint`, `npx tsc --noEmit` et `npm run build` passent sur chaque lot.
+
+### Mesures, avant → après (site public)
+
+| Dimension | Avant | Après |
+|---|---:|---:|
+| Couleurs codées en dur | 24 | 0 |
+| Tailles de texte distinctes | 21 | 8 |
+| Ombres portées distinctes | 7 | 2 |
+| Blocs `style={{…}}` | 156 | 7 |
+| `var(--font-heading)` en ligne | 42 | 3 |
+
+Les 2 ombres restantes sont sur le panneau de chat, seul élément en
+surimpression. Les 7 styles en ligne sont du positionnement dynamique
+(infobulle du glossaire, hauteur auto du champ de saisie, cadrage des
+portraits) et le serif du nom de l'établissement.
+
+### Décisions prises
+
+1. **Serif en titres, sans en corps.** Source Serif 4 + Source Sans 3.
+   Le serif intégral aurait été plus tranché mais plus risqué à faire
+   accepter par le médecin ; le sans en corps reste la pratique des
+   services publics de santé. Réversible en une ligne dans `globals.css`.
+2. **Logo retiré.** Pas de charte Ramsay disponible : le pictogramme est
+   remplacé par le nom composé, norme des établissements français. À
+   remplacer dès réception du kit de marque.
+3. **Tracé ECG conservé, désamorcé.** Un trait de 1,5 px, sans dégradé,
+   sans halo, sans animation.
+4. **Numérotation des sections conservée**, mais comme numéro de
+   sommaire (position dans le document), pas comme chronologie —
+   numéroter une FAQ « étape 5 » aurait reproduit exactement le défaut
+   reproché à `sectionAccent` : dériver du sens d'une position.
+
+### Reste à faire
+
+- **Textes en base.** Les textes de l'accueil vivent dans la table
+  Supabase `site_content`, pas dans le code. La refonte met à jour
+  `site-defaults.ts` (fallback et bouton « restaurer »), mais la ligne
+  existante garde ses anciennes formulations : elles doivent être
+  reprises depuis `/admin/page-accueil`. **Preview et production
+  partagent la même base** — modifier ces textes les change aussi en
+  production.
+- **Relecteur par fiche.** Le pied de fiche nomme aujourd'hui tous les
+  cardiologues actifs. Un relecteur nommé *par fiche* demande une
+  colonne `reviewed_by` (migration additive + champ admin) ; non fait
+  pour ne pas toucher au schéma partagé avec la production.
+- **Source GACI par fiche.** Même raison : il manque un champ reliant
+  une fiche à son document GACI.
+- **Copie à faits.** Les formulations qui demandent une information que
+  seul le médecin détient (qui appelle la veille, horaires de
+  surveillance) ont été supprimées plutôt que remplacées par du
+  remplissage. À écrire avec lui.
+- **Admin.** Hors périmètre ; il a hérité des jetons et de la
+  typographie, mais sa mise en page n'a pas été retravaillée.
