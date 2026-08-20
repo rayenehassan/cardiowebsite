@@ -1,23 +1,68 @@
 @import "tailwindcss";
 
+/* ═══════════════════════════════════════════════════════════════════
+   Système visuel — voir docs/audit-ui-design.md
+
+   Trois règles qui gouvernent tout le fichier :
+   1. Aucune couleur hors des jetons ci-dessous. Rien d'hexadécimal
+      dans le TSX.
+   2. Un seul rayon d'angle (3px). Aucune ombre portée : la séparation
+      se fait au filet 1px et à l'espace vertical.
+   3. Le mouvement ne sert qu'à accuser réception d'une action, jamais
+      à décorer une apparition.
+   ═══════════════════════════════════════════════════════════════════ */
+
 @theme inline {
-  --color-primary: #0284C7;
-  --color-primary-light: #38BDF8;
-  --color-primary-dark: #0369A1;
-  --color-accent: #6366F1;
-  --color-accent-2: #059669;
-  --color-background: #ffffff;
-  --color-surface: #F8FAFF;
-  --color-surface-alt: #EEF4FF;
-  --color-foreground: #0F172A;
-  --color-muted: #475569;
-  --color-muted-soft: #64748B;
-  --color-border: rgba(0, 0, 0, 0.07);
-  --color-danger: #DC2626;
-  --color-success: #059669;
-  --font-sans: var(--font-inter), system-ui, sans-serif;
-  --font-heading: var(--font-space-grotesk), system-ui, sans-serif;
-  --font-mono: ui-monospace, monospace;
+  /* ── Fonds : blanc papier légèrement chaud. Surtout pas de bleu
+        dans les gris — un gris bleuté lit « interface », un gris
+        chaud lit « document ». ── */
+  --color-background:    #FBFAF8;
+  --color-surface:       #F4F2ED;
+  --color-surface-alt:   #EDEAE2;
+  --color-border:        #DCD8D0;
+  --color-border-strong: #BFB8AB;
+
+  /* ── Encres ── */
+  --color-foreground:  #16191E;
+  --color-muted:       #4A515B;
+  --color-muted-soft:  #6B727C;
+
+  /* ── Sémantique : un emploi et un seul par teinte. ── */
+  --color-primary:       #1B4F72;  /* liens, navigation, action primaire */
+  --color-primary-dark:  #123C58;  /* survol de l'action primaire */
+  --color-primary-light: #2F6C95;  /* anneaux de focus, états secondaires */
+  --color-danger:        #A0342A;  /* urgence vitale : le 15, et rien d'autre */
+  --color-warn:          #8A5E17;  /* consigne à ne pas manquer */
+  --color-success:       #3D6B4A;  /* confirmation admin */
+
+  /* ── Typographie : superfamille Source. Serif pour les titres
+        (registre brochure hospitalière), sans pour le texte courant
+        et les données. Corps à 18px — public 60+. ── */
+  --font-sans:    var(--font-source-sans), system-ui, sans-serif;
+  --font-heading: var(--font-source-serif), Georgia, "Times New Roman", serif;
+  --font-mono:    ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+  /* Échelle fermée : 13 / 15 / 18 / 21 / 26 / 32 / 40 / 48.
+     Toute taille hors de cette liste est un bug. */
+  --text-xs:   0.8125rem;  --text-xs--line-height:   1.45;
+  --text-sm:   0.9375rem;  --text-sm--line-height:   1.5;
+  --text-base: 1.125rem;   --text-base--line-height: 1.6;
+  --text-lg:   1.3125rem;  --text-lg--line-height:   1.5;
+  --text-xl:   1.625rem;   --text-xl--line-height:   1.3;
+  --text-2xl:  2rem;       --text-2xl--line-height:  1.2;
+  --text-3xl:  2.5rem;     --text-3xl--line-height:  1.12;
+  --text-4xl:  3rem;       --text-4xl--line-height:  1.06;
+  --text-5xl:  3rem;       --text-5xl--line-height:  1.06;
+
+  /* ── Surfaces : un rayon unique. `rounded-full` reste rond pour
+        les rares objets réellement circulaires. ── */
+  --radius-xs:  3px;
+  --radius-sm:  3px;
+  --radius-md:  3px;
+  --radius-lg:  3px;
+  --radius-xl:  3px;
+  --radius-2xl: 3px;
+  --radius-3xl: 3px;
 }
 
 html {
@@ -32,13 +77,28 @@ body {
   background: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-sans);
+  font-size: 1.125rem;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Titres : serif, jamais un mot seul sur la dernière ligne. */
+h1, h2, h3 {
+  font-family: var(--font-heading);
+  text-wrap: balance;
+  letter-spacing: -0.012em;
+}
+
+/* Le texte courant évite les lignes orphelines quand le navigateur le
+   permet ; sinon la propriété est simplement ignorée. */
+p, li {
+  text-wrap: pretty;
+}
+
 *:focus-visible {
   outline: 2px solid var(--color-primary);
-  outline-offset: 3px;
+  outline-offset: 2px;
 }
 
 .scrollbar-hide {
@@ -49,200 +109,72 @@ body {
   display: none;
 }
 
-/* ── Mesh gradient — même technique que Sloan, 4 ellipses, palette bleue ── */
-.mesh-bg {
-  background:
-    linear-gradient(to bottom, transparent 75%, #F8FAFF 100%),
-    radial-gradient(ellipse 700px 600px at 65% 10%, rgba(147, 197, 253, 0.52) 0%, transparent 70%),
-    radial-gradient(ellipse 600px 500px at 35% 85%, rgba(165, 180, 252, 0.38) 0%, transparent 65%),
-    radial-gradient(ellipse 800px 500px at 90% 45%, rgba(103, 232, 249, 0.28) 0%, transparent 70%),
-    radial-gradient(ellipse 500px 500px at 15% 10%, rgba(196, 181, 253, 0.22) 0%, transparent 60%),
-    #ffffff;
-}
-
-/* ── Glassmorphism (sur fond clair) ── */
-.glass {
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04);
-}
-
-.glass-hover {
-  transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
-}
-
-.glass-hover:hover {
-  background: rgba(255, 255, 255, 0.92);
-  border-color: rgba(2, 132, 199, 0.22);
-  box-shadow: 0 8px 32px rgba(2, 132, 199, 0.1), 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-/* ── Gradient text ── */
-.text-gradient {
-  background: linear-gradient(135deg, #0EA5E9 0%, #6366F1 55%, #0284C7 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* ── Section label ── */
-.section-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  max-width: 100%;
-  background: rgba(2, 132, 199, 0.08);
-  border: 1px solid rgba(2, 132, 199, 0.18);
-  border-radius: 100px;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #0369A1;
-  font-family: var(--font-heading);
-}
-.section-label > svg {
-  flex-shrink: 0;
-}
-.section-label > .section-label-text {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* ── Glow effects ── */
-.glow-btn {
-  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.18), 0 1px 4px rgba(0, 0, 0, 0.1);
-}
-
-.glow-btn:hover {
-  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.24), 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* ── Keyframe animations ── */
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(28px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@keyframes floatY {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-18px); }
-}
-
-@keyframes pulseDot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.4; transform: scale(0.8); }
-}
-
-/* ── Animation utilities ── */
-.anim-fade-up {
-  animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.anim-fade-in {
-  animation: fadeIn 0.8s ease both;
-}
-
-.anim-float {
-  animation: floatY 7s ease-in-out infinite;
-}
-
-.anim-pulse-dot {
-  animation: pulseDot 2.5s ease-in-out infinite;
-}
-
-.delay-100 { animation-delay: 100ms; }
-.delay-200 { animation-delay: 200ms; }
-.delay-300 { animation-delay: 300ms; }
-.delay-400 { animation-delay: 400ms; }
-.delay-500 { animation-delay: 500ms; }
-
-/* ── Floating orbs ── */
-.orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  pointer-events: none;
-  will-change: transform;
-}
-
-/* ── Buttons ── */
+/* ── Boutons ─────────────────────────────────────────────────────
+   Rectangulaires, nets, sans halo. C'est la forme qu'utilisent les
+   services publics de santé ; la pilule à ombre diffuse appartient au
+   vocabulaire SaaS. Hauteur 48px conservée (cible tactile). ── */
 .btn-primary {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 15px 30px;
+  padding: 13px 24px;
   min-height: 48px;
-  background: #0F172A;
+  background: var(--color-primary);
   color: #ffffff;
   font-weight: 600;
-  font-size: 16px;
-  border-radius: 100px;
-  font-family: var(--font-heading);
-  letter-spacing: 0.01em;
-  transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  font-size: 1.0625rem;
+  border-radius: 3px;
+  transition: background 0.15s ease;
 }
 
 .btn-primary:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
+  background: var(--color-primary-dark);
 }
 
 .btn-ghost {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 15px 30px;
+  padding: 13px 24px;
   min-height: 48px;
   background: transparent;
-  color: #0F172A;
+  color: var(--color-foreground);
   font-weight: 500;
-  font-size: 16px;
-  border-radius: 100px;
-  border: 1px solid rgba(15, 23, 42, 0.18);
-  font-family: var(--font-heading);
-  transition: border-color 0.2s ease, background 0.2s ease;
+  font-size: 1.0625rem;
+  border-radius: 3px;
+  border: 1px solid var(--color-border-strong);
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .btn-ghost:hover {
-  border-color: rgba(2, 132, 199, 0.4);
-  background: rgba(2, 132, 199, 0.04);
+  border-color: var(--color-primary);
+  background: var(--color-surface);
 }
 
-/* ── Intervention card hover (CSS custom properties, no JS) ── */
+/* ── Carte de fiche ──────────────────────────────────────────────
+   Une carte reste une carte ici : c'est un objet cliquable dans une
+   liste. Mais elle ne décolle plus et ne projette plus d'ombre — au
+   survol la bordure fonce et le titre se souligne. ── */
 .intervention-card {
-  background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .intervention-card:hover {
-  border-color: var(--card-accent-border, rgba(2, 132, 199, 0.3));
-  box-shadow: var(--card-accent-shadow, 0 8px 32px rgba(2,132,199,0.14)), 0 2px 8px rgba(0,0,0,0.06);
-  transform: translateY(-4px);
+  border-color: var(--color-primary);
+  background: var(--color-surface);
 }
 
-/* ── Light content scope (pages médicales) ── */
+.intervention-card:hover .card-title {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ── Portée « contenu clair » (pages médicales) ── */
 .light-content {
-  background: #ffffff;
-  color: #111827;
+  background: var(--color-background);
+  color: var(--color-foreground);
 }
 
 /* ── Éditeur riche TipTap (admin) ── */
@@ -256,7 +188,7 @@ body {
 .rich-editor .tiptap li { margin: 0.2em 0; }
 .rich-editor .tiptap p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
-  color: #94A3B8;
+  color: var(--color-muted-soft);
   pointer-events: none;
   float: left;
   height: 0;
@@ -272,33 +204,41 @@ body {
 .rich-text li     { margin: 0.3em 0; }
 .rich-text p      { margin: 0 0 1.3em; }
 .rich-text p:last-child { margin-bottom: 0; }
+.rich-text a      { color: var(--color-primary); text-underline-offset: 2px; }
 
-/* ── Bande ECG du hero ── */
-/* Tracé ECG du hero : un segment lumineux (16 % du tracé) parcourt la ligne
-   en boucle, comme le balayage d'un moniteur ; la trace complète reste
-   en rémanence discrète (.ecg-ghost, sans animation). */
-@keyframes ecgRun {
-  from { stroke-dashoffset: 1; }
-  to   { stroke-dashoffset: -1; }
-}
-.ecg-run {
-  stroke-dasharray: 0.16 0.84;
-  animation: ecgRun 16s linear infinite;
+/* ── Impression : version papier des fiches ──────────────────────
+   Les éléments d'interface sont masqués via la variante Tailwind
+   print:hidden ; ici, uniquement la mise en page du document. ── */
+@media print {
+  @page { margin: 16mm 14mm; }
+
+  body {
+    background: #ffffff;
+    color: #000000;
+    font-size: 11.5pt;
+    line-height: 1.45;
+  }
+
+  /* Titres de section jamais orphelins en bas de page */
+  h1, h2, h3, summary { break-after: avoid; }
+
+  /* Un item de liste ne se coupe pas en deux */
+  li { break-inside: avoid-page; }
+
+  /* Un lien imprimé ne mène nulle part : on imprime sa destination. */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+    color: #444444;
+    word-break: break-all;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  /* moniteur figé : segment masqué, rémanence renforcée */
-  .ecg-run { animation: none; visibility: hidden; }
-  .ecg-ghost { stroke: rgba(3, 105, 161, 0.55); }
-}
-
-/* ── Impression : version papier des fiches ── */
-/* Les éléments d'interface sont masqués via la variante Tailwind print:hidden ;
-   ici, uniquement la mise en page du document imprimé. */
-@media print {
-  @page { margin: 14mm 12mm; }
-  /* Titres de section jamais orphelins en bas de page */
-  h1, h2, h3, summary { break-after: avoid; }
-  /* Un item de liste ne se coupe pas en deux */
-  li { break-inside: avoid-page; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

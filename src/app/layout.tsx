@@ -1,17 +1,21 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Inter } from "next/font/google";
+import { Source_Serif_4, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
 
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+// Superfamille Source : le serif porte les titres et le texte long,
+// le sans porte les libellés et les données. Les deux partagent les
+// mêmes proportions, ce qui se voit — c'est une décision, pas un
+// tirage. Voir docs/audit-ui-design.md § Typographie.
+const sourceSerif = Source_Serif_4({
+  variable: "--font-source-serif",
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
 });
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+const sourceSans = Source_Sans_3({
+  variable: "--font-source-sans",
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -28,7 +32,7 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${spaceGrotesk.variable} ${inter.variable} h-full antialiased`}
+      className={`${sourceSerif.variable} ${sourceSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

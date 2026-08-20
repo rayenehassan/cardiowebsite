@@ -1,14 +1,13 @@
 export const dynamic = "force-dynamic";
 
-import { Users, ArrowRight, Phone, Mail, BookOpen, MapPin, Heart, Lock, Shield, UserRound, Building2, Activity, ShieldCheck } from "lucide-react";
+import { ArrowRight, Phone, Mail, UserRound, Heart, Lock, Shield, BookOpen, Users } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import InterventionCard from "@/components/ui/InterventionCard";
 import InterventionSearch from "@/components/ui/InterventionSearch";
-import AnimateIn from "@/components/ui/AnimateIn";
 import { getPublishedInterventions } from "@/lib/interventions";
 import { getPublicSiteContent } from "@/lib/site-content";
 import { getPublicDoctors } from "@/lib/doctors";
+import { frenchTypography } from "@/lib/text";
 import { BadgeIcon } from "@/types/site";
 
 const BADGE_ICONS: Record<BadgeIcon, React.ElementType> = {
@@ -19,17 +18,26 @@ const BADGE_ICONS: Record<BadgeIcon, React.ElementType> = {
   users: Users,
 };
 
-// Onde ECG du hero (4 cycles P-QRS-T sur 1200 unités, ligne de base à y=42).
+// Onde ECG (4 cycles P-QRS-T sur 1200 unités, ligne de base à y=42).
+// Tracé à la main : c'est la signature graphique du service, pas un effet.
+// Un seul trait, sans dégradé, sans halo, sans animation.
 const ECG_PATH =
   "M0,36 H90 q6,-10 12,0 H130 l6,4 8,-44 8,52 6,-12 H205 q12,-16 24,0 H390 q6,-10 12,0 H430 l6,4 8,-44 8,52 6,-12 H505 q12,-16 24,0 H690 q6,-10 12,0 H730 l6,4 8,-44 8,52 6,-12 H805 q12,-16 24,0 H990 q6,-10 12,0 H1030 l6,4 8,-44 8,52 6,-12 H1105 q12,-16 24,0 H1200";
 
-// Points de réassurance de la section « environnement ».
-// TODO copy : à faire valider par le médecin (formulations neutres, non médicales).
-const ENVIRONMENT_POINTS: { icon: React.ElementType; text: string }[] = [
-  { icon: Users, text: "Une équipe médicale et paramédicale à vos côtés" },
-  { icon: Activity, text: "Un plateau technique dédié à la cardiologie interventionnelle" },
-  { icon: ShieldCheck, text: "Une surveillance continue avant, pendant et après" },
-];
+const DATE_FR = new Intl.DateTimeFormat("fr-FR", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
+
+/** Date de la fiche modifiée le plus récemment, ou null si aucune. */
+function lastUpdate(dates: string[]): string | null {
+  const times = dates
+    .map((d) => new Date(d).getTime())
+    .filter((t) => Number.isFinite(t));
+  if (!times.length) return null;
+  return DATE_FR.format(new Date(Math.max(...times)));
+}
 
 export default async function HomePage() {
   const [interventions, content, doctors] = await Promise.all([
@@ -40,380 +48,282 @@ export default async function HomePage() {
 
   const { hero, interventionsSection, teamSection, importantInfo } = content;
 
+  // Preuve de fabrication, calculée sur les données réelles : c'est le seul
+  // signal qu'un gabarit générique ne peut pas produire.
+  const updated = lastUpdate(interventions.map((i) => i.updatedAt));
+  const heroTitle = [hero.titleBefore, hero.titleHighlight, hero.titleAfter]
+    .filter((part) => part?.trim())
+    .join(" ");
+
   return (
     <>
-      {/* ── Hero ── */}
-      <section id="accueil" className="relative min-h-[85svh] sm:min-h-screen flex items-center mesh-bg overflow-hidden">
-<div className="relative w-full max-w-[1440px] mx-auto px-5 sm:px-8 py-14 sm:py-24 pb-24 sm:pb-32">
-          <div className="anim-fade-up mb-5 sm:mb-6">
-            <span className="section-label" title={hero.locationLabel}>
-              <MapPin className="w-3.5 h-3.5" />
-              <span className="section-label-text">{hero.locationLabel}</span>
-            </span>
-          </div>
+      {/* ── Hero ──────────────────────────────────────────────────────
+          Hauteur dictée par le contenu. Le patient arrive avec un mot
+          précis donné par son cardiologue : il doit atteindre la
+          recherche sans défiler. ── */}
+      <section id="accueil" className="border-b border-border">
+        <div className="max-w-5xl mx-auto px-5 sm:px-8 pt-12 sm:pt-16 pb-10 sm:pb-14">
+          <p className="text-sm text-muted-soft pb-3 mb-6 border-b border-border">
+            {hero.locationLabel}
+          </p>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,700px)_460px] gap-10 lg:gap-16 lg:justify-center items-start">
-
-            {/* ── Colonne gauche : texte ── */}
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] gap-10 lg:gap-14 items-start">
             <div>
-              <h1
-                className="anim-fade-up delay-100 text-[2.2rem] sm:text-5xl lg:text-[60px] font-bold leading-[1.1] sm:leading-[1.05] tracking-[-0.02em] mb-5 text-foreground"
-                style={{ fontFamily: "var(--font-heading)" }}
-              >
-                {hero.titleBefore}{hero.titleBefore ? " " : ""}
-                <span style={{
-                  background: hero.highlightGradient
-                    ? `linear-gradient(90deg, ${hero.highlightColor1} 0%, ${hero.highlightColor2} 100%)`
-                    : hero.highlightColor1,
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}>{hero.titleHighlight}</span>
-                {hero.titleAfter ? " " + hero.titleAfter : ""}
+              <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-5">
+                {frenchTypography(heroTitle)}
               </h1>
 
-              <p className="anim-fade-up delay-200 text-lg sm:text-xl text-muted leading-relaxed mb-8 max-w-lg">
-                {hero.subtitle}
+              <p className="text-lg text-muted max-w-xl mb-7">
+                {frenchTypography(hero.subtitle)}
               </p>
 
-              <div className="anim-fade-up delay-300 flex flex-wrap items-center gap-4">
-                <Link href="/#interventions" className="btn-primary glow-btn">
-                  {hero.ctaLabel}
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
+              <Link href="#interventions" className="btn-primary">
+                {frenchTypography(hero.ctaLabel)}
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
+              </Link>
 
-              {/* ── Recherche mobile ── */}
-              <div className="lg:hidden mt-8 anim-fade-up delay-400">
+              <div className="lg:hidden mt-9">
                 <InterventionSearch interventions={interventions} />
               </div>
+
+              {/* Preuve : chiffres réels, date réelle. */}
+              <p className="mt-9 pt-4 border-t border-border text-sm text-muted-soft">
+                {interventions.length}{" "}
+                {interventions.length > 1 ? "fiches" : "fiche"} publiées
+                {doctors.length > 0 && (
+                  <>
+                    {" · rédigées par "}
+                    {doctors.length}{" "}
+                    {doctors.length > 1 ? "cardiologues" : "cardiologue"} du
+                    service
+                  </>
+                )}
+                {updated && <> · dernière mise à jour le {updated}</>}
+              </p>
             </div>
 
-            {/* ── Colonne droite : recherche desktop ── */}
-            <div className="anim-fade-up delay-400 hidden lg:block">
+            <div className="hidden lg:block">
               <InterventionSearch interventions={interventions} />
             </div>
-
           </div>
         </div>
 
-        {/* ECG animé posé directement sur le fond bleu du hero */}
-        <div className="absolute inset-x-0 bottom-0 h-16 sm:h-24 pointer-events-none" aria-hidden="true">
-          <div
-            className="absolute inset-0"
-            style={{
-              maskImage: "linear-gradient(to right, transparent, black 12%, black 88%, transparent)",
-              WebkitMaskImage: "linear-gradient(to right, transparent, black 12%, black 88%, transparent)",
-            }}
+        {/* Signature ECG : un filet, à la hauteur d'un filet. */}
+        <div className="h-8 sm:h-10 overflow-hidden" aria-hidden="true">
+          <svg
+            viewBox="0 0 1200 100"
+            preserveAspectRatio="none"
+            className="w-full h-full text-primary"
           >
-            <svg viewBox="0 0 1200 100" preserveAspectRatio="none" className="w-full h-full">
-              {/* Dégradé repris de la palette bleue du hero */}
-              <defs>
-                <linearGradient id="ecgGrad" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor="#0284C7" />
-                  <stop offset="100%" stopColor="#38BDF8" />
-                </linearGradient>
-              </defs>
-              {/* rémanence : la trace complète, très discrète */}
-              <path
-                className="ecg-ghost"
-                d={ECG_PATH}
-                fill="none"
-                stroke="url(#ecgGrad)"
-                strokeOpacity={0.22}
-                strokeWidth="1.5"
-                vectorEffect="non-scaling-stroke"
-                pathLength={1}
-              />
-              {/* halo diffus du segment en mouvement */}
-              <path
-                className="ecg-run"
-                d={ECG_PATH}
-                fill="none"
-                stroke="url(#ecgGrad)"
-                strokeOpacity={0.36}
-                strokeWidth="8"
-                vectorEffect="non-scaling-stroke"
-                pathLength={1}
-                style={{ filter: "blur(7px)" }}
-              />
-              {/* segment lumineux qui parcourt le tracé */}
-              <path
-                className="ecg-run"
-                d={ECG_PATH}
-                fill="none"
-                stroke="url(#ecgGrad)"
-                strokeWidth="2.1"
-                vectorEffect="non-scaling-stroke"
-                pathLength={1}
-              />
-            </svg>
-          </div>
+            <path
+              d={ECG_PATH}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeOpacity="0.5"
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
         </div>
       </section>
 
-      {/* ── Interventions ── */}
-      <section className="py-14 sm:py-24 lg:py-32 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div id="interventions" className="scroll-mt-24" aria-hidden="true" />
-          <AnimateIn className="mb-8 sm:mb-14">
-            <span className="section-label mb-4 sm:mb-5 inline-flex" title={interventionsSection.kicker}>
-              <BookOpen className="w-3.5 h-3.5" />
-              <span className="section-label-text">{interventionsSection.kicker}</span>
-            </span>
-            <h2
-              className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] mb-3 sm:mb-4 text-foreground"
-              style={{ fontFamily: "var(--font-heading)" }}
-            >
-              {interventionsSection.title}
-            </h2>
-            <p className="text-muted text-lg sm:text-xl mt-4 max-w-2xl">
-              {interventionsSection.subtitle}
+      {/* ── Interventions ─────────────────────────────────────────────
+          Liste à filets plutôt que grille de cartes : cibles plus
+          larges, lecture verticale, et une fiche médicale se lit comme
+          un sommaire, pas comme un tableau de bord. ── */}
+      <section id="interventions" className="scroll-mt-24 border-b border-border">
+        <div className="max-w-5xl mx-auto px-5 sm:px-8 py-12 sm:py-16">
+          {interventionsSection.kicker?.trim() && (
+            <p className="text-sm text-muted-soft mb-2">
+              {frenchTypography(interventionsSection.kicker)}
             </p>
-            {interventionsSection.badges.length > 0 && (
-              <div className="flex flex-col gap-2 mt-4 max-w-2xl">
-                {interventionsSection.badges.map((badge, i) => {
-                  const Icon = BADGE_ICONS[badge.icon] ?? Heart;
-                  return (
-                    <span
-                      key={i}
-                      className="flex items-center gap-2 text-base text-muted"
-                    >
-                      <Icon className="w-4 h-4 shrink-0" style={{ color: badge.icon === "heart" ? "#F43F5E" : "#0369A1" }} />
-                      {badge.label}
-                    </span>
-                  );
-                })}
-              </div>
-            )}
-          </AnimateIn>
+          )}
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3">
+            {frenchTypography(interventionsSection.title)}
+          </h2>
+          <p className="text-lg text-muted max-w-2xl">
+            {frenchTypography(interventionsSection.subtitle)}
+          </p>
+
+          {interventionsSection.badges.length > 0 && (
+            <ul className="mt-5 flex flex-col gap-2 max-w-2xl">
+              {interventionsSection.badges.map((badge, i) => {
+                const Icon = BADGE_ICONS[badge.icon] ?? Heart;
+                return (
+                  <li key={i} className="flex items-start gap-2.5 text-base text-muted">
+                    <Icon
+                      className="w-4 h-4 shrink-0 mt-1.5 text-muted-soft"
+                      aria-hidden="true"
+                    />
+                    {frenchTypography(badge.label)}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
 
           {interventions.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {interventions.map((intervention, i) => (
-                <AnimateIn key={intervention.id} delay={i * 75} className="h-full">
-                  <InterventionCard intervention={intervention} index={i} />
-                </AnimateIn>
+            <ul className="mt-9 border-t border-border">
+              {interventions.map((intervention) => (
+                <li key={intervention.id} className="border-b border-border">
+                  <Link
+                    href={`/interventions/${intervention.slug}`}
+                    className="group flex items-baseline gap-5 py-5 transition-colors hover:bg-surface focus-visible:bg-surface -mx-3 px-3"
+                  >
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-lg font-semibold text-foreground group-hover:underline underline-offset-4">
+                        {frenchTypography(intervention.title)}
+                      </span>
+                      {intervention.subtitle && (
+                        <span className="block text-base text-muted mt-1">
+                          {frenchTypography(intervention.subtitle)}
+                        </span>
+                      )}
+                    </span>
+                    <ArrowRight
+                      className="w-5 h-5 shrink-0 self-center text-primary"
+                      aria-hidden="true"
+                    />
+                  </Link>
+                </li>
               ))}
-            </div>
+            </ul>
           ) : (
-            <AnimateIn>
-              <div
-                className="rounded-2xl p-12 text-center border"
-                style={{ background: "#F8FAFF", borderColor: "rgba(2,132,199,0.1)" }}
-              >
-                <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5"
-                  style={{ background: "rgba(2,132,199,0.08)", border: "1px solid rgba(2,132,199,0.15)" }}
-                >
-                  <BookOpen className="w-6 h-6 text-primary" />
-                </div>
-                <h3
-                  className="text-lg font-semibold text-foreground mb-2"
-                  style={{ fontFamily: "var(--font-heading)" }}
-                >
-                  Aucune fiche publiée pour le moment
-                </h3>
-                <p className="text-sm text-muted max-w-md mx-auto leading-relaxed">
-                  Les fiches apparaîtront ici automatiquement dès qu&apos;une intervention sera publiée.
-                </p>
-              </div>
-            </AnimateIn>
+            <p className="mt-9 py-8 border-y border-border text-base text-muted">
+              Les fiches apparaîtront ici dès qu&rsquo;une intervention sera
+              publiée.
+            </p>
           )}
         </div>
       </section>
 
-      {/* ── Environnement / plateau technique ── */}
-      <section className="py-14 sm:py-24 lg:py-32" style={{ background: "#F8FAFF" }}>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+      {/* ── Environnement ─────────────────────────────────────────── */}
+      <section className="border-b border-border bg-surface">
+        <div className="max-w-5xl mx-auto px-5 sm:px-8 py-12 sm:py-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 items-start">
+            <figure className="m-0">
+              <div className="relative aspect-[4/3] overflow-hidden border border-border">
+                <Image
+                  src="/cath-lab.jpeg"
+                  alt="La salle de cathétérisme du service de cardiologie interventionnelle"
+                  fill
+                  quality={85}
+                  sizes="(max-width: 1024px) 100vw, 560px"
+                  className="object-cover"
+                />
+              </div>
+              <figcaption className="mt-2.5 text-sm text-muted-soft">
+                La salle de cathétérisme du service.
+              </figcaption>
+            </figure>
 
-            {/* ── Photo ── */}
-            <AnimateIn>
-              <figure className="m-0">
-                <div
-                  className="relative aspect-[4/3] rounded-2xl overflow-hidden border"
-                  style={{
-                    borderColor: "rgba(15,23,42,0.08)",
-                    boxShadow: "0 18px 50px -14px rgba(15,23,42,0.28)",
-                  }}
-                >
-                  <Image
-                    src="/cath-lab.jpeg"
-                    alt="La salle de cathétérisme du service de cardiologie interventionnelle"
-                    fill
-                    quality={85}
-                    sizes="(max-width: 1024px) 100vw, 600px"
-                    className="object-cover"
-                  />
-                </div>
-                <figcaption className="mt-3 text-sm text-muted text-center lg:text-left">
-                  La salle de cathétérisme de notre service
-                </figcaption>
-              </figure>
-            </AnimateIn>
-
-            {/* ── Texte ── */}
-            <AnimateIn delay={120}>
-              <span className="section-label mb-4 sm:mb-5 inline-flex">
-                <Building2 className="w-3.5 h-3.5" />
-                <span className="section-label-text">Votre environnement de soins</span>
-              </span>
-              <h2
-                className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] mb-4 sm:mb-5 text-foreground"
-                style={{ fontFamily: "var(--font-heading)" }}
-              >
-                Découvrez le lieu de votre intervention
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4">
+                Le lieu de votre intervention
               </h2>
-              <p className="text-muted text-lg sm:text-xl leading-relaxed mb-8 max-w-xl">
-                L&apos;appréhension vient souvent de l&apos;inconnu. Voici la salle où se
-                déroulera votre intervention : un plateau technique dédié à la cardiologie,
-                où une équipe vous accompagne à chaque étape.
+              <p className="text-lg text-muted mb-4">
+                Cette photo est celle de la salle où se déroulera votre
+                intervention. Ce n&rsquo;est pas une image d&rsquo;illustration.
               </p>
-              <ul className="space-y-4">
-                {ENVIRONMENT_POINTS.map(({ icon: Icon, text }, i) => (
-                  <li key={i} className="flex items-start gap-3.5">
-                    <span
-                      className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                      style={{ background: "rgba(2,132,199,0.08)", border: "1px solid rgba(2,132,199,0.16)" }}
-                    >
-                      <Icon className="w-5 h-5" style={{ color: "#0369A1" }} aria-hidden="true" />
-                    </span>
-                    <span className="text-base sm:text-lg text-foreground leading-snug pt-2">
-                      {text}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </AnimateIn>
-
+              <p className="text-lg text-muted">
+                Ce qui s&rsquo;y passe, minute par minute, est décrit dans la
+                fiche de votre intervention : la préparation, la durée, ce que
+                vous ressentirez, et quand vous rentrez chez vous.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── Équipe ── */}
-      <section className="py-14 sm:py-24 lg:py-32" style={{ background: "#EEF4FF" }}>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div id="equipe" className="scroll-mt-24" aria-hidden="true" />
-          <AnimateIn className="mb-8 sm:mb-14">
-            <span className="section-label mb-4 sm:mb-5 inline-flex" title={teamSection.kicker}>
-              <Users className="w-3.5 h-3.5" />
-              <span className="section-label-text">{teamSection.kicker}</span>
-            </span>
-            <h2
-              className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] mb-3 sm:mb-4 text-foreground"
-              style={{ fontFamily: "var(--font-heading)" }}
-            >
-              {teamSection.title}
-            </h2>
-            <p className="text-muted text-lg sm:text-xl max-w-lg">
-              {teamSection.subtitle}
+      {/* ── Équipe ───────────────────────────────────────────────────
+          Les portraits sont de vraies photos des cardiologues du
+          service : on leur donne de la place et des angles droits. ── */}
+      <section id="equipe" className="scroll-mt-24 border-b border-border">
+        <div className="max-w-5xl mx-auto px-5 sm:px-8 py-12 sm:py-16">
+          {teamSection.kicker?.trim() && (
+            <p className="text-sm text-muted-soft mb-2">
+              {frenchTypography(teamSection.kicker)}
             </p>
-          </AnimateIn>
+          )}
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3">
+            {frenchTypography(teamSection.title)}
+          </h2>
+          <p className="text-lg text-muted max-w-2xl">
+            {frenchTypography(teamSection.subtitle)}
+          </p>
 
           {doctors.length > 0 ? (
-            <div
-              className={`grid gap-5 sm:gap-8 ${
-                doctors.length === 1
-                  ? "grid-cols-1 max-w-md mx-auto"
-                  : doctors.length === 2
-                  ? "grid-cols-1 sm:grid-cols-2 max-w-3xl mx-auto"
-                  : doctors.length === 4
-                  ? "grid-cols-1 sm:grid-cols-2 max-w-4xl mx-auto"
-                  : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-              }`}
-            >
-              {doctors.map((doctor, i) => (
-                <AnimateIn key={doctor.id} delay={i * 100}>
-                  <div
-                    className="rounded-2xl overflow-hidden border bg-white transition-shadow duration-200 hover:shadow-[0_8px_28px_rgba(15,23,42,0.08)] h-full flex flex-col"
-                    style={{ borderColor: "rgba(15,23,42,0.08)" }}
-                  >
-                    <div className="relative h-56 sm:h-72 w-full bg-surface flex items-center justify-center">
-                      {doctor.photoUrl ? (
-                        <Image
-                          src={doctor.photoUrl}
-                          alt={doctor.name}
-                          fill
-                          quality={85}
-                          sizes="(max-width: 640px) 100vw, 33vw"
-                          className="object-cover"
-                          style={{ objectPosition: "50% 25%" }}
-                        />
-                      ) : (
-                        <UserRound className="w-16 h-16 text-muted" aria-hidden="true" />
-                      )}
-                    </div>
-                    <div className="p-5 sm:p-6 flex-1">
-                      <h3
-                        className="font-semibold text-xl text-foreground mb-1"
-                        style={{ fontFamily: "var(--font-heading)" }}
-                      >
-                        {doctor.name}
-                      </h3>
-                      <p className="text-base text-muted mb-4">{doctor.subtitle}</p>
-                      <div className="space-y-1">
-                        {doctor.phone && (
-                          <a
-                            href={`tel:${doctor.phone.replace(/\s/g, "")}`}
-                            className="flex items-center gap-2.5 text-base text-foreground hover:text-primary transition-colors py-2"
-                            style={{ minHeight: "44px" }}
-                          >
-                            <Phone className="w-5 h-5 flex-shrink-0" style={{ color: "#0369A1" }} />
-                            {doctor.phone}
-                          </a>
-                        )}
-                        {doctor.email && (
-                          <a
-                            href={`mailto:${doctor.email}`}
-                            className="flex items-center gap-2.5 text-base text-foreground hover:text-primary transition-colors py-2 break-all"
-                            style={{ minHeight: "44px" }}
-                          >
-                            <Mail className="w-5 h-5 flex-shrink-0" style={{ color: "#0369A1" }} />
-                            {doctor.email}
-                          </a>
-                        )}
-                      </div>
-                    </div>
+            <div className="mt-9 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {doctors.map((doctor) => (
+                <div key={doctor.id} className="flex flex-col">
+                  <div className="relative aspect-[3/4] w-full bg-surface border border-border flex items-center justify-center">
+                    {doctor.photoUrl ? (
+                      <Image
+                        src={doctor.photoUrl}
+                        alt={doctor.name}
+                        fill
+                        quality={85}
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover"
+                        style={{ objectPosition: "50% 25%" }}
+                      />
+                    ) : (
+                      <UserRound
+                        className="w-14 h-14 text-muted-soft"
+                        aria-hidden="true"
+                      />
+                    )}
                   </div>
-                </AnimateIn>
+
+                  <h3 className="mt-4 text-xl font-bold text-foreground">
+                    {doctor.name}
+                  </h3>
+                  <p className="text-base text-muted mt-0.5">
+                    {frenchTypography(doctor.subtitle)}
+                  </p>
+
+                  <div className="mt-3 flex flex-col">
+                    {doctor.phone && (
+                      <a
+                        href={`tel:${doctor.phone.replace(/\s/g, "")}`}
+                        className="flex items-center gap-2.5 text-base text-primary hover:underline underline-offset-4 py-2 min-h-11"
+                      >
+                        <Phone className="w-4 h-4 shrink-0" aria-hidden="true" />
+                        {doctor.phone}
+                      </a>
+                    )}
+                    {doctor.email && (
+                      <a
+                        href={`mailto:${doctor.email}`}
+                        className="flex items-center gap-2.5 text-base text-primary hover:underline underline-offset-4 py-2 min-h-11 break-all"
+                      >
+                        <Mail className="w-4 h-4 shrink-0" aria-hidden="true" />
+                        {doctor.email}
+                      </a>
+                    )}
+                  </div>
+                </div>
               ))}
             </div>
           ) : (
-            <AnimateIn>
-              <div
-                className="rounded-2xl p-10 text-center border"
-                style={{ background: "#F8FAFF", borderColor: "rgba(2,132,199,0.1)" }}
-              >
-                <p className="text-sm text-muted">
-                  L&apos;équipe médicale sera bientôt présentée ici.
-                </p>
-              </div>
-            </AnimateIn>
+            <p className="mt-9 py-8 border-y border-border text-base text-muted">
+              L&rsquo;équipe médicale sera bientôt présentée ici.
+            </p>
           )}
         </div>
       </section>
 
-
-      {/* ── Disclaimer ── */}
-      <section className="py-10 sm:py-16 bg-white">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6">
-          <AnimateIn>
-            <div
-              className="rounded-2xl p-6 sm:p-8 text-center border"
-              style={{ background: "#FFF5F7", borderColor: "rgba(244,63,94,0.12)" }}
-            >
-              <h2
-                className="font-semibold text-lg text-foreground mb-3"
-                style={{ fontFamily: "var(--font-heading)" }}
-              >
-                {importantInfo.title}
-              </h2>
-              <p className="text-base leading-relaxed whitespace-pre-line" style={{ color: "#475569" }}>
-                {importantInfo.body}
-              </p>
-            </div>
-          </AnimateIn>
+      {/* ── Information importante ── */}
+      <section>
+        <div className="max-w-5xl mx-auto px-5 sm:px-8 py-12 sm:py-16">
+          <div className="max-w-2xl border-l-2 border-warn pl-5">
+            <h2 className="text-lg font-bold text-foreground mb-2">
+              {frenchTypography(importantInfo.title)}
+            </h2>
+            <p className="text-base text-muted whitespace-pre-line">
+              {frenchTypography(importantInfo.body)}
+            </p>
+          </div>
         </div>
       </section>
     </>
