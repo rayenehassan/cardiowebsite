@@ -21,7 +21,7 @@ export default async function MentionsLegalesPage() {
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-3xl mx-auto px-5 sm:px-8 py-10 sm:py-14">
+      <div className="max-w-4xl mx-auto px-5 sm:px-8 lg:px-12 py-10 sm:py-14">
         <Link
           href="/"
           className="inline-flex items-center gap-2 min-h-11 text-base text-muted hover:text-primary transition-colors mb-8"

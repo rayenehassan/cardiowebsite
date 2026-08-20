@@ -167,11 +167,11 @@ function renderSection(section: Section, index: number, number: number): React.R
         <SectionBlock key={section.id} {...props}>
           {isHtml ? (
             <div
-              className="rich-text text-base text-muted max-w-prose"
+              className="rich-text text-base text-muted max-w-[70ch]"
               dangerouslySetInnerHTML={{ __html: section.body || "" }}
             />
           ) : (
-            <p className="text-base text-muted max-w-prose">
+            <p className="text-base text-muted max-w-[70ch]">
               <GlossaryText text={section.body || ""} />
             </p>
           )}
@@ -183,7 +183,7 @@ function renderSection(section: Section, index: number, number: number): React.R
       const items = (section.items || []).filter((i) => i.trim());
       return (
         <SectionBlock key={section.id} {...props}>
-          <ul className="flex flex-col gap-3 max-w-prose">
+          <ul className="flex flex-col gap-3 max-w-[70ch]">
             {items.map((item, i) => (
               <li key={i} className="flex items-baseline gap-3 text-base text-muted">
                 <span className="shrink-0 text-muted-soft tabular-nums">
@@ -325,7 +325,7 @@ export default async function InterventionPage({ params }: Props) {
     <div className="light-content min-h-screen smooth-scroll">
       {/* ── Barre de retour, collée sous l'en-tête global ── */}
       <div className="print:hidden sticky top-16 z-40 border-b border-border bg-background">
-        <div className="max-w-5xl mx-auto px-5 sm:px-8 py-2 flex items-center justify-between gap-3">
+        <div className="max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-12 py-2 flex items-center justify-between gap-3">
           <Link
             href="/#interventions"
             className="inline-flex items-center gap-2 min-h-11 text-base text-foreground hover:text-primary transition-colors"
@@ -339,7 +339,7 @@ export default async function InterventionPage({ params }: Props) {
 
       {/* ── En-tête de fiche ── */}
       <div className="border-b border-border">
-        <div className="max-w-5xl mx-auto px-5 sm:px-8 pt-10 sm:pt-12 pb-8 sm:pb-10">
+        <div className="max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-12 pt-10 sm:pt-12 pb-8 sm:pb-10">
           <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-3">
             {frenchTypography(intervention.title)}
           </h1>
@@ -370,8 +370,8 @@ export default async function InterventionPage({ params }: Props) {
       </div>
 
       {/* ── Sommaire + contenu ── */}
-      <div className="max-w-5xl mx-auto px-5 sm:px-8 py-8 sm:py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-[210px_1fr] gap-8 lg:gap-12 items-start">
+      <div className="max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-12 py-8 sm:py-10">
+        <div className="grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] gap-8 lg:gap-14 xl:gap-20 items-start">
           <aside className="hidden lg:block print:hidden sticky top-32">
             <InterventionSidebarNav items={navItems} />
           </aside>
@@ -393,7 +393,7 @@ export default async function InterventionPage({ params }: Props) {
 
             {/* ── Pied de fiche : avertissement, urgence, provenance ── */}
             <div className="mt-14 border-t border-border pt-8">
-              <div className="border-l-2 border-warn pl-5 max-w-prose">
+              <div className="border-l-2 border-warn pl-5 max-w-[70ch]">
                 <p className="text-base text-muted">
                   Ces informations sont générales. Elles ne remplacent pas les
                   explications que votre cardiologue vous donnera pour votre

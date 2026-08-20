@@ -62,7 +62,7 @@ export default function Header({ brand }: Props) {
 
   return (
     <header className="sticky top-0 z-50 print:hidden bg-primary">
-      <div className="max-w-5xl mx-auto px-5 sm:px-8">
+      <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12">
         <div className="flex items-center justify-between h-16 gap-4">
           {/* Nom composé, sans pictogramme : c'est la norme des
               établissements de santé français, et un logo abstrait

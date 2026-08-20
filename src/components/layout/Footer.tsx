@@ -20,7 +20,7 @@ export default function Footer({ brand, footer }: Props) {
       {/* Bandeau urgence — le 15 est figé en dur (sécurité médicale).
           C'est le seul endroit du site où la couleur d'urgence sert. */}
       <div className="border-b border-border bg-background">
-        <div className="max-w-5xl mx-auto px-5 sm:px-8 py-3">
+        <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 py-3">
           <a
             href="tel:15"
             className="flex items-center gap-3 min-h-11 text-foreground hover:text-danger transition-colors"
@@ -39,7 +39,7 @@ export default function Footer({ brand, footer }: Props) {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-5 sm:px-8 py-10 sm:py-12">
+      <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 py-10 sm:py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
           <div>
             <p

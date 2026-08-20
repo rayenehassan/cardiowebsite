@@ -8,8 +8,9 @@
       dans le TSX.
    2. Un seul rayon d'angle (3px). Aucune ombre portée : la séparation
       se fait au filet 1px et à l'espace vertical.
-   3. Le mouvement ne sert qu'à accuser réception d'une action, jamais
-      à décorer une apparition.
+   3. Le mouvement ne sert qu'à accuser réception d'une action. Seule
+      exception assumée : le balayage du tracé ECG du hero, qui décrit
+      le sujet du site. Jamais d'apparition décorative au défilement.
    ═══════════════════════════════════════════════════════════════════ */
 
 @theme inline {
@@ -206,6 +207,21 @@ p, li {
 .rich-text p:last-child { margin-bottom: 0; }
 .rich-text a      { color: var(--color-primary); text-underline-offset: 2px; }
 
+/* ── Signature ECG du hero ───────────────────────────────────────
+   Un segment parcourt le tracé en boucle, comme le balayage d'un
+   moniteur de surveillance. Le mouvement décrit ici le sujet du site
+   au lieu de le décorer : c'est la seule animation ambiante conservée.
+   Une seule encre, pas de dégradé, pas de halo diffus. ── */
+@keyframes ecgRun {
+  from { stroke-dashoffset: 1; }
+  to   { stroke-dashoffset: -1; }
+}
+
+.ecg-run {
+  stroke-dasharray: 0.18 0.82;
+  animation: ecgRun 12s linear infinite;
+}
+
 /* ── Impression : version papier des fiches ──────────────────────
    Les éléments d'interface sont masqués via la variante Tailwind
    print:hidden ; ici, uniquement la mise en page du document. ── */
@@ -241,4 +257,9 @@ p, li {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+
+  /* Moniteur figé : le segment mobile disparaît, la trace complète est
+     renforcée pour que la signature reste lisible. */
+  .ecg-run { animation: none !important; visibility: hidden; }
+  .ecg-ghost { stroke-opacity: 0.75 !important; }
 }

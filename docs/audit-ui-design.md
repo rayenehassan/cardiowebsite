@@ -492,3 +492,23 @@ portraits) et le serif du nom de l'établissement.
   remplissage. À écrire avec lui.
 - **Admin.** Hors périmètre ; il a hérité des jetons et de la
   typographie, mais sa mise en page n'a pas été retravaillée.
+
+### Ajustements après première revue (20 août 2026)
+
+Deux retours sur la preview :
+
+1. **La page n'utilisait pas la largeur de l'écran.** Les conteneurs
+   étaient passés à `max-w-5xl` (1024px), plus étroit que l'original —
+   sur un écran large, l'ensemble se lisait comme une version mobile
+   centrée. Conteneurs portés à `max-w-[1400px]` (accueil, en-tête, pied)
+   et `max-w-[1280px]` (fiche), avec `lg:px-12`. Pour que la largeur
+   serve à quelque chose plutôt que d'étirer les lignes : la liste des
+   fiches passe sur deux colonnes en `lg`, l'équipe sur quatre en `xl`,
+   la colonne de recherche du hero à 500px, et le texte long reste
+   plafonné à 70 caractères par ligne.
+2. **Le tracé ECG avait perdu son mouvement.** L'audit l'avait
+   entièrement figé ; c'était une correction de trop. Le balayage est
+   rétabli (un segment parcourt la trace en 12 s, comme un moniteur),
+   mais sans ce qui en faisait un effet : pas de dégradé bleu-cyan, pas
+   de halo flouté de 8px, une seule encre. `prefers-reduced-motion`
+   masque le segment et renforce la rémanence.

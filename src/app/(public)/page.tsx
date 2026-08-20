@@ -19,8 +19,9 @@ const BADGE_ICONS: Record<BadgeIcon, React.ElementType> = {
 };
 
 // Onde ECG (4 cycles P-QRS-T sur 1200 unités, ligne de base à y=42).
-// Tracé à la main : c'est la signature graphique du service, pas un effet.
-// Un seul trait, sans dégradé, sans halo, sans animation.
+// Tracé à la main : signature graphique du service. Un segment le parcourt
+// en boucle comme le balayage d'un moniteur — une seule encre, sans
+// dégradé et sans halo flouté, contrairement à la version d'origine.
 const ECG_PATH =
   "M0,36 H90 q6,-10 12,0 H130 l6,4 8,-44 8,52 6,-12 H205 q12,-16 24,0 H390 q6,-10 12,0 H430 l6,4 8,-44 8,52 6,-12 H505 q12,-16 24,0 H690 q6,-10 12,0 H730 l6,4 8,-44 8,52 6,-12 H805 q12,-16 24,0 H990 q6,-10 12,0 H1030 l6,4 8,-44 8,52 6,-12 H1105 q12,-16 24,0 H1200";
 
@@ -62,18 +63,18 @@ export default async function HomePage() {
           précis donné par son cardiologue : il doit atteindre la
           recherche sans défiler. ── */}
       <section id="accueil" className="border-b border-border">
-        <div className="max-w-5xl mx-auto px-5 sm:px-8 pt-12 sm:pt-16 pb-10 sm:pb-14">
+        <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 pt-12 sm:pt-16 pb-10 sm:pb-14">
           <p className="text-sm text-muted-soft pb-3 mb-6 border-b border-border">
             {hero.locationLabel}
           </p>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] gap-10 lg:gap-14 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_440px] xl:grid-cols-[minmax(0,1fr)_500px] gap-10 lg:gap-16 xl:gap-24 items-start">
             <div>
               <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-5">
                 {frenchTypography(heroTitle)}
               </h1>
 
-              <p className="text-lg text-muted max-w-xl mb-7">
+              <p className="text-lg text-muted max-w-2xl mb-7">
                 {frenchTypography(hero.subtitle)}
               </p>
 
@@ -108,20 +109,41 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* Signature ECG : un filet, à la hauteur d'un filet. */}
-        <div className="h-8 sm:h-10 overflow-hidden" aria-hidden="true">
+        {/* Signature ECG : la trace complète en rémanence, et un segment
+            qui la parcourt en boucle. Les bords sont fondus pour que le
+            tracé ne soit pas coupé net. */}
+        <div
+          className="h-10 sm:h-14 overflow-hidden"
+          aria-hidden="true"
+          style={{
+            maskImage:
+              "linear-gradient(to right, transparent, black 8%, black 92%, transparent)",
+            WebkitMaskImage:
+              "linear-gradient(to right, transparent, black 8%, black 92%, transparent)",
+          }}
+        >
           <svg
             viewBox="0 0 1200 100"
             preserveAspectRatio="none"
             className="w-full h-full text-primary"
           >
             <path
+              className="ecg-ghost"
               d={ECG_PATH}
               fill="none"
               stroke="currentColor"
-              strokeWidth="1.5"
-              strokeOpacity="0.5"
+              strokeWidth="1.25"
+              strokeOpacity="0.28"
               vectorEffect="non-scaling-stroke"
+            />
+            <path
+              className="ecg-run"
+              d={ECG_PATH}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              vectorEffect="non-scaling-stroke"
+              pathLength={1}
             />
           </svg>
         </div>
@@ -132,7 +154,7 @@ export default async function HomePage() {
           larges, lecture verticale, et une fiche médicale se lit comme
           un sommaire, pas comme un tableau de bord. ── */}
       <section id="interventions" className="scroll-mt-24 border-b border-border">
-        <div className="max-w-5xl mx-auto px-5 sm:px-8 py-12 sm:py-16">
+        <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 py-12 sm:py-16">
           {interventionsSection.kicker?.trim() && (
             <p className="text-sm text-muted-soft mb-2">
               {frenchTypography(interventionsSection.kicker)}
@@ -163,7 +185,7 @@ export default async function HomePage() {
           )}
 
           {interventions.length > 0 ? (
-            <ul className="mt-9 border-t border-border">
+            <ul className="mt-9 border-t border-border lg:grid lg:grid-cols-2 lg:gap-x-16 xl:gap-x-24">
               {interventions.map((intervention) => (
                 <li key={intervention.id} className="border-b border-border">
                   <Link
@@ -199,8 +221,8 @@ export default async function HomePage() {
 
       {/* ── Environnement ─────────────────────────────────────────── */}
       <section className="border-b border-border bg-surface">
-        <div className="max-w-5xl mx-auto px-5 sm:px-8 py-12 sm:py-16">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 items-start">
+        <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 py-12 sm:py-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 xl:gap-24 items-start">
             <figure className="m-0">
               <div className="relative aspect-[4/3] overflow-hidden border border-border">
                 <Image
@@ -208,7 +230,7 @@ export default async function HomePage() {
                   alt="La salle de cathétérisme du service de cardiologie interventionnelle"
                   fill
                   quality={85}
-                  sizes="(max-width: 1024px) 100vw, 560px"
+                  sizes="(max-width: 1024px) 100vw, 680px"
                   className="object-cover"
                 />
               </div>
@@ -239,7 +261,7 @@ export default async function HomePage() {
           Les portraits sont de vraies photos des cardiologues du
           service : on leur donne de la place et des angles droits. ── */}
       <section id="equipe" className="scroll-mt-24 border-b border-border">
-        <div className="max-w-5xl mx-auto px-5 sm:px-8 py-12 sm:py-16">
+        <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 py-12 sm:py-16">
           {teamSection.kicker?.trim() && (
             <p className="text-sm text-muted-soft mb-2">
               {frenchTypography(teamSection.kicker)}
@@ -253,7 +275,7 @@ export default async function HomePage() {
           </p>
 
           {doctors.length > 0 ? (
-            <div className="mt-9 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="mt-9 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 xl:gap-10">
               {doctors.map((doctor) => (
                 <div key={doctor.id} className="flex flex-col">
                   <div className="relative aspect-[3/4] w-full bg-surface border border-border flex items-center justify-center">
@@ -315,7 +337,7 @@ export default async function HomePage() {
 
       {/* ── Information importante ── */}
       <section>
-        <div className="max-w-5xl mx-auto px-5 sm:px-8 py-12 sm:py-16">
+        <div className="max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 py-12 sm:py-16">
           <div className="max-w-2xl border-l-2 border-warn pl-5">
             <h2 className="text-lg font-bold text-foreground mb-2">
               {frenchTypography(importantInfo.title)}
