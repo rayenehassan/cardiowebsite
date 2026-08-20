@@ -11,6 +11,7 @@ Plateforme française d'information pré-interventionnelle en cardiologie. Le si
 - `npm run build` : build de production.
 - Avant livraison d'un changement de code, lancer `npm run lint` puis `npm run build` si l'environnement le permet.
 - Backups et restauration : voir `docs/BACKUPS.md`.
+- Refonte UI en cours de décision : voir `docs/audit-ui-design.md` (audit « anti-IA » du site public, système de remplacement, plan en 5 lots). Proposition non appliquée — lire avant toute modification de `globals.css`, du hero ou de la fiche intervention.
 
 ## Stack
 
