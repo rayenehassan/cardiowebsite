@@ -5,6 +5,10 @@ import { SiteContent } from "@/types/site";
  * Servent de fallback si la ligne Supabase `site_content` est absente ou
  * incomplète, et de référence pour le bouton "Restaurer les valeurs par défaut"
  * dans l'admin.
+ *
+ * Règle de rédaction (voir docs/audit-ui-design.md § La voix) : chaque phrase
+ * doit contenir un fait que seul cet établissement pourrait écrire. Pas de
+ * « sereinement », pas de « à votre écoute », pas de « à chaque étape ».
  */
 export const DEFAULT_SITE_CONTENT: SiteContent = {
   brand: {
@@ -12,29 +16,34 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     subtitle: "Hôpital privé de la Loire",
   },
   hero: {
-    locationLabel: "Hôpital Privé de la Loire, Saint-Étienne",
+    locationLabel: "Hôpital privé de la Loire, Saint-Étienne",
     titleBefore: "Comprendre votre",
     titleHighlight: "intervention cardiaque",
     titleAfter: "",
-    highlightColor1: "#FB7185",
-    highlightColor2: "#E11D48",
-    highlightGradient: true,
+    // Conservés pour compatibilité avec les lignes Supabase existantes ;
+    // le rendu public les ignore depuis la refonte (le titre est d'une
+    // seule encre).
+    highlightColor1: "#1B4F72",
+    highlightColor2: "#1B4F72",
+    highlightGradient: false,
     subtitle:
-      "Votre cardiologue vous a proposé un geste interventionnel. Trouvez ici toutes les informations pour vous préparer sereinement.",
-    ctaLabel: "Voir les interventions",
+      "Cherchez le nom que votre cardiologue vous a indiqué. Chaque fiche décrit le déroulé, la préparation et les suites, dans les mots de l'équipe qui vous prendra en charge.",
+    ctaLabel: "Voir toutes les fiches",
   },
   interventionsSection: {
     kicker: "Votre intervention",
     title: "Quelle est votre intervention ?",
-    subtitle: "Trouvez la fiche correspondant à l'intervention que vous allez avoir.",
+    subtitle:
+      "Cherchez le nom inscrit sur votre convocation, ou parcourez la liste ci-dessous.",
     badges: [
       {
         icon: "heart",
-        label: "Fiches rédigées par des spécialistes en cardiologie interventionnelle.",
+        label:
+          "Chaque fiche est écrite et relue par les cardiologues qui réalisent le geste.",
       },
       {
         icon: "lock",
-        label: "Ni compte, ni cookie, ni tracking — visite strictement anonyme.",
+        label: "Ni compte, ni cookie, ni tracking — votre visite reste anonyme.",
       },
     ],
   },
@@ -42,18 +51,18 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     kicker: "Votre équipe médicale",
     title: "Vos cardiologues",
     subtitle:
-      "Des spécialistes en cardiologie interventionnelle à votre écoute à l'Hôpital privé de la Loire.",
+      "Ce sont eux qui réalisent les interventions décrites sur ce site, et qui en ont rédigé les fiches.",
   },
   importantInfo: {
     title: "Information importante",
     body:
-      "Ce site fournit des informations générales sur les procédures de cardiologie interventionnelle. Il ne remplace pas les explications personnalisées de votre cardiologue. Pour toute question concernant votre situation, contactez directement votre équipe médicale. En cas d'urgence, composez le 15.",
+      "Ce site décrit les interventions de cardiologie interventionnelle en termes généraux. Il ne remplace pas les explications que votre cardiologue vous donnera pour votre situation. Pour toute question sur votre cas, appelez directement le service. En cas d'urgence, composez le 15.",
   },
   footer: {
     description:
-      "Plateforme d'information sur les procédures pratiquées par l'équipe de cardiologie interventionnelle de l'Hôpital Privé de la Loire.",
+      "Fiches d'information sur les interventions pratiquées par l'équipe de cardiologie interventionnelle de l'Hôpital privé de la Loire.",
     contact: {
-      lines: ["Hôpital Privé de la Loire", "Saint-Étienne, France"],
+      lines: ["Hôpital privé de la Loire", "Saint-Étienne, France"],
       phoneLabel: "Tél. : 04 78 22 91 12",
       phoneHref: "tel:0478229112",
     },

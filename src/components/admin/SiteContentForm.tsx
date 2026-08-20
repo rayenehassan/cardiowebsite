@@ -398,14 +398,7 @@ export default function SiteContentForm({ initial }: Props) {
             {/* Aperçu du titre */}
             <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50 px-4 py-3 text-[22px] font-bold leading-snug" style={{ fontFamily: "var(--font-heading)" }}>
               <span className="text-gray-900">{content.hero.titleBefore}{content.hero.titleBefore ? " " : ""}</span>
-              <span style={{
-                background: content.hero.highlightGradient
-                  ? `linear-gradient(90deg, ${content.hero.highlightColor1 || "#FB7185"} 0%, ${content.hero.highlightColor2 || "#E11D48"} 100%)`
-                  : (content.hero.highlightColor1 || "#FB7185"),
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}>{content.hero.titleHighlight || "…"}</span>
+              <span className="text-gray-900">{content.hero.titleHighlight || "…"}</span>
               {content.hero.titleAfter ? <span className="text-gray-900"> {content.hero.titleAfter}</span> : null}
             </div>
 
@@ -422,7 +415,7 @@ export default function SiteContentForm({ initial }: Props) {
                 />
               </div>
               <div>
-                <label className={labelClass}>Mis en évidence</label>
+                <label className={labelClass}>Milieu</label>
                 <input
                   type="text"
                   value={content.hero.titleHighlight}
@@ -440,42 +433,6 @@ export default function SiteContentForm({ initial }: Props) {
                   className={inputClass}
                   placeholder="(optionnel)"
                 />
-              </div>
-            </div>
-
-            {/* Options couleur */}
-            <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 space-y-3">
-              <p className="text-sm font-semibold text-gray-700" style={{ fontFamily: "var(--font-heading)" }}>Couleur du texte mis en évidence</p>
-              <div className="flex items-center gap-4 flex-wrap">
-                <label className="flex items-center gap-2 text-sm text-gray-600">
-                  <input
-                    type="color"
-                    value={content.hero.highlightColor1 ?? "#FB7185"}
-                    onChange={(e) => patch("hero", { ...content.hero, highlightColor1: e.target.value })}
-                    className="w-9 h-9 rounded-lg border border-gray-300 cursor-pointer p-0.5"
-                  />
-                  Couleur {content.hero.highlightGradient ? "départ" : ""}
-                </label>
-                {content.hero.highlightGradient && (
-                  <label className="flex items-center gap-2 text-sm text-gray-600">
-                    <input
-                      type="color"
-                      value={content.hero.highlightColor2 ?? "#E11D48"}
-                      onChange={(e) => patch("hero", { ...content.hero, highlightColor2: e.target.value })}
-                      className="w-9 h-9 rounded-lg border border-gray-300 cursor-pointer p-0.5"
-                    />
-                    Couleur fin
-                  </label>
-                )}
-                <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none ml-auto">
-                  <div
-                    onClick={() => patch("hero", { ...content.hero, highlightGradient: !content.hero.highlightGradient })}
-                    className={`w-10 h-6 rounded-full transition-colors cursor-pointer flex items-center px-0.5 ${content.hero.highlightGradient ? "bg-blue-500" : "bg-gray-300"}`}
-                  >
-                    <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${content.hero.highlightGradient ? "translate-x-4" : "translate-x-0"}`} />
-                  </div>
-                  Dégradé
-                </label>
               </div>
             </div>
             <div>
