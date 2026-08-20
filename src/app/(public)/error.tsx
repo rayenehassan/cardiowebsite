@@ -16,7 +16,7 @@ export default function PublicError({ error, reset }: Props) {
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 text-center">
-      <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+      <AlertTriangle className="w-12 h-12 text-warn mx-auto mb-4" />
       <h1 className="text-2xl font-bold text-foreground mb-3">
         Les fiches ne sont pas disponibles
       </h1>

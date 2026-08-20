@@ -20,34 +20,30 @@ export default async function MentionsLegalesPage() {
   const isHtml = body.trimStart().startsWith("<");
 
   return (
-    <div className="bg-white min-h-screen">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+    <div className="min-h-screen">
+      <div className="max-w-3xl mx-auto px-5 sm:px-8 py-10 sm:py-14">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-base text-muted hover:text-foreground transition-colors mb-8 py-2"
-          style={{ fontFamily: "var(--font-heading)", minHeight: "44px" }}
+          className="inline-flex items-center gap-2 min-h-11 text-base text-muted hover:text-primary transition-colors mb-8"
         >
           <ArrowLeft className="w-4 h-4" />
           Retour à l&apos;accueil
         </Link>
 
         <h1
-          className="text-3xl sm:text-4xl font-bold text-foreground mb-8 tracking-[-0.02em]"
-          style={{ fontFamily: "var(--font-heading)" }}
+          className="text-3xl font-bold text-foreground mb-8"
         >
           {legalNotice.title}
         </h1>
 
         {isHtml ? (
           <div
-            className="rich-text text-base leading-relaxed"
-            style={{ color: "#334155" }}
+            className="rich-text text-base text-muted"
             dangerouslySetInnerHTML={{ __html: body }}
           />
         ) : (
           <div
-            className="text-base leading-relaxed whitespace-pre-line"
-            style={{ color: "#334155" }}
+            className="text-base text-muted whitespace-pre-line"
           >
             {body}
           </div>

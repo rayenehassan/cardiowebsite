@@ -8,7 +8,7 @@ export default function NotFound() {
         Procédure introuvable
       </h1>
       <p className="text-muted mb-8">
-        La procédure recherchee n’existe pas ou n’a pas encore ete publiée.
+        La procédure recherchée n’existe pas, ou n’a pas encore été publiée.
       </p>
       <Link
         href="/"
