@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import type { Section } from "@/types/intervention";
+import { frenchTypography } from "@/lib/text";
 
 interface NavItem {
   id: string;
   label: string;
+  number: number;
   type: Section["type"];
 }
 
@@ -52,66 +54,57 @@ export default function InterventionSidebarNav({ items, collapsible = false }: P
   }, [items]);
 
   const links = (
-    <ul className="space-y-1">
-      {items.map((item) => (
-        <li key={item.id}>
-          <a
-            href={`#${item.id}`}
-            onClick={() => collapsible && setOpen(false)}
-            className={`block px-3 py-2.5 rounded-lg text-base transition-colors ${
-              activeId === item.id
-                ? "bg-blue-50 font-semibold"
-                : "hover:bg-gray-100"
-            }`}
-            style={{
-              fontFamily: "var(--font-heading)",
-              minHeight: "44px",
-              display: "flex",
-              alignItems: "center",
-              color: activeId === item.id ? "#0369A1" : "#334155",
-            }}
-          >
-            {item.label}
-          </a>
-        </li>
-      ))}
+    <ul className="flex flex-col">
+      {items.map((item) => {
+        const active = activeId === item.id;
+        return (
+          <li key={item.id}>
+            <a
+              href={`#${item.id}`}
+              onClick={() => collapsible && setOpen(false)}
+              aria-current={active ? "true" : undefined}
+              className={`flex items-baseline gap-2.5 min-h-11 py-2 border-l-2 pl-3 -ml-px text-base transition-colors ${
+                active
+                  ? "border-primary text-primary font-semibold"
+                  : "border-transparent text-muted hover:text-foreground"
+              }`}
+            >
+              <span className="tabular-nums text-muted-soft shrink-0">
+                {item.number}
+              </span>
+              <span>{frenchTypography(item.label)}</span>
+            </a>
+          </li>
+        );
+      })}
     </ul>
   );
 
   if (collapsible) {
     return (
-      <div className="rounded-xl border border-gray-200 overflow-hidden">
+      <div className="border border-border">
         <button
           onClick={() => setOpen((v) => !v)}
-          className="w-full flex items-center justify-between px-4 py-3.5 bg-gray-50 hover:bg-gray-100 transition-colors"
-          style={{ fontFamily: "var(--font-heading)", minHeight: "48px" }}
+          className="w-full flex items-center justify-between gap-3 min-h-12 px-4 py-3 text-base text-foreground bg-surface transition-colors hover:bg-surface-alt"
           aria-expanded={open}
         >
-          <span className="text-[13px] font-semibold tracking-wider uppercase" style={{ color: "#475569" }}>
-            Sur cette page
-          </span>
+          <span>Sur cette page ({items.length})</span>
           <ChevronDown
-            className="w-5 h-5 transition-transform duration-200"
-            style={{
-              color: "#475569",
-              transform: open ? "rotate(180deg)" : "rotate(0deg)",
-            }}
+            className={`w-5 h-5 shrink-0 text-muted transition-transform ${
+              open ? "rotate-180" : ""
+            }`}
+            aria-hidden="true"
           />
         </button>
-        {open && <div className="px-3 py-3">{links}</div>}
+        {open && <div className="px-4 py-3 border-t border-border">{links}</div>}
       </div>
     );
   }
 
   return (
-    <nav>
-      <p
-        className="text-[13px] font-semibold tracking-wider uppercase mb-3"
-        style={{ fontFamily: "var(--font-heading)", color: "#475569" }}
-      >
-        Sur cette page
-      </p>
-      {links}
+    <nav aria-label="Sommaire de la fiche">
+      <p className="text-sm text-muted-soft mb-3">Sur cette page</p>
+      <div className="border-l border-border">{links}</div>
     </nav>
   );
 }

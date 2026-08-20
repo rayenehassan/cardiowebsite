@@ -2,32 +2,31 @@ export const dynamic = "force-dynamic";
 
 import { notFound } from "next/navigation";
 import { getPublishedInterventionBySlug } from "@/lib/interventions";
+import { getPublicDoctors } from "@/lib/doctors";
 import Accordion from "@/components/ui/Accordion";
 import VideoEmbed from "@/components/ui/VideoEmbed";
 import InterventionSidebarNav from "@/components/ui/InterventionSidebarNav";
 import GlossaryText from "@/components/ui/GlossaryText";
 import PrintButton from "@/components/ui/PrintButton";
 import NextImage from "next/image";
-import { Download, ArrowLeft, FileText, Clock, Syringe, BedDouble, CalendarCheck, Phone, ChevronDown } from "lucide-react";
+import { Download, ArrowLeft, FileText, Phone, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
 import type { Section, SubSection } from "@/types/intervention";
+import { frenchTypography } from "@/lib/text";
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
+const DATE_FR = new Intl.DateTimeFormat("fr-FR", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
+
 function sectionAnchor(section: Section, index: number): string {
   return `s-${index}-${section.id.slice(0, 6)}`;
-}
-
-function quickFactIcon(label: string) {
-  const l = label.toLowerCase();
-  if (l.includes("durée") || l.includes("duree")) return <Clock className="w-5 h-5" style={{ color: "#0369A1" }} />;
-  if (l.includes("anesth")) return <Syringe className="w-5 h-5" style={{ color: "#0369A1" }} />;
-  if (l.includes("hospital")) return <BedDouble className="w-5 h-5" style={{ color: "#0369A1" }} />;
-  if (l.includes("reprise") || l.includes("retour")) return <CalendarCheck className="w-5 h-5" style={{ color: "#0369A1" }} />;
-  return null;
 }
 
 function sectionHasContent(section: Section): boolean {
@@ -41,80 +40,49 @@ function sectionHasContent(section: Section): boolean {
   }
 }
 
-function sectionAccent(section: Section, index: number): { color: string; headerBg: string; dotBg: string } {
-  if (section.type === "faqs")
-    return { color: "#D97706", headerBg: "rgba(217,119,6,0.07)", dotBg: "rgba(217,119,6,0.14)" };
-  if (index % 2 === 0)
-    return { color: "#0284C7", headerBg: "rgba(2,132,199,0.05)", dotBg: "rgba(2,132,199,0.1)" };
-  return { color: "#E11D48", headerBg: "rgba(225,29,72,0.05)", dotBg: "rgba(225,29,72,0.1)" };
-}
-
-function renderSubSection(sub: SubSection, accentColor: string): React.ReactNode {
+/**
+ * Sous-section : un seul niveau de repli, sous le contenu principal.
+ * Marquée par un filet vertical plutôt que par une carte colorée.
+ */
+function renderSubSection(sub: SubSection): React.ReactNode {
   if (!sub.title?.trim()) return null;
   const items = sub.type === "list" ? (sub.items || []).filter((i) => i.trim()) : [];
   const hasContent = sub.type === "text" ? Boolean(sub.body?.trim()) : items.length > 0;
   if (!hasContent) return null;
 
   return (
-    <details className="group/sub mt-6">
-      <summary
-        className="flex items-center gap-3 cursor-pointer list-none select-none rounded-xl border-2 px-4 py-3.5 transition-[filter] hover:brightness-[0.97]"
-        style={{ borderColor: `${accentColor}40`, background: `${accentColor}0F` }}
-      >
-        <span
-          className="print:hidden w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-transform group-open/sub:rotate-180"
-          style={{ background: accentColor }}
-        >
-          <ChevronDown className="w-5 h-5 text-white" />
-        </span>
-        <span className="flex-1 min-w-0">
-          <span
-            className="block text-[17px] font-semibold leading-snug"
-            style={{ color: accentColor, fontFamily: "var(--font-heading)" }}
-          >
-            {sub.title}
-          </span>
-          <span className="print:hidden block text-sm text-gray-500 mt-0.5">
-            <span className="group-open/sub:hidden">Cliquez pour afficher</span>
-            <span className="hidden group-open/sub:inline">Cliquez pour masquer</span>
-          </span>
+    <details className="group/sub mt-7 border-l-2 border-border pl-5">
+      <summary className="flex items-baseline gap-2.5 cursor-pointer list-none select-none min-h-11 py-1">
+        <ChevronDown
+          className="print:hidden w-4 h-4 shrink-0 self-center text-primary transition-transform group-open/sub:rotate-180"
+          aria-hidden="true"
+        />
+        <span className="text-lg font-bold text-foreground">
+          {frenchTypography(sub.title)}
         </span>
       </summary>
-      <div className="mt-4 px-1">
+
+      <div className="mt-3">
         {sub.type === "text" && sub.body && (
           <div
-            className="rich-text leading-[1.65] text-[17px]"
-            style={{ color: "#334155" }}
+            className="rich-text text-base text-muted"
             dangerouslySetInnerHTML={{ __html: sub.body }}
           />
         )}
         {sub.type === "list" && (
-          <ul className="space-y-2">
+          <ul className="flex flex-col gap-2">
             {items.map((item, i) => (
-              <li key={i} className="flex items-start gap-3">
-                {sub.ordered !== false ? (
-                  <span
-                    className="text-sm font-bold shrink-0 mt-0.5"
-                    style={{ color: accentColor, fontFamily: "var(--font-heading)" }}
-                  >
-                    {i + 1}.
-                  </span>
-                ) : (
-                  <span
-                    className="w-2 h-2 rounded-full shrink-0 mt-2.5"
-                    style={{ background: accentColor }}
-                  />
-                )}
+              <li key={i} className="flex items-baseline gap-3 text-base text-muted">
+                <span className="shrink-0 text-muted-soft tabular-nums">
+                  {sub.ordered !== false ? `${i + 1}.` : "—"}
+                </span>
                 {item.includes("<") ? (
                   <span
-                    className="rich-text leading-relaxed text-[17px]"
-                    style={{ color: "#334155" }}
+                    className="rich-text"
                     dangerouslySetInnerHTML={{ __html: item }}
                   />
                 ) : (
-                  <span className="leading-relaxed text-[17px]" style={{ color: "#334155" }}>
-                    {item}
-                  </span>
+                  <span><GlossaryText text={item} /></span>
                 )}
               </li>
             ))}
@@ -125,57 +93,47 @@ function renderSubSection(sub: SubSection, accentColor: string): React.ReactNode
   );
 }
 
-function SectionCard({
-  id, title, accentColor, headerBg, collapsible, appendix, className, children,
+/**
+ * Enveloppe de section — un bloc de document, pas une carte.
+ * Le numéro indique la position dans le document (celle du sommaire) :
+ * il permet au patient de dire « je suis au point 3 », et il s'imprime.
+ */
+function SectionBlock({
+  id, number, title, collapsible, appendix, className, children,
 }: {
-  id: string; title: string; accentColor: string; headerBg: string;
-  collapsible?: boolean; appendix?: React.ReactNode; className?: string; children: React.ReactNode;
+  id: string; number: number; title: string;
+  collapsible?: boolean; appendix?: React.ReactNode;
+  className?: string; children: React.ReactNode;
 }) {
-  const headerInner = (
+  const heading = (
     <>
-      <span className="w-1 h-5 rounded-full shrink-0" style={{ background: accentColor }} />
-      <h2
-        className="text-lg sm:text-xl font-bold text-gray-900 flex-1"
-        style={{ fontFamily: "var(--font-heading)" }}
-      >
-        {title}
+      <span className="shrink-0 text-base text-muted-soft tabular-nums pt-1.5 w-7">
+        {number}
+      </span>
+      <h2 className="flex-1 text-xl sm:text-2xl font-bold text-foreground">
+        {frenchTypography(title)}
       </h2>
       {collapsible && (
-        <span className="print:hidden flex items-center gap-2 shrink-0">
-          <span className="hidden sm:inline text-sm font-semibold" style={{ color: accentColor }}>
-            <span className="group-open:hidden">Afficher</span>
-            <span className="hidden group-open:inline">Masquer</span>
-          </span>
-          <span
-            className="w-8 h-8 rounded-full flex items-center justify-center transition-transform group-open:rotate-180"
-            style={{ background: accentColor }}
-          >
-            <ChevronDown className="w-5 h-5 text-white" />
-          </span>
+        <span className="print:hidden flex items-center gap-2 shrink-0 self-center text-base text-primary">
+          <span className="hidden sm:inline group-open:hidden">Afficher</span>
+          <span className="hidden sm:group-open:inline">Masquer</span>
+          <ChevronDown
+            className="w-5 h-5 transition-transform group-open:rotate-180"
+            aria-hidden="true"
+          />
         </span>
       )}
     </>
   );
 
-  const body = (
-    <div className="px-6 sm:px-8 py-6 sm:py-8">
-      {children}
-      {appendix}
-    </div>
-  );
+  const body = <div className="mt-4 pl-0 sm:pl-7">{children}{appendix}</div>;
+  const outer = `scroll-mt-32 border-t border-border pt-8 sm:pt-10${className ? ` ${className}` : ""}`;
 
   if (collapsible) {
     return (
-      <details
-        id={id}
-        className={`group scroll-mt-36 rounded-2xl overflow-hidden bg-white${className ? ` ${className}` : ""}`}
-        style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}
-      >
-        <summary
-          className="flex items-center gap-3 px-5 sm:px-7 py-4 cursor-pointer list-none"
-          style={{ background: headerBg }}
-        >
-          {headerInner}
+      <details id={id} className={`group ${outer}`}>
+        <summary className="flex items-start gap-3 cursor-pointer list-none min-h-11">
+          {heading}
         </summary>
         {body}
       </details>
@@ -183,130 +141,134 @@ function SectionCard({
   }
 
   return (
-    <div
-      id={id}
-      className={`scroll-mt-36 rounded-2xl overflow-hidden bg-white${className ? ` ${className}` : ""}`}
-      style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }}
-    >
-      <div
-        className="flex items-center gap-3 px-5 sm:px-7 py-4"
-        style={{ background: headerBg }}
-      >
-        {headerInner}
-      </div>
+    <section id={id} className={outer}>
+      <div className="flex items-start gap-3">{heading}</div>
       {body}
-    </div>
+    </section>
   );
 }
 
-function renderSection(section: Section, index: number): React.ReactNode {
+function renderSection(section: Section, index: number, number: number): React.ReactNode {
   if (!sectionHasContent(section)) return null;
   const anchor = sectionAnchor(section, index);
-  const { color, headerBg, dotBg } = sectionAccent(section, index);
-  const appendix = section.subsection ? renderSubSection(section.subsection, color) : undefined;
-  const cardProps = { id: anchor, title: section.title, accentColor: color, headerBg, collapsible: section.collapsible, appendix };
+  const appendix = section.subsection ? renderSubSection(section.subsection) : undefined;
+  const props = {
+    id: anchor,
+    number,
+    title: section.title,
+    collapsible: section.collapsible,
+    appendix,
+  };
 
   switch (section.type) {
     case "text": {
       const isHtml = (section.body || "").trimStart().startsWith("<");
       return (
-        <SectionCard key={section.id} {...cardProps}>
+        <SectionBlock key={section.id} {...props}>
           {isHtml ? (
-            <div className="rich-text leading-[1.65] text-[18px]" style={{ color: "#334155" }}
-              dangerouslySetInnerHTML={{ __html: section.body || "" }} />
+            <div
+              className="rich-text text-base text-muted max-w-prose"
+              dangerouslySetInnerHTML={{ __html: section.body || "" }}
+            />
           ) : (
-            <p className="leading-[1.65] text-[18px]" style={{ color: "#334155" }}>
+            <p className="text-base text-muted max-w-prose">
               <GlossaryText text={section.body || ""} />
             </p>
           )}
-        </SectionCard>
+        </SectionBlock>
       );
     }
 
     case "list": {
       const items = (section.items || []).filter((i) => i.trim());
       return (
-        <SectionCard key={section.id} {...cardProps}>
-          <ul className="space-y-3">
+        <SectionBlock key={section.id} {...props}>
+          <ul className="flex flex-col gap-3 max-w-prose">
             {items.map((item, i) => (
-              <li key={i} className="flex items-start gap-4">
-                {section.ordered !== false ? (
-                  <span
-                    className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-sm font-bold mt-0.5"
-                    style={{ background: dotBg, color, fontFamily: "var(--font-heading)" }}
-                  >
-                    {i + 1}
-                  </span>
-                ) : (
-                  <span className="w-2 h-2 rounded-full shrink-0 mt-3" style={{ background: color }} />
-                )}
+              <li key={i} className="flex items-baseline gap-3 text-base text-muted">
+                <span className="shrink-0 text-muted-soft tabular-nums">
+                  {section.ordered !== false ? `${i + 1}.` : "—"}
+                </span>
                 {item.includes("<") ? (
-                  <span className="rich-text leading-relaxed text-[18px]" style={{ color: "#334155" }}
-                    dangerouslySetInnerHTML={{ __html: item }} />
+                  <span
+                    className="rich-text"
+                    dangerouslySetInnerHTML={{ __html: item }}
+                  />
                 ) : (
-                  <span className="leading-relaxed text-[18px]" style={{ color: "#334155" }}>
-                    <GlossaryText text={item} />
-                  </span>
+                  <span><GlossaryText text={item} /></span>
                 )}
               </li>
             ))}
           </ul>
-        </SectionCard>
+        </SectionBlock>
       );
     }
 
     case "video":
       // Une vidéo ne s'imprime pas : la section entière est masquée sur papier.
       return (
-        <SectionCard key={section.id} {...cardProps} className="print:hidden">
-          <VideoEmbed video={{ id: section.id, title: section.title, url: section.videoUrl!, type: section.videoType || "youtube" }} />
-        </SectionCard>
+        <SectionBlock key={section.id} {...props} className="print:hidden">
+          <VideoEmbed
+            video={{
+              id: section.id,
+              title: section.title,
+              url: section.videoUrl!,
+              type: section.videoType || "youtube",
+            }}
+          />
+        </SectionBlock>
       );
 
     case "image":
       return (
-        <SectionCard key={section.id} {...cardProps}>
-          <div className="rounded-xl overflow-hidden border border-gray-100">
-            <div className="bg-gray-50">
-              <NextImage src={section.imageUrl!} alt={section.imageAlt || section.title}
-                width={0} height={0} sizes="(min-width: 640px) 672px, 100vw"
-                className="w-full h-auto block" unoptimized />
+        <SectionBlock key={section.id} {...props}>
+          <figure className="m-0 max-w-2xl">
+            <div className="border border-border bg-surface">
+              <NextImage
+                src={section.imageUrl!}
+                alt={section.imageAlt || section.title}
+                width={0}
+                height={0}
+                sizes="(min-width: 640px) 672px, 100vw"
+                className="w-full h-auto block"
+                unoptimized
+              />
             </div>
             {section.imageAlt && (
-              <p className="px-4 py-3 text-sm text-center border-t border-gray-100" style={{ color: "#475569" }}>
-                {section.imageAlt}
-              </p>
+              <figcaption className="mt-2 text-sm text-muted-soft">
+                {frenchTypography(section.imageAlt)}
+              </figcaption>
             )}
-          </div>
-        </SectionCard>
+          </figure>
+        </SectionBlock>
       );
 
     case "document":
       return section.isPublic !== false ? (
-        <SectionCard key={section.id} {...cardProps}>
-          <a href={section.documentUrl} target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-4 p-4 rounded-xl border border-gray-100 hover:border-blue-200 hover:bg-blue-50 transition-colors group"
-            style={{ minHeight: "64px" }}>
-            <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style={{ background: dotBg }}>
-              <FileText className="w-5 h-5" style={{ color }} />
-            </div>
-            <span className="flex-1 text-gray-800 text-base font-medium">{section.title}</span>
-            <div className="flex items-center gap-2 text-sm font-semibold shrink-0 transition-colors group-hover:text-blue-600"
-              style={{ color, fontFamily: "var(--font-heading)" }}>
-              <Download className="w-4 h-4" />
+        <SectionBlock key={section.id} {...props}>
+          <a
+            href={section.documentUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 min-h-14 border border-border px-4 py-3 text-base text-foreground transition-colors hover:border-primary hover:bg-surface"
+          >
+            <FileText className="w-5 h-5 shrink-0 text-muted-soft" aria-hidden="true" />
+            <span className="flex-1">{frenchTypography(section.title)}</span>
+            <span className="flex items-center gap-1.5 font-semibold text-primary shrink-0">
+              <Download className="w-4 h-4" aria-hidden="true" />
               Télécharger
-            </div>
+            </span>
           </a>
-        </SectionCard>
+        </SectionBlock>
       ) : null;
 
     case "faqs": {
       const faqs = (section.faqs || []).filter((f) => f.question.trim());
       if (!faqs.length) return null;
       return (
-        <SectionCard key={section.id} {...cardProps}>
+        <SectionBlock key={section.id} {...props}>
           <Accordion items={faqs} />
-        </SectionCard>
+        </SectionBlock>
       );
     }
 
@@ -315,16 +277,24 @@ function renderSection(section: Section, index: number): React.ReactNode {
   }
 }
 
-function buildNavItems(sections: Section[]): Array<{ id: string; label: string; type: Section["type"] }> {
+function buildNavItems(
+  sections: Section[]
+): Array<{ id: string; label: string; number: number; type: Section["type"] }> {
+  let n = 0;
   return sections
     .map((section, index) => {
       if (!sectionHasContent(section)) return null;
       if (section.type === "document" && section.isPublic === false) return null;
-      return { id: sectionAnchor(section, index), label: section.title, type: section.type };
+      n += 1;
+      return {
+        id: sectionAnchor(section, index),
+        label: section.title,
+        number: n,
+        type: section.type,
+      };
     })
-    .filter((item): item is { id: string; label: string; type: Section["type"] } => item !== null);
+    .filter((item): item is { id: string; label: string; number: number; type: Section["type"] } => item !== null);
 }
-
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
@@ -338,123 +308,124 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function InterventionPage({ params }: Props) {
   const { slug } = await params;
-  const intervention = await getPublishedInterventionBySlug(slug);
+  const [intervention, doctors] = await Promise.all([
+    getPublishedInterventionBySlug(slug),
+    getPublicDoctors(),
+  ]);
   if (!intervention) notFound();
 
   const navItems = buildNavItems(intervention.sections);
+  const numberOf = new Map(navItems.map((item) => [item.id, item.number]));
+  const updated = Number.isFinite(new Date(intervention.updatedAt).getTime())
+    ? DATE_FR.format(new Date(intervention.updatedAt))
+    : null;
+  const reviewers = doctors.map((d) => d.name).filter(Boolean);
 
   return (
     <div className="light-content min-h-screen smooth-scroll">
-
-      {/* Top bar — sticky below global header */}
-      <div className="print:hidden sticky top-[64px] z-40 border-b border-gray-100" style={{ background: "linear-gradient(135deg, #EEF4FF 0%, #F8FAFF 55%, #FFF5F7 100%)" }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+      {/* ── Barre de retour, collée sous l'en-tête global ── */}
+      <div className="print:hidden sticky top-16 z-40 border-b border-border bg-background">
+        <div className="max-w-5xl mx-auto px-5 sm:px-8 py-2 flex items-center justify-between gap-3">
           <Link
             href="/#interventions"
-            className="inline-flex items-center gap-2 text-base text-foreground hover:text-primary transition-colors py-2"
-            style={{ fontFamily: "var(--font-heading)", minHeight: "44px" }}
+            className="inline-flex items-center gap-2 min-h-11 text-base text-foreground hover:text-primary transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" />
-            Toutes les procédures
+            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+            Toutes les fiches
           </Link>
           <PrintButton />
         </div>
       </div>
 
-      {/* ── Hero pleine largeur ── */}
-      <div style={{ background: "linear-gradient(135deg, #EEF4FF 0%, #F8FAFF 55%, #FFF5F7 100%)" }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-10 sm:pt-14 pb-10 sm:pb-14">
-          <h1
-            className="text-[28px] sm:text-4xl lg:text-[48px] font-bold text-gray-900 mb-3 tracking-[-0.02em] leading-tight"
-            style={{ fontFamily: "var(--font-heading)" }}
-          >
-            {intervention.title}
+      {/* ── En-tête de fiche ── */}
+      <div className="border-b border-border">
+        <div className="max-w-5xl mx-auto px-5 sm:px-8 pt-10 sm:pt-12 pb-8 sm:pb-10">
+          <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-3">
+            {frenchTypography(intervention.title)}
           </h1>
           {intervention.subtitle?.trim() && (
-            <p className="text-lg sm:text-xl leading-relaxed max-w-2xl" style={{ color: "#475569" }}>
-              {intervention.subtitle}
+            <p className="text-lg text-muted max-w-2xl">
+              {frenchTypography(intervention.subtitle)}
             </p>
           )}
 
-          {/* Quick facts */}
+          {/* Informations clés : tableau à filets, lisible et imprimable.
+              Plus de flou d'arrière-plan, plus d'icône par libellé — la
+              pictogramme ne faisait que répéter le mot. */}
           {intervention.quickFacts.length > 0 && (
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-gray-200 rounded-xl overflow-hidden border border-gray-200">
-              {intervention.quickFacts.map((fact, i) => {
-                const icon = quickFactIcon(fact.label);
-                return (
-                  <div key={i} className="bg-white/80 backdrop-blur-sm p-5 flex items-start gap-3.5">
-                    {icon && (
-                      <div
-                        className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
-                        style={{ background: "rgba(2,132,199,0.08)", border: "1px solid rgba(2,132,199,0.18)" }}
-                      >
-                        {icon}
-                      </div>
-                    )}
-                    <div className="min-w-0">
-                      <p
-                        className="text-[13px] font-semibold tracking-wider uppercase"
-                        style={{ fontFamily: "var(--font-heading)", color: "#475569" }}
-                      >
-                        {fact.label}
-                      </p>
-                      <p
-                        className="text-lg font-semibold text-gray-900 mt-1"
-                        style={{ fontFamily: "var(--font-heading)" }}
-                      >
-                        {fact.value}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            <dl className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t border-l border-border">
+              {intervention.quickFacts.map((fact, i) => (
+                <div key={i} className="border-b border-r border-border px-4 py-3.5">
+                  <dt className="text-sm text-muted-soft">
+                    {frenchTypography(fact.label)}
+                  </dt>
+                  <dd className="text-lg font-bold text-foreground mt-0.5">
+                    {frenchTypography(fact.value)}
+                  </dd>
+                </div>
+              ))}
+            </dl>
           )}
         </div>
       </div>
 
-      {/* ── Grille sidebar + sections ── */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr] gap-6 lg:gap-8 items-start">
-
-          {/* ── Sidebar ── */}
-          <aside className="hidden lg:block print:hidden sticky top-[144px]">
+      {/* ── Sommaire + contenu ── */}
+      <div className="max-w-5xl mx-auto px-5 sm:px-8 py-8 sm:py-10">
+        <div className="grid grid-cols-1 lg:grid-cols-[210px_1fr] gap-8 lg:gap-12 items-start">
+          <aside className="hidden lg:block print:hidden sticky top-32">
             <InterventionSidebarNav items={navItems} />
           </aside>
 
-          {/* ── Contenu sections ── */}
           <main className="min-w-0">
             {navItems.length > 0 && (
-              <div className="mb-6 lg:hidden print:hidden">
+              <div className="mb-8 lg:hidden print:hidden">
                 <InterventionSidebarNav items={navItems} collapsible />
               </div>
             )}
 
-            <div className="space-y-4">
-              {intervention.sections.map((section, index) =>
-                renderSection(section, index)
-              )}
+            <div className="flex flex-col gap-8 sm:gap-10">
+              {intervention.sections.map((section, index) => {
+                const number = numberOf.get(sectionAnchor(section, index));
+                if (!number) return null;
+                return renderSection(section, index, number);
+              })}
             </div>
 
-            <div className="mt-14 p-6 sm:p-7 rounded-2xl border" style={{ background: "#F0F6FF", borderColor: "rgba(2,132,199,0.16)" }}>
-              <p className="text-base leading-relaxed mb-4" style={{ color: "#1E3A8A" }}>
-                Ces informations sont fournies à titre général. Elles ne remplacent pas
-                les conseils personnalisés de votre cardiologue. En cas de question ou
-                d&apos;inquiétude, contactez votre équipe médicale.
-              </p>
+            {/* ── Pied de fiche : avertissement, urgence, provenance ── */}
+            <div className="mt-14 border-t border-border pt-8">
+              <div className="border-l-2 border-warn pl-5 max-w-prose">
+                <p className="text-base text-muted">
+                  Ces informations sont générales. Elles ne remplacent pas les
+                  explications que votre cardiologue vous donnera pour votre
+                  situation. En cas de doute, appelez le service.
+                </p>
+              </div>
+
               <a
                 href="tel:15"
-                className="inline-flex items-center gap-3 px-4 py-3 rounded-lg bg-white border transition-colors hover:border-red-300"
-                style={{ borderColor: "rgba(220,38,38,0.2)", minHeight: "48px" }}
+                className="mt-6 inline-flex items-center gap-3 min-h-12 border border-danger px-4 py-3 text-base font-semibold text-danger transition-colors hover:bg-surface"
               >
-                <Phone className="w-5 h-5" style={{ color: "#B91C1C" }} />
-                <span className="text-base font-semibold text-foreground" style={{ fontFamily: "var(--font-heading)" }}>
-                  Urgence : composez le 15
-                </span>
+                <Phone className="w-5 h-5 shrink-0" aria-hidden="true" />
+                Urgence : composez le 15
               </a>
+
+              {/* Provenance — la seule chose qu'un gabarit ne peut pas
+                  fabriquer : une date réelle et des noms réels. */}
+              <p className="mt-8 pt-4 border-t border-border text-sm text-muted-soft">
+                {updated && <>Fiche mise à jour le {updated}.</>}
+                {reviewers.length > 0 && (
+                  <>
+                    {" "}Rédigée et relue par{" "}
+                    {reviewers.length > 1
+                      ? `${reviewers.slice(0, -1).join(", ")} et ${reviewers[reviewers.length - 1]}`
+                      : reviewers[0]}
+                    , cardiologue
+                    {reviewers.length > 1 ? "s" : ""} du service.
+                  </>
+                )}
+              </p>
             </div>
           </main>
-
         </div>
       </div>
     </div>

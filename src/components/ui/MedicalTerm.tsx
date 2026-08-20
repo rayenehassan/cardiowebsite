@@ -43,8 +43,7 @@ export default function MedicalTerm({ term, definition }: Props) {
         onBlur={close}
         onKeyDown={(e) => { if (e.key === "Escape") close(); }}
         aria-describedby={visible ? tooltipId : undefined}
-        className="font-inherit underline decoration-dotted decoration-1 underline-offset-[3px] text-foreground hover:text-primary transition-colors cursor-help"
-        style={{ textDecorationColor: "rgba(2, 132, 199, 0.5)" }}
+        className="font-inherit underline decoration-dotted decoration-1 underline-offset-[3px] decoration-primary/60 text-foreground hover:text-primary transition-colors cursor-help"
       >
         {term}
       </button>
@@ -54,7 +53,7 @@ export default function MedicalTerm({ term, definition }: Props) {
           <span
             id={tooltipId}
             role="tooltip"
-            className="rounded-lg bg-white border border-gray-200 p-3 text-base font-normal text-gray-700 leading-relaxed text-left shadow-[0_8px_24px_rgba(15,23,42,0.12)] pointer-events-none"
+            className="bg-background border border-border-strong p-3 text-base font-normal text-muted leading-relaxed text-left pointer-events-none"
             style={{
               position: "fixed",
               top: pos.top,
@@ -66,8 +65,7 @@ export default function MedicalTerm({ term, definition }: Props) {
             }}
           >
             <span
-              className="block text-xs font-semibold uppercase tracking-wider text-primary mb-1"
-              style={{ fontFamily: "var(--font-heading)" }}
+              className="block text-sm font-semibold text-primary mb-1"
             >
               {term}
             </span>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import GlossaryText from "./GlossaryText";
+import { frenchTypography } from "@/lib/text";
 
 interface AccordionItem {
   id: string;
@@ -18,39 +19,28 @@ export default function Accordion({ items }: Props) {
   const [openId, setOpenId] = useState<string | null>(null);
 
   return (
-    <div className="space-y-2.5">
+    <div className="border-t border-border max-w-prose">
       {items.map((item) => {
         const isOpen = openId === item.id;
         return (
-          <div
-            key={item.id}
-            className="rounded-xl overflow-hidden border border-gray-200"
-            style={{ background: isOpen ? "#F8FAFF" : "#ffffff" }}
-          >
+          <div key={item.id} className="border-b border-border">
             <button
-              className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left hover:bg-gray-50 focus-visible:bg-gray-50 transition-colors"
+              className="w-full flex items-start justify-between gap-4 min-h-14 py-3.5 text-left transition-colors hover:text-primary"
               onClick={() => setOpenId(isOpen ? null : item.id)}
               aria-expanded={isOpen}
-              style={{ minHeight: "56px" }}
             >
-              <span
-                className="font-semibold text-foreground text-base sm:text-[17px] leading-snug"
-                style={{ fontFamily: "var(--font-heading)" }}
-              >
-                {item.question}
+              <span className="text-base font-semibold text-foreground">
+                {frenchTypography(item.question)}
               </span>
               <ChevronDown
-                className={`w-5 h-5 shrink-0 transition-transform duration-200 ${
+                className={`w-5 h-5 shrink-0 mt-0.5 text-muted transition-transform ${
                   isOpen ? "rotate-180" : ""
                 }`}
-                style={{ color: "#475569" }}
+                aria-hidden="true"
               />
             </button>
             {isOpen && (
-              <div
-                className="px-5 pb-5 leading-[1.8] text-[17px] border-t border-gray-100 pt-4"
-                style={{ color: "#334155" }}
-              >
+              <div className="pb-4 text-base text-muted">
                 {item.answer.trimStart().startsWith("<") ? (
                   <div
                     className="rich-text"

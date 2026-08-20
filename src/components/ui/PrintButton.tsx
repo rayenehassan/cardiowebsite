@@ -33,10 +33,9 @@ export default function PrintButton() {
   return (
     <button
       onClick={() => window.print()}
-      className="print:hidden inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-base text-foreground hover:border-gray-300 hover:bg-gray-50 transition-colors cursor-pointer"
-      style={{ fontFamily: "var(--font-heading)", minHeight: "44px" }}
+      className="print:hidden inline-flex items-center gap-2 min-h-11 border border-border bg-background px-4 py-2 text-base text-foreground transition-colors hover:border-primary hover:bg-surface cursor-pointer"
     >
-      <Printer className="w-4 h-4" style={{ color: "#0369A1" }} aria-hidden="true" />
+      <Printer className="w-4 h-4 text-muted-soft" aria-hidden="true" />
       <span>
         Imprimer<span className="hidden sm:inline"> la fiche</span>
       </span>
