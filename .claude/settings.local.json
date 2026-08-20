@@ -25,7 +25,31 @@
       "WebFetch(domain:payloadcms.com)",
       "Bash(git fetch *)",
       "Bash(git pull *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(git checkout *)",
+      "WebFetch(domain:www.nngroup.com)",
+      "WebFetch(domain:www.925studios.co)",
+      "Bash(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\rayen\\\\OneDrive\\\\Desktop\\\\cardiologie-webpage\\\\src\\\\app\\\\api\\\\admin\\\\uploads\")",
+      "Bash(Out-Null)",
+      "Bash(Write-Output \"ok\")",
+      "Bash(git merge *)",
+      "Bash(node -e \"const p = require\\('./node_modules/@tiptap/react/package.json'\\); console.log\\(p.version\\)\")",
+      "Bash(node -e \"const p = require\\('./node_modules/@tiptap/starter-kit/package.json'\\); console.log\\(p.version\\)\")",
+      "Bash(git stash *)",
+      "Bash(node *)",
+      "Bash(grep *)",
+      "Bash(ADMIN_USERNAME=admin ADMIN_PASSWORD_HASH='$2b$10$7qGkNaJ33T4oEayqmWaFQe1eOhegIivAaFh65vo2r1xeo4iWwOyr.' npm run *)",
+      "Bash(Remove-Item -Recurse -Force .next -ErrorAction SilentlyContinue)",
+      "Bash(xargs wc -l)",
+      "Bash(npm init *)",
+      "Bash(npm i *)",
+      "Bash(npx playwright *)",
+      "Bash(echo \"exit=$?\")",
+      "Bash(gh auth *)",
+      "PowerShell(gh auth *)",
+      "PowerShell(git *)"
     ]
   }
 }
