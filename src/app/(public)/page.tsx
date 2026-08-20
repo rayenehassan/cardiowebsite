@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import { Users, ArrowRight, Phone, Mail, BookOpen, MapPin, Heart, Lock, Shield, UserRound } from "lucide-react";
+import { Users, ArrowRight, Phone, Mail, BookOpen, MapPin, Heart, Lock, Shield, UserRound, Building2, Activity, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import InterventionCard from "@/components/ui/InterventionCard";
@@ -23,32 +23,13 @@ const BADGE_ICONS: Record<BadgeIcon, React.ElementType> = {
 const ECG_PATH =
   "M0,36 H90 q6,-10 12,0 H130 l6,4 8,-44 8,52 6,-12 H205 q12,-16 24,0 H390 q6,-10 12,0 H430 l6,4 8,-44 8,52 6,-12 H505 q12,-16 24,0 H690 q6,-10 12,0 H730 l6,4 8,-44 8,52 6,-12 H805 q12,-16 24,0 H990 q6,-10 12,0 H1030 l6,4 8,-44 8,52 6,-12 H1105 q12,-16 24,0 H1200";
 
-function CathLabCard() {
-  return (
-    <div className="max-w-sm sm:max-w-md rounded-2xl overflow-hidden glass">
-      <div className="relative w-full aspect-[4/3]">
-        <Image
-          src="/cath-lab.jpeg"
-          alt="Salle de cathétérisme"
-          fill
-          sizes="(max-width: 640px) 384px, 448px"
-          className="object-cover"
-        />
-      </div>
-      <div className="p-4 sm:p-5">
-        <p
-          className="text-sm sm:text-base font-semibold text-foreground leading-snug"
-          style={{ fontFamily: "var(--font-heading)" }}
-        >
-          Notre salle de cathétérisme
-        </p>
-        <p className="text-xs sm:text-sm text-muted leading-snug mt-0.5">
-          L&apos;environnement où se déroulera votre intervention
-        </p>
-      </div>
-    </div>
-  );
-}
+// Points de réassurance de la section « environnement ».
+// TODO copy : à faire valider par le médecin (formulations neutres, non médicales).
+const ENVIRONMENT_POINTS: { icon: React.ElementType; text: string }[] = [
+  { icon: Users, text: "Une équipe médicale et paramédicale à vos côtés" },
+  { icon: Activity, text: "Un plateau technique dédié à la cardiologie interventionnelle" },
+  { icon: ShieldCheck, text: "Une surveillance continue avant, pendant et après" },
+];
 
 export default async function HomePage() {
   const [interventions, content, doctors] = await Promise.all([
@@ -106,21 +87,11 @@ export default async function HomePage() {
               <div className="lg:hidden mt-8 anim-fade-up delay-400">
                 <InterventionSearch interventions={interventions} />
               </div>
-
-              {/* ── Photo salle de cathétérisme (mobile) ── */}
-              <div className="lg:hidden mt-6 anim-fade-up delay-500">
-                <CathLabCard />
-              </div>
             </div>
 
-            {/* ── Colonne droite : recherche desktop + photo ── */}
-            <div className="hidden lg:block">
-              <div className="anim-fade-up delay-400">
-                <InterventionSearch interventions={interventions} />
-              </div>
-              <div className="anim-fade-up delay-500 mt-6 sm:mt-7">
-                <CathLabCard />
-              </div>
+            {/* ── Colonne droite : recherche desktop ── */}
+            <div className="anim-fade-up delay-400 hidden lg:block">
+              <InterventionSearch interventions={interventions} />
             </div>
 
           </div>
@@ -249,6 +220,74 @@ export default async function HomePage() {
               </div>
             </AnimateIn>
           )}
+        </div>
+      </section>
+
+      {/* ── Environnement / plateau technique ── */}
+      <section className="py-14 sm:py-24 lg:py-32" style={{ background: "#F8FAFF" }}>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+
+            {/* ── Photo ── */}
+            <AnimateIn>
+              <figure className="m-0">
+                <div
+                  className="relative aspect-[4/3] rounded-2xl overflow-hidden border"
+                  style={{
+                    borderColor: "rgba(15,23,42,0.08)",
+                    boxShadow: "0 18px 50px -14px rgba(15,23,42,0.28)",
+                  }}
+                >
+                  <Image
+                    src="/cath-lab.jpeg"
+                    alt="La salle de cathétérisme du service de cardiologie interventionnelle"
+                    fill
+                    quality={85}
+                    sizes="(max-width: 1024px) 100vw, 600px"
+                    className="object-cover"
+                  />
+                </div>
+                <figcaption className="mt-3 text-sm text-muted text-center lg:text-left">
+                  La salle de cathétérisme de notre service
+                </figcaption>
+              </figure>
+            </AnimateIn>
+
+            {/* ── Texte ── */}
+            <AnimateIn delay={120}>
+              <span className="section-label mb-4 sm:mb-5 inline-flex">
+                <Building2 className="w-3.5 h-3.5" />
+                <span className="section-label-text">Votre environnement de soins</span>
+              </span>
+              <h2
+                className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] mb-4 sm:mb-5 text-foreground"
+                style={{ fontFamily: "var(--font-heading)" }}
+              >
+                Découvrez le lieu de votre intervention
+              </h2>
+              <p className="text-muted text-lg sm:text-xl leading-relaxed mb-8 max-w-xl">
+                L&apos;appréhension vient souvent de l&apos;inconnu. Voici la salle où se
+                déroulera votre intervention : un plateau technique dédié à la cardiologie,
+                où une équipe vous accompagne à chaque étape.
+              </p>
+              <ul className="space-y-4">
+                {ENVIRONMENT_POINTS.map(({ icon: Icon, text }, i) => (
+                  <li key={i} className="flex items-start gap-3.5">
+                    <span
+                      className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                      style={{ background: "rgba(2,132,199,0.08)", border: "1px solid rgba(2,132,199,0.16)" }}
+                    >
+                      <Icon className="w-5 h-5" style={{ color: "#0369A1" }} aria-hidden="true" />
+                    </span>
+                    <span className="text-base sm:text-lg text-foreground leading-snug pt-2">
+                      {text}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </AnimateIn>
+
+          </div>
         </div>
       </section>
 
