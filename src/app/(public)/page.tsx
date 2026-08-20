@@ -31,6 +31,20 @@ const DATE_FR = new Intl.DateTimeFormat("fr-FR", {
   year: "numeric",
 });
 
+/**
+ * Colonnes de la grille équipe. Le nombre de colonnes suit le nombre de
+ * cardiologues pour qu'une rangée ne se termine jamais sur un emplacement
+ * vide — c'est ce trou à droite qui déséquilibrait le bloc. En dessous de
+ * trois, la grille est bornée pour que les portraits ne s'étirent pas.
+ */
+function teamGridClass(count: number): string {
+  if (count <= 1) return "grid-cols-1 max-w-[420px]";
+  if (count === 2) return "grid-cols-1 sm:grid-cols-2 max-w-[880px]";
+  if (count === 3) return "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3";
+  if (count === 4) return "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4";
+  return "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
+}
+
 /** Date de la fiche modifiée le plus récemment, ou null si aucune. */
 function lastUpdate(dates: string[]): string | null {
   const times = dates
@@ -275,17 +289,17 @@ export default async function HomePage() {
           </p>
 
           {doctors.length > 0 ? (
-            <div className="mt-9 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 xl:gap-10">
+            <div className={`mt-9 grid gap-8 xl:gap-10 ${teamGridClass(doctors.length)}`}>
               {doctors.map((doctor) => (
                 <div key={doctor.id} className="flex flex-col">
-                  <div className="relative aspect-[3/4] w-full bg-surface border border-border flex items-center justify-center">
+                  <div className="relative w-full h-72 sm:h-80 lg:h-[360px] bg-surface border border-border flex items-center justify-center">
                     {doctor.photoUrl ? (
                       <Image
                         src={doctor.photoUrl}
                         alt={doctor.name}
                         fill
                         quality={85}
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 420px"
                         className="object-cover"
                         style={{ objectPosition: "50% 25%" }}
                       />
