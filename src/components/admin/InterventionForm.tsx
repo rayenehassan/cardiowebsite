@@ -138,6 +138,13 @@ export default function InterventionForm({ intervention, mode }: Props) {
   const [showPicker, setShowPicker] = useState(false);
   const [confirmTemplate, setConfirmTemplate] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  // Force le remount des éditeurs d'une liste quand ses éléments changent de position
+  // (insertion au milieu, suppression, réordonnancement) : Tiptap ne resynchronise pas
+  // son contenu depuis la prop `value` après le montage initial.
+  const [itemsVersion, setItemsVersion] = useState<Record<string, number>>({});
+  function bumpItemsVersion(sectionId: string) {
+    setItemsVersion((prev) => ({ ...prev, [sectionId]: (prev[sectionId] ?? 0) + 1 }));
+  }
 
   // ── Brouillon localStorage + garde fermeture ──
   // `restoreVersion` est incrémenté à chaque restauration pour forcer
@@ -247,6 +254,7 @@ export default function InterventionForm({ intervention, mode }: Props) {
           : s
       )
     );
+    bumpItemsVersion(sectionId);
   }
   function moveListItem(sectionId: string, index: number, dir: "up" | "down") {
     setSections((prev) =>
@@ -256,6 +264,7 @@ export default function InterventionForm({ intervention, mode }: Props) {
           : s
       )
     );
+    bumpItemsVersion(sectionId);
   }
 
   // FAQ helpers
@@ -508,7 +517,7 @@ export default function InterventionForm({ intervention, mode }: Props) {
                       </span>
                       <div className="flex-1">
                         <RichTextEditor
-                          key={`${section.id}-item-${i}-${restoreVersion}`}
+                          key={`${section.id}-item-${i}-${restoreVersion}-${itemsVersion[section.id] ?? 0}`}
                           inline
                           value={item}
                           onChange={(html) => updateListItem(section.id, i, html)}
