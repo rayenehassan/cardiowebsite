@@ -98,7 +98,7 @@ export default async function HomePage() {
                   src="/images/plateau-technique.jpg"
                   alt="Salle de cardiologie interventionnelle équipée d'un système d'imagerie de pointe"
                   fill
-                  quality={90}
+                  quality={85}
                   sizes="(max-width: 1024px) 100vw, 1024px"
                   className="object-cover"
                 />
