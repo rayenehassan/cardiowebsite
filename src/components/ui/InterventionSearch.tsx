@@ -61,7 +61,7 @@ export default function InterventionSearch({ interventions }: Props) {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Ex : coronarographie, pacemaker…"
+            placeholder=""
             aria-label="Rechercher une intervention"
             className="w-full pl-16 pr-14 py-4 rounded-xl border outline-none transition-all"
             style={{
