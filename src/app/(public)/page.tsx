@@ -93,14 +93,14 @@ export default async function HomePage() {
               className="relative rounded-2xl overflow-hidden border"
               style={{ borderColor: "rgba(15,23,42,0.08)" }}
             >
-              <div className="relative w-full aspect-[16/9] sm:aspect-[21/9]">
+              <div className="relative w-full aspect-[4/3] sm:aspect-[16/9]">
                 <Image
                   src="/images/plateau-technique.jpg"
                   alt="Salle de cardiologie interventionnelle équipée d'un système d'imagerie de pointe"
                   fill
                   quality={85}
                   sizes="(max-width: 1024px) 100vw, 1024px"
-                  className="object-cover"
+                  className="object-cover object-[50%_62%]"
                 />
               </div>
               <div className="p-5 sm:p-6" style={{ background: "#F8FAFF" }}>
