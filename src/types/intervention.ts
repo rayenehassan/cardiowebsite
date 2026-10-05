@@ -21,6 +21,8 @@ export interface Section {
   // image
   imageUrl?: string;
   imageAlt?: string;
+  // images supplémentaires affichées à côté de la première
+  extraImages?: Array<{ id: string; url: string; alt: string }>;
   // faqs
   faqs?: Array<{ id: string; question: string; answer: string }>;
   // document

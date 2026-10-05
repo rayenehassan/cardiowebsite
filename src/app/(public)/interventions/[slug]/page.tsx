@@ -29,12 +29,19 @@ function quickFactIcon(label: string) {
   return null;
 }
 
+function allSectionImages(section: Section): Array<{ url: string; alt: string }> {
+  return [
+    { url: section.imageUrl || "", alt: section.imageAlt || "" },
+    ...(section.extraImages || []).map((img) => ({ url: img.url, alt: img.alt })),
+  ].filter((img) => img.url.trim());
+}
+
 function sectionHasContent(section: Section): boolean {
   switch (section.type) {
     case "text": return Boolean(section.body?.trim());
     case "list": return (section.items || []).some((i) => i.trim());
     case "video": return Boolean(section.videoUrl?.trim());
-    case "image": return Boolean(section.imageUrl?.trim());
+    case "image": return allSectionImages(section).length > 0;
     case "document": return Boolean(section.documentUrl?.trim());
     case "faqs": return (section.faqs || []).some((f) => f.question.trim());
   }
@@ -138,23 +145,29 @@ function renderSection(section: Section, index: number): React.ReactNode {
         </SectionCard>
       );
 
-    case "image":
+    case "image": {
+      const images = allSectionImages(section);
       return (
         <SectionCard key={section.id} {...cardProps}>
-          <div className="rounded-xl overflow-hidden border border-gray-100">
-            <div className="bg-gray-50">
-              <NextImage src={section.imageUrl!} alt={section.imageAlt || section.title}
-                width={0} height={0} sizes="(min-width: 640px) 672px, 100vw"
-                className="w-full h-auto block" unoptimized />
-            </div>
-            {section.imageAlt && (
-              <p className="px-4 py-3 text-sm text-center border-t border-gray-100" style={{ color: "#475569" }}>
-                {section.imageAlt}
-              </p>
-            )}
+          <div className={images.length > 1 ? "grid grid-cols-1 sm:grid-cols-2 gap-4" : ""}>
+            {images.map((img, i) => (
+              <div key={i} className="rounded-xl overflow-hidden border border-gray-100">
+                <div className="bg-gray-50">
+                  <NextImage src={img.url} alt={img.alt || section.title}
+                    width={0} height={0} sizes="(min-width: 640px) 672px, 100vw"
+                    className="w-full h-auto block" unoptimized />
+                </div>
+                {img.alt && (
+                  <p className="px-4 py-3 text-sm text-center border-t border-gray-100" style={{ color: "#475569" }}>
+                    {img.alt}
+                  </p>
+                )}
+              </div>
+            ))}
           </div>
         </SectionCard>
       );
+    }
 
     case "document":
       return section.isPublic !== false ? (

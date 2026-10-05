@@ -632,6 +632,68 @@ export default function InterventionForm({ intervention, mode }: Props) {
                     placeholder="Description de l'image pour les lecteurs d'écran"
                   />
                 </div>
+                {(section.extraImages || []).map((img, i) => (
+                  <div key={img.id} className="space-y-3 border-t border-gray-100 pt-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-700">Image {i + 2}</span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateSection(section.id, {
+                            extraImages: (section.extraImages || []).filter((x) => x.id !== img.id),
+                          })
+                        }
+                        className="flex items-center gap-1 text-sm text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        Retirer
+                      </button>
+                    </div>
+                    <FileUpload
+                      kind="image"
+                      value={img.url || undefined}
+                      onChange={(url) =>
+                        updateSection(section.id, {
+                          extraImages: (section.extraImages || []).map((x) => (x.id === img.id ? { ...x, url } : x)),
+                        })
+                      }
+                      onClear={() =>
+                        updateSection(section.id, {
+                          extraImages: (section.extraImages || []).map((x) => (x.id === img.id ? { ...x, url: "" } : x)),
+                        })
+                      }
+                    />
+                    <div>
+                      <label className={labelClass}>Texte alternatif (accessibilité)</label>
+                      <input
+                        type="text"
+                        value={img.alt}
+                        onChange={(e) =>
+                          updateSection(section.id, {
+                            extraImages: (section.extraImages || []).map((x) => (x.id === img.id ? { ...x, alt: e.target.value } : x)),
+                          })
+                        }
+                        className={inputClass}
+                        placeholder="Description de l'image pour les lecteurs d'écran"
+                      />
+                    </div>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() =>
+                    updateSection(section.id, {
+                      extraImages: [
+                        ...(section.extraImages || []),
+                        { id: `img-${Date.now()}-${Math.random().toString(36).slice(2)}`, url: "", alt: "" },
+                      ],
+                    })
+                  }
+                  className="flex items-center gap-1 text-sm text-primary hover:text-primary-dark font-medium"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Ajouter une image
+                </button>
               </>
             )}
 
