@@ -9,6 +9,7 @@ import { SiteBrand } from "@/types/site";
 const navLinks = [
   { hash: "accueil", label: "Accueil" },
   { hash: "interventions", label: "Interventions" },
+  { hash: "preparation", label: "Vous préparer" },
   { hash: "equipe", label: "Équipe" },
 ];
 
