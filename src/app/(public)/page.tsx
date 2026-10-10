@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import { Users, ArrowRight, Phone, Mail, BookOpen, MapPin, Heart, Lock, Shield, UserRound } from "lucide-react";
+import { Users, ArrowRight, Phone, Mail, BookOpen, MapPin, Heart, Lock, Shield, UserRound, ClipboardList } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import InterventionCard from "@/components/ui/InterventionCard";
@@ -26,7 +26,7 @@ export default async function HomePage() {
     getPublicDoctors(),
   ]);
 
-  const { hero, interventionsSection, teamSection, importantInfo } = content;
+  const { hero, interventionsSection, teamSection, preparationSection, importantInfo } = content;
 
   return (
     <>
@@ -189,6 +189,49 @@ export default async function HomePage() {
           )}
         </div>
       </section>
+
+      {/* ── Préparation à l'examen ── */}
+      {preparationSection.steps.length > 0 && (
+      <section className="py-14 sm:py-24 lg:py-32" style={{ background: "#F8FAFF" }}>
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          <div id="preparation" className="scroll-mt-24" aria-hidden="true" />
+          <AnimateIn className="mb-8 sm:mb-12">
+            <span className="section-label mb-4 sm:mb-5 inline-flex">
+              <ClipboardList className="w-3.5 h-3.5" />
+              <span className="section-label-text">{preparationSection.kicker}</span>
+            </span>
+            <h2
+              className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] mb-3 sm:mb-4 text-foreground"
+              style={{ fontFamily: "var(--font-heading)" }}
+            >
+              {preparationSection.title}
+            </h2>
+          </AnimateIn>
+          <ol className="space-y-3 sm:space-y-4">
+            {preparationSection.steps.map((step, i) => (
+              <AnimateIn key={i} delay={i * 50}>
+                <li
+                  className="flex items-start gap-4 rounded-2xl border bg-white p-4 sm:p-5"
+                  style={{ borderColor: "rgba(15,23,42,0.08)" }}
+                >
+                  <span
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-base font-bold text-white"
+                    style={{ background: "#0369A1", fontFamily: "var(--font-heading)" }}
+                    aria-hidden="true"
+                  >
+                    {i + 1}
+                  </span>
+                  <p className="text-base sm:text-lg leading-relaxed text-foreground pt-1">
+                    {step.text}
+                    {step.optional && <span className="text-muted"> (non obligatoire)</span>}
+                  </p>
+                </li>
+              </AnimateIn>
+            ))}
+          </ol>
+        </div>
+      </section>
+      )}
 
       {/* ── Équipe ── */}
       <section className="py-14 sm:py-24 lg:py-32" style={{ background: "#EEF4FF" }}>

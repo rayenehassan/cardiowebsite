@@ -44,6 +44,20 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     subtitle:
       "Des spécialistes en cardiologie interventionnelle à votre écoute à l'Hôpital privé de la Loire.",
   },
+  preparationSection: {
+    kicker: "Avant votre venue",
+    title: "Comment vous préparer à votre examen",
+    steps: [
+      { text: "Être à jeun : ni liquides, ni nourriture solide, ni tabac pendant au moins 6 heures avant l'admission.", optional: false },
+      { text: "Arrêter les médicaments anticoagulants 48 heures avant le jour de l'examen (Eliquis, Xarelto, Pradaxa, Coumadine, Préviscan, Sintrom).", optional: false },
+      { text: "Poursuivre tous les autres médicaments comme d'habitude, y compris les médicaments pour le diabète.", optional: false },
+      { text: "Faire la prise de sang et apporter le résultat le jour de votre examen.", optional: false },
+      { text: "Épilation des deux avant-bras avec une crème dépilatoire.", optional: true },
+      { text: "Épilation des deux plis de l'aine avec une crème dépilatoire.", optional: true },
+      { text: "Apporter votre ordonnance en cours.", optional: false },
+      { text: "Apporter votre carte Vitale, votre carte de mutuelle et votre pièce d'identité.", optional: false },
+    ],
+  },
   importantInfo: {
     title: "Information importante",
     body:
@@ -93,6 +107,11 @@ export function mergeSiteContent(partial: unknown): SiteContent {
         p.interventionsSection?.badges ?? defaults.interventionsSection.badges,
     },
     teamSection: { ...defaults.teamSection, ...(p.teamSection ?? {}) },
+    preparationSection: {
+      ...defaults.preparationSection,
+      ...(p.preparationSection ?? {}),
+      steps: p.preparationSection?.steps ?? defaults.preparationSection.steps,
+    },
     importantInfo: { ...defaults.importantInfo, ...(p.importantInfo ?? {}) },
     footer: {
       ...defaults.footer,

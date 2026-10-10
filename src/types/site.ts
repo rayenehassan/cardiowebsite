@@ -35,6 +35,17 @@ export interface SiteTeamSection {
   subtitle: string;
 }
 
+export interface SitePreparationStep {
+  text: string;
+  optional: boolean;
+}
+
+export interface SitePreparationSection {
+  kicker: string;
+  title: string;
+  steps: SitePreparationStep[];
+}
+
 export interface SiteImportantInfo {
   title: string;
   body: string;
@@ -62,6 +73,7 @@ export interface SiteContent {
   hero: SiteHero;
   interventionsSection: SiteInterventionsSection;
   teamSection: SiteTeamSection;
+  preparationSection: SitePreparationSection;
   importantInfo: SiteImportantInfo;
   footer: SiteFooter;
   legalNotice: SiteLegalNotice;

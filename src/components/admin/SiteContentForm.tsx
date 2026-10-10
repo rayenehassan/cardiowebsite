@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import {
   SiteBadge,
+  SitePreparationStep,
   SiteContent,
   BadgeIcon,
 } from "@/types/site";
@@ -70,6 +71,7 @@ type SectionKey =
   | "hero"
   | "interventionsSection"
   | "teamSection"
+  | "preparationSection"
   | "importantInfo"
   | "footer"
   | "legalNotice";
@@ -79,6 +81,7 @@ const SECTION_LABEL: Record<SectionKey, string> = {
   hero: "Bannière principale (Hero)",
   interventionsSection: "Section interventions",
   teamSection: "Section équipe médicale",
+  preparationSection: "Préparation à l'examen",
   importantInfo: "Information importante",
   footer: "Pied de page",
   legalNotice: "Mentions légales",
@@ -240,6 +243,20 @@ export default function SiteContentForm({ initial }: Props) {
   function moveBadge(index: number, dir: "up" | "down") {
     const badges = moveItem(content.interventionsSection.badges, index, dir);
     patch("interventionsSection", { ...content.interventionsSection, badges });
+  }
+
+  // ── Preparation steps helpers ─────────────────────────────────────────────
+
+  function patchSteps(steps: SitePreparationStep[]) {
+    patch("preparationSection", { ...content.preparationSection, steps });
+  }
+
+  function updateStep(index: number, change: Partial<SitePreparationStep>) {
+    patchSteps(
+      content.preparationSection.steps.map((st, i) =>
+        i === index ? { ...st, ...change } : st
+      )
+    );
   }
 
   // ── Footer contact lines helpers ──────────────────────────────────────────
@@ -680,6 +697,134 @@ export default function SiteContentForm({ initial }: Props) {
               Les cardiologues affichés dans cette section se modifient depuis
               l&apos;onglet <strong>Équipe médicale</strong>.
             </p>
+          </div>
+        )}
+      </fieldset>
+
+      {/* Preparation section */}
+      <fieldset className="bg-white rounded-xl border border-border overflow-hidden">
+        <SectionHeader {...headerProps("preparationSection")} />
+        {!collapsed.has("preparationSection") && (
+          <div className="p-5 space-y-4">
+            <div>
+              <label className={labelClass}>Étiquette (kicker)</label>
+              <input
+                type="text"
+                value={content.preparationSection.kicker}
+                onChange={(e) =>
+                  patch("preparationSection", {
+                    ...content.preparationSection,
+                    kicker: e.target.value,
+                  })
+                }
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className={labelClass}>Titre</label>
+              <input
+                type="text"
+                value={content.preparationSection.title}
+                onChange={(e) =>
+                  patch("preparationSection", {
+                    ...content.preparationSection,
+                    title: e.target.value,
+                  })
+                }
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className={labelClass}>Conseils (numérotés automatiquement)</label>
+              <div className="space-y-2">
+                {content.preparationSection.steps.map((step, i) => (
+                  <div
+                    key={i}
+                    className="flex gap-1.5 items-start border border-border rounded-lg p-2 bg-surface"
+                  >
+                    <div className="flex flex-col shrink-0 mt-1.5">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          patchSteps(
+                            moveItem(content.preparationSection.steps, i, "up")
+                          )
+                        }
+                        disabled={i === 0}
+                        className="p-0.5 text-muted hover:text-foreground disabled:opacity-20 transition-colors"
+                      >
+                        <ChevronUp className="w-3 h-3" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          patchSteps(
+                            moveItem(content.preparationSection.steps, i, "down")
+                          )
+                        }
+                        disabled={
+                          i === content.preparationSection.steps.length - 1
+                        }
+                        className="p-0.5 text-muted hover:text-foreground disabled:opacity-20 transition-colors"
+                      >
+                        <ChevronDown className="w-3 h-3" />
+                      </button>
+                    </div>
+                    <span className="w-6 h-9 flex items-center justify-center text-sm font-semibold text-primary shrink-0">
+                      {i + 1}
+                    </span>
+                    <div className="flex-1 min-w-0 space-y-1.5">
+                      <textarea
+                        value={step.text}
+                        onChange={(e) => updateStep(i, { text: e.target.value })}
+                        placeholder="Texte du conseil…"
+                        className="w-full px-2.5 py-2 border border-border rounded-md bg-white text-sm min-h-[60px]"
+                      />
+                      <label className="flex items-center gap-2 text-sm text-muted">
+                        <input
+                          type="checkbox"
+                          checked={step.optional}
+                          onChange={(e) =>
+                            updateStep(i, { optional: e.target.checked })
+                          }
+                        />
+                        Afficher « (non obligatoire) »
+                      </label>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        patchSteps(
+                          content.preparationSection.steps.filter(
+                            (_, j) => j !== i
+                          )
+                        )
+                      }
+                      className="p-2 text-muted hover:text-danger transition-colors shrink-0"
+                      title="Retirer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() =>
+                    patchSteps([
+                      ...content.preparationSection.steps,
+                      { text: "", optional: false },
+                    ])
+                  }
+                  className="flex items-center gap-1 text-sm text-primary hover:text-primary-dark font-medium mt-1"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Ajouter un conseil
+                </button>
+              </div>
+              <p className="text-xs text-muted mt-2">
+                Si aucun conseil n&apos;est renseigné, la section n&apos;apparaît pas sur la page d&apos;accueil.
+              </p>
+            </div>
           </div>
         )}
       </fieldset>
