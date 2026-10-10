@@ -11,6 +11,7 @@ const navLinks = [
   { hash: "interventions", label: "Interventions" },
   { hash: "preparation", label: "Vous préparer" },
   { hash: "equipe", label: "Équipe" },
+  { hash: "contact", label: "Contact" },
 ];
 
 interface Props {

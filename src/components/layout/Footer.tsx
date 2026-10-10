@@ -6,6 +6,7 @@ const navLinks = [
   { href: "/#accueil", label: "Accueil" },
   { href: "/#interventions", label: "Interventions" },
   { href: "/#equipe", label: "Équipe" },
+  { href: "/#contact", label: "Contact" },
 ];
 
 interface Props {
@@ -108,7 +109,7 @@ export default function Footer({ brand, footer }: Props) {
           </div>
 
           {/* Contact */}
-          <div>
+          <div id="contact" className="scroll-mt-24">
             <h3
               className="text-base font-semibold text-foreground mb-3"
               style={{ fontFamily: "var(--font-heading)" }}
