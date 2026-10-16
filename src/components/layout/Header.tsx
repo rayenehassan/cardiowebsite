@@ -60,7 +60,7 @@ export default function Header({ brand }: Props) {
         style={{ background: "#0F172A", borderColor: "rgba(255,255,255,0.08)" }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-[64px]">
+          <div className="flex items-center justify-between gap-4 min-h-[64px]">
             {/* Logo */}
             <Link href="/" onClick={handleLogoClick} className="flex items-center gap-2.5 py-2 min-w-0 flex-shrink">
               <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true" className="shrink-0">
@@ -71,15 +71,15 @@ export default function Header({ brand }: Props) {
               </svg>
               <div className="leading-tight min-w-0">
                 <p
-                  className="text-[15px] font-bold text-white truncate"
+                  className="text-[15px] font-bold text-white"
                   style={{ fontFamily: "var(--font-heading)" }}
                   title={brand.name}
                 >
                   {brand.name}
                 </p>
                 <p
-                  className="text-[13px] font-medium truncate"
-                  style={{ fontFamily: "var(--font-heading)", color: "rgba(255,255,255,0.85)" }}
+                  className="text-[13px] font-bold"
+                  style={{ fontFamily: "var(--font-heading)", color: "rgba(255,255,255,0.92)" }}
                   title={brand.subtitle}
                 >
                   {brand.subtitle}
@@ -90,13 +90,13 @@ export default function Header({ brand }: Props) {
             {/* Right cluster: nav (desktop) / burger (mobile) */}
             <div className="flex items-center gap-2 sm:gap-3">
               {/* Desktop nav */}
-              <nav className="hidden md:flex items-center gap-1">
+              <nav className="hidden lg:flex items-center gap-1">
                 {navLinks.map(({ hash, label }) => (
                   <Link
                     key={hash}
                     href={`/#${hash}`}
                     onClick={(e) => handleNavClick(e, hash)}
-                    className="px-4 py-3 text-[15px] font-medium rounded-lg transition-colors hover:bg-white/10 focus-visible:bg-white/10"
+                    className="px-3 xl:px-4 py-3 text-[15px] font-medium whitespace-nowrap rounded-lg transition-colors hover:bg-white/10 focus-visible:bg-white/10"
                     style={{
                       fontFamily: "var(--font-heading)",
                       color: "rgba(255,255,255,0.92)",
@@ -112,7 +112,7 @@ export default function Header({ brand }: Props) {
 
               {/* Mobile toggle */}
               <button
-                className="md:hidden p-3 rounded-lg transition-colors hover:bg-white/10"
+                className="lg:hidden p-3 rounded-lg transition-colors hover:bg-white/10"
                 onClick={() => setMenuOpen(!menuOpen)}
                 aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
                 aria-expanded={menuOpen}
@@ -125,7 +125,7 @@ export default function Header({ brand }: Props) {
 
           {menuOpen && (
             <nav
-              className="md:hidden pb-3 pt-2 flex flex-col gap-1 border-t"
+              className="lg:hidden pb-3 pt-2 flex flex-col gap-1 border-t"
               style={{ borderColor: "rgba(255,255,255,0.1)" }}
             >
               {navLinks.map(({ hash, label }) => (
