@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import { Users, ArrowRight, Phone, Mail, BookOpen, MapPin, Heart, Lock, Shield, UserRound, ClipboardList } from "lucide-react";
+import { Users, ArrowRight, Phone, Mail, BookOpen, MapPin, Heart, Lock, Shield, UserRound, ClipboardList, FileText, Download } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import InterventionCard from "@/components/ui/InterventionCard";
@@ -18,6 +18,27 @@ const BADGE_ICONS: Record<BadgeIcon, React.ElementType> = {
   book: BookOpen,
   users: Users,
 };
+
+const PATIENT_DOCUMENTS = [
+  {
+    heading: "Fiches d'information",
+    items: [
+      { title: "Coronarographie", file: "GACI-Info-Coronarographie.pdf" },
+      { title: "Dilatation coronaire", file: "GACI-Info-Dilatation-coronaire.pdf" },
+      { title: "Alcoolisation septale", file: "GACI-Info-Alcoolisation-septale.pdf" },
+      { title: "Fermeture du foramen ovale perméable (FOP)", file: "FCPC-Info-Patient-FOP-2502.pdf" },
+      { title: "Fermeture de la communication interauriculaire (CIA)", file: "FCPC-Info-Patient-CIA-version-2502.pdf" },
+    ],
+  },
+  {
+    heading: "Formulaires de consentement",
+    items: [
+      { title: "Valve aortique", file: "consentement-valve-aortique.pdf" },
+      { title: "Dilatation aortique", file: "consentement-dilatation-aortique.pdf" },
+      { title: "Clip mitral", file: "consentement-clip-mitral.pdf" },
+    ],
+  },
+];
 
 export default async function HomePage() {
   const [interventions, content, doctors] = await Promise.all([
@@ -232,6 +253,57 @@ export default async function HomePage() {
         </div>
       </section>
       )}
+
+      {/* ── Documents à télécharger ── */}
+      <section className="py-14 sm:py-24 lg:py-32 bg-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          <div id="documents" className="scroll-mt-24" aria-hidden="true" />
+          <AnimateIn className="mb-8 sm:mb-12">
+            <span className="section-label mb-4 sm:mb-5 inline-flex">
+              <FileText className="w-3.5 h-3.5" />
+              <span className="section-label-text">Documents à télécharger</span>
+            </span>
+            <h2
+              className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] mb-3 sm:mb-4 text-foreground"
+              style={{ fontFamily: "var(--font-heading)" }}
+            >
+              Fiches d&apos;informations et de consentement
+            </h2>
+          </AnimateIn>
+          <div className="space-y-8">
+            {PATIENT_DOCUMENTS.map((group) => (
+              <AnimateIn key={group.heading}>
+                <h3
+                  className="text-lg font-semibold text-foreground mb-3"
+                  style={{ fontFamily: "var(--font-heading)" }}
+                >
+                  {group.heading}
+                </h3>
+                <ul className="space-y-3">
+                  {group.items.map((doc) => (
+                    <li key={doc.file}>
+                      <a
+                        href={`/documents/${doc.file}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-4 rounded-2xl border p-4 sm:p-5 transition-shadow hover:shadow-[0_8px_28px_rgba(15,23,42,0.08)]"
+                        style={{ background: "#F8FAFF", borderColor: "rgba(15,23,42,0.08)", minHeight: "44px" }}
+                      >
+                        <FileText className="w-6 h-6 shrink-0" style={{ color: "#0369A1" }} aria-hidden="true" />
+                        <span className="flex-1 text-base sm:text-lg text-foreground">{doc.title}</span>
+                        <span className="inline-flex items-center gap-1.5 text-sm font-medium" style={{ color: "#0369A1" }}>
+                          <Download className="w-4 h-4" aria-hidden="true" />
+                          PDF
+                        </span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </AnimateIn>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* ── Équipe ── */}
       <section className="py-14 sm:py-24 lg:py-32" style={{ background: "#EEF4FF" }}>
