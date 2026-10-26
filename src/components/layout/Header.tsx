@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { SiteBrand } from "@/types/site";
 
@@ -16,6 +16,11 @@ const navLinks = [
   { hash: "contact", label: "Contact" },
 ];
 
+function openSection(hash: string) {
+  const details = document.getElementById(hash)?.parentElement?.querySelector("details");
+  if (details) details.open = true;
+}
+
 interface Props {
   brand: SiteBrand;
 }
@@ -24,6 +29,16 @@ export default function Header({ brand }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+
+  useEffect(() => {
+    const openFromHash = () => {
+      const hash = window.location.hash.slice(1);
+      if (hash) openSection(hash);
+    };
+    openFromHash();
+    window.addEventListener("hashchange", openFromHash);
+    return () => window.removeEventListener("hashchange", openFromHash);
+  }, []);
 
   function handleNavClick(e: React.MouseEvent<HTMLAnchorElement>, hash: string) {
     setMenuOpen(false);
@@ -34,6 +49,7 @@ export default function Header({ brand }: Props) {
     if (hash === "accueil") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
+      openSection(hash);
       const el = document.getElementById(hash);
       if (el) {
         el.scrollIntoView({ behavior: "smooth", block: "start" });
