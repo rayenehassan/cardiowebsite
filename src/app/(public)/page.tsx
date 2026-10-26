@@ -462,7 +462,16 @@ export default async function HomePage() {
               Fiches d&apos;informations et de consentement
             </h2>
           </AnimateIn>
-          <div className="space-y-8">
+          <details className="group rounded-2xl border bg-white" style={{ borderColor: "rgba(15,23,42,0.08)" }}>
+            <summary
+              className="flex cursor-pointer list-none items-center gap-3 rounded-2xl p-4 sm:p-5 text-base sm:text-lg font-semibold text-foreground [&::-webkit-details-marker]:hidden"
+              style={{ background: "#F8FAFF", minHeight: "44px" }}
+            >
+              <span className="flex-1 group-open:hidden">Voir les documents</span>
+              <span className="hidden flex-1 group-open:inline">Masquer les documents</span>
+              <ChevronDown className="w-5 h-5 shrink-0 transition-transform group-open:rotate-180" style={{ color: "#0369A1" }} aria-hidden="true" />
+            </summary>
+          <div className="space-y-8 p-4 sm:p-6">
             {PATIENT_DOCUMENTS.map((group) => (
               <AnimateIn key={group.heading}>
                 <h3
@@ -494,6 +503,7 @@ export default async function HomePage() {
               </AnimateIn>
             ))}
           </div>
+          </details>
         </div>
       </section>
 
