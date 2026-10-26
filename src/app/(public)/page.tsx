@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import { Users, ArrowRight, Phone, Mail, BookOpen, MapPin, Heart, Lock, Shield, UserRound, ClipboardList, FileText, Download } from "lucide-react";
+import { Users, ArrowRight, Phone, Mail, BookOpen, MapPin, Heart, Lock, Shield, UserRound, ClipboardList, FileText, Download, Apple, Check } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import InterventionCard from "@/components/ui/InterventionCard";
@@ -38,6 +38,50 @@ const PATIENT_DOCUMENTS = [
       { title: "Clip mitral", file: "consentement-clip-mitral.pdf" },
     ],
   },
+];
+
+const FOOD_ESSENTIALS = [
+  "Plus de légumes, de fruits, de légumineuses, de céréales complètes et de noix.",
+  "Moins de viande, de charcuterie, de sel, de sucre et d'alcool.",
+  "Des matières grasses de meilleure qualité : huile d'olive ou de colza plutôt que beurre et crème.",
+];
+
+const FOOD_PLATE = [
+  { favor: "Légumes et fruits, frais ou surgelés nature, à chaque repas", limit: "Plats préparés, soupes et conserves salées" },
+  { favor: "Céréales complètes : pain complet, riz complet, pâtes complètes, flocons d'avoine", limit: "Pain blanc, pâtisseries, viennoiseries, biscuits" },
+  { favor: "Légumineuses : lentilles, pois chiches, haricots secs", limit: "Viande rouge en excès" },
+  { favor: "Poisson, surtout gras : saumon, sardine, maquereau, hareng", limit: "Charcuterie : jambon, saucisson, saucisses, lardons" },
+  { favor: "Noix et autres fruits à coque, non salés", limit: "Beurre, crème, fritures, fromages gras" },
+  { favor: "Huile d'olive ou de colza pour cuisiner et assaisonner", limit: "Produits industriels contenant des graisses trans (huiles hydrogénées)" },
+  { favor: "Eau ; café filtré (3 à 4 tasses par jour au plus)", limit: "Sodas, jus de fruits, boissons sucrées, alcool" },
+];
+
+const FOOD_BENCHMARKS = [
+  { food: "Légumes", target: "Au moins 200 g par jour", practice: "2 à 3 portions" },
+  { food: "Fruits", target: "Au moins 200 g par jour", practice: "2 à 3 fruits" },
+  { food: "Fibres", target: "30 à 45 g par jour", practice: "Céréales complètes, légumineuses, fruits et légumes" },
+  { food: "Noix", target: "30 g par jour", practice: "Une petite poignée, non salées" },
+  { food: "Poisson", target: "1 à 2 fois par semaine", practice: "Au moins une fois du poisson gras" },
+  { food: "Viande rouge", target: "350 à 500 g par semaine au maximum", practice: "Environ 3 à 4 portions de 120 g" },
+  { food: "Charcuterie", target: "Le moins possible", practice: "Une exception, pas une habitude" },
+  { food: "Sel", target: "Moins de 5 g par jour", practice: "Environ une cuillère à café rase, pain, fromage et plats préparés compris" },
+  { food: "Sucres ajoutés", target: "Moins de 10 % des calories", practice: "Pas de boissons sucrées, jus de fruits compris" },
+  { food: "Alcool", target: "100 g d'alcool pur par semaine au maximum", practice: "Environ 7 à 12 verres, et moins vaut mieux" },
+];
+
+const FOOD_TIPS = [
+  { label: "Aux courses", text: "remplissez d'abord le panier de légumes, fruits, légumineuses, poisson et céréales complètes. Lisez les étiquettes pour le sel et le sucre." },
+  { label: "Moins de sel", text: "cuisinez davantage « maison », peu d'aliments transformés, et assaisonnez avec des herbes, des épices, de l'ail ou du citron plutôt qu'avec du sel." },
+  { label: "Moins de viande", text: "remplacez-la par des légumineuses, des noix ou du soja, ce qui améliore aussi le taux de mauvais cholestérol." },
+  { label: "Au quotidien", text: "une poignée de noix ou un fruit comme collation, de l'eau à table, du poisson une ou deux fois par semaine." },
+  { label: "Au restaurant", text: "choisissez poisson ou légumes, sauce à part, et partagez le dessert." },
+];
+
+const FOOD_GOOD_TO_KNOW = [
+  { label: "Poids", text: "si vous êtes en surpoids, perdre 5 à 10 % de votre poids améliore la tension, le cholestérol et la glycémie. Gardez ensuite une alimentation saine dans la durée plutôt qu'un régime strict de courte durée." },
+  { label: "Compléments", text: "les vitamines et les capsules d'huile de poisson n'ont pas montré de bénéfice pour le cœur, et la levure de riz rouge est déconseillée. Parlez-en à votre médecin avant d'en prendre." },
+  { label: "Traitement", text: "l'alimentation complète vos médicaments, elle ne les remplace pas. Ne les arrêtez pas sans avis médical." },
+  { label: "Cas particuliers", text: "si vous avez du diabète, une maladie des reins ou un régime spécifique, demandez à votre médecin ou à un diététicien d'adapter ces conseils." },
 ];
 
 export default async function HomePage() {
@@ -253,6 +297,134 @@ export default async function HomePage() {
         </div>
       </section>
       )}
+
+      {/* ── Conseils Alimentation ── */}
+      <section className="py-14 sm:py-24 lg:py-32 bg-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          <div id="alimentation" className="scroll-mt-24" aria-hidden="true" />
+          <AnimateIn className="mb-8 sm:mb-12">
+            <span className="section-label mb-4 sm:mb-5 inline-flex">
+              <Apple className="w-3.5 h-3.5" />
+              <span className="section-label-text">Fiche patient</span>
+            </span>
+            <h2
+              className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] mb-3 sm:mb-4 text-foreground"
+              style={{ fontFamily: "var(--font-heading)" }}
+            >
+              Conseils Alimentation
+            </h2>
+            <p className="text-muted text-lg sm:text-xl mt-4">
+              Bien manger pour protéger mon cœur et mes artères
+            </p>
+          </AnimateIn>
+
+          <div className="space-y-10">
+            <AnimateIn>
+              <h3 className="text-xl font-semibold text-foreground mb-3" style={{ fontFamily: "var(--font-heading)" }}>
+                L&apos;essentiel
+              </h3>
+              <p className="text-base sm:text-lg leading-relaxed text-foreground mb-4">
+                Une alimentation saine est l&apos;un des piliers de la protection de vos artères, en plus de votre traitement. Le modèle recommandé est l&apos;alimentation de type méditerranéen : beaucoup de végétaux, du poisson, de l&apos;huile d&apos;olive, peu de viande et peu d&apos;aliments transformés.
+              </p>
+              <ul className="space-y-2 mb-4">
+                {FOOD_ESSENTIALS.map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-base sm:text-lg leading-relaxed text-foreground">
+                    <Check className="w-5 h-5 mt-1 shrink-0" style={{ color: "#0369A1" }} aria-hidden="true" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <p className="text-base sm:text-lg leading-relaxed text-muted">
+                Il ne s&apos;agit pas d&apos;un régime strict, mais d&apos;habitudes à prendre peu à peu et à garder.
+              </p>
+            </AnimateIn>
+
+            <AnimateIn>
+              <h3 className="text-xl font-semibold text-foreground mb-3" style={{ fontFamily: "var(--font-heading)" }}>
+                Dans mon assiette
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="rounded-2xl border p-4 sm:p-5" style={{ background: "#F0FDF4", borderColor: "rgba(22,101,52,0.15)" }}>
+                  <p className="font-bold text-foreground mb-3">Je privilégie</p>
+                  <ul className="space-y-2">
+                    {FOOD_PLATE.map((row) => (
+                      <li key={row.favor} className="text-base leading-relaxed text-foreground">{row.favor}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="rounded-2xl border p-4 sm:p-5" style={{ background: "#FFF5F7", borderColor: "rgba(244,63,94,0.15)" }}>
+                  <p className="font-bold text-foreground mb-3">Je limite ou j&apos;évite</p>
+                  <ul className="space-y-2">
+                    {FOOD_PLATE.map((row) => (
+                      <li key={row.limit} className="text-base leading-relaxed text-foreground">{row.limit}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <p className="text-sm sm:text-base text-muted mt-3">
+                Le café non filtré (bouilli, « à la turque », certains expressos) élève le mauvais cholestérol.
+              </p>
+            </AnimateIn>
+
+            <AnimateIn>
+              <h3 className="text-xl font-semibold text-foreground mb-3" style={{ fontFamily: "var(--font-heading)" }}>
+                Mes repères
+              </h3>
+              <div className="space-y-3">
+                {FOOD_BENCHMARKS.map((row) => (
+                  <div
+                    key={row.food}
+                    className="rounded-2xl border p-4 sm:p-5"
+                    style={{ background: "#F8FAFF", borderColor: "rgba(15,23,42,0.08)" }}
+                  >
+                    <p className="text-base sm:text-lg text-foreground">
+                      <span className="font-bold">{row.food}</span> : {row.target}
+                    </p>
+                    <p className="text-base text-muted mt-1">{row.practice}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="text-base leading-relaxed text-foreground mt-3">
+                Pour l&apos;alcool, aucune quantité n&apos;est bénéfique pour le cœur : les risques les plus bas s&apos;observent chez les personnes qui n&apos;en boivent pas.
+              </p>
+            </AnimateIn>
+
+            <AnimateIn>
+              <h3 className="text-xl font-semibold text-foreground mb-3" style={{ fontFamily: "var(--font-heading)" }}>
+                Pour y arriver
+              </h3>
+              <ul className="space-y-3">
+                {FOOD_TIPS.map((tip) => (
+                  <li key={tip.label} className="flex items-start gap-3 text-base sm:text-lg leading-relaxed text-foreground">
+                    <Check className="w-5 h-5 mt-1 shrink-0" style={{ color: "#0369A1" }} aria-hidden="true" />
+                    <span><span className="font-bold">{tip.label} :</span> {tip.text}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="text-base sm:text-lg leading-relaxed text-muted mt-4">
+                Changez une habitude à la fois : c&apos;est plus facile à tenir dans la durée.
+              </p>
+            </AnimateIn>
+
+            <AnimateIn>
+              <h3 className="text-xl font-semibold text-foreground mb-3" style={{ fontFamily: "var(--font-heading)" }}>
+                À savoir
+              </h3>
+              <ul className="space-y-3">
+                {FOOD_GOOD_TO_KNOW.map((item) => (
+                  <li key={item.label} className="flex items-start gap-3 text-base sm:text-lg leading-relaxed text-foreground">
+                    <Check className="w-5 h-5 mt-1 shrink-0" style={{ color: "#0369A1" }} aria-hidden="true" />
+                    <span><span className="font-bold">{item.label} :</span> {item.text}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="text-sm text-muted mt-6">
+                Source : recommandations de la Société européenne de cardiologie 2021 sur la prévention cardiovasculaire (Eur Heart J 2021;42:3227-3337).
+              </p>
+            </AnimateIn>
+          </div>
+        </div>
+      </section>
 
       {/* ── Documents à télécharger ── */}
       <section className="py-14 sm:py-24 lg:py-32 bg-white">
