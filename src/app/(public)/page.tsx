@@ -96,8 +96,8 @@ export default async function HomePage() {
   return (
     <>
       {/* ── Hero ── */}
-      <section id="accueil" className="relative min-h-[85svh] sm:min-h-screen flex items-center mesh-bg overflow-hidden">
-<div className="relative w-full max-w-[1440px] mx-auto px-5 sm:px-8 py-14 sm:py-24">
+      <section id="accueil" className="relative min-h-[60svh] flex items-center mesh-bg overflow-hidden">
+<div className="relative w-full max-w-[1440px] mx-auto px-5 sm:px-8 py-8 sm:py-14">
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,700px)_460px] gap-10 lg:gap-16 lg:justify-center items-center">
 
             {/* ── Colonne gauche : texte ── */}
@@ -109,7 +109,7 @@ export default async function HomePage() {
                 </span>
               </div>
               <h1
-                className="anim-fade-up delay-100 text-[2.2rem] sm:text-5xl lg:text-[60px] font-bold leading-[1.1] sm:leading-[1.05] tracking-[-0.02em] mb-5 text-foreground"
+                className="anim-fade-up delay-100 text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.1] sm:leading-[1.05] tracking-[-0.02em] mb-5 text-foreground"
                 style={{ fontFamily: "var(--font-heading)" }}
               >
                 {hero.titleBefore}{hero.titleBefore ? " " : ""}
@@ -124,7 +124,7 @@ export default async function HomePage() {
                 {hero.titleAfter ? " " + hero.titleAfter : ""}
               </h1>
 
-              <p className="anim-fade-up delay-200 text-lg sm:text-xl text-muted leading-relaxed mb-8 max-w-lg">
+              <p className="anim-fade-up delay-200 text-base sm:text-lg text-muted leading-relaxed mb-6 max-w-lg">
                 {hero.subtitle}
               </p>
 
@@ -136,7 +136,7 @@ export default async function HomePage() {
               </div>
 
               {/* ── Recherche mobile ── */}
-              <div className="lg:hidden mt-8 anim-fade-up delay-400">
+              <div className="lg:hidden mt-6 anim-fade-up delay-400">
                 <InterventionSearch interventions={interventions} />
               </div>
             </div>
@@ -151,14 +151,14 @@ export default async function HomePage() {
       </section>
 
       {/* ── Plateau technique ── */}
-      <section className="py-10 sm:py-16 bg-white">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+      <section className="py-6 sm:py-10 bg-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <AnimateIn>
             <div
               className="relative rounded-2xl overflow-hidden border"
               style={{ borderColor: "rgba(15,23,42,0.08)" }}
             >
-              <div className="relative w-full aspect-[4/3] sm:aspect-[16/9]">
+              <div className="relative w-full aspect-[16/9] sm:aspect-[21/9]">
                 <Image
                   src="/images/plateau-technique.jpg"
                   alt="Salle de cardiologie interventionnelle équipée d'un système d'imagerie de pointe"
@@ -185,21 +185,21 @@ export default async function HomePage() {
       </section>
 
       {/* ── Interventions ── */}
-      <section className="py-14 sm:py-24 lg:py-32 bg-white">
+      <section className="py-8 sm:py-12 lg:py-14 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div id="interventions" className="scroll-mt-24" aria-hidden="true" />
-          <AnimateIn className="mb-8 sm:mb-14">
+          <AnimateIn className="mb-5 sm:mb-8">
             <span className="section-label mb-4 sm:mb-5 inline-flex" title={interventionsSection.kicker}>
               <BookOpen className="w-3.5 h-3.5" />
               <span className="section-label-text">{interventionsSection.kicker}</span>
             </span>
             <h2
-              className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] mb-3 sm:mb-4 text-foreground"
+              className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-[-0.03em] mb-2 sm:mb-3 text-foreground"
               style={{ fontFamily: "var(--font-heading)" }}
             >
               {interventionsSection.title}
             </h2>
-            <p className="text-muted text-lg sm:text-xl mt-4 max-w-2xl">
+            <p className="text-muted text-base sm:text-lg mt-4 max-w-2xl">
               {interventionsSection.subtitle}
             </p>
             {interventionsSection.badges.length > 0 && (
@@ -257,16 +257,16 @@ export default async function HomePage() {
 
       {/* ── Préparation à l'examen ── */}
       {preparationSection.steps.length > 0 && (
-      <section className="py-14 sm:py-24 lg:py-32" style={{ background: "#F8FAFF" }}>
+      <section className="py-8 sm:py-12 lg:py-14" style={{ background: "#F8FAFF" }}>
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <div id="preparation" className="scroll-mt-24" aria-hidden="true" />
-          <AnimateIn className="mb-8 sm:mb-12">
+          <AnimateIn className="mb-5 sm:mb-8">
             <span className="section-label mb-4 sm:mb-5 inline-flex">
               <ClipboardList className="w-3.5 h-3.5" />
               <span className="section-label-text">{preparationSection.kicker}</span>
             </span>
             <h2
-              className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] mb-3 sm:mb-4 text-foreground"
+              className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-[-0.03em] mb-2 sm:mb-3 text-foreground"
               style={{ fontFamily: "var(--font-heading)" }}
             >
               {preparationSection.title}
@@ -309,21 +309,21 @@ export default async function HomePage() {
       )}
 
       {/* ── Conseils Alimentation ── */}
-      <section className="py-14 sm:py-24 lg:py-32 bg-white">
+      <section className="py-8 sm:py-12 lg:py-14 bg-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <div id="alimentation" className="scroll-mt-24" aria-hidden="true" />
-          <AnimateIn className="mb-8 sm:mb-12">
+          <AnimateIn className="mb-5 sm:mb-8">
             <span className="section-label mb-4 sm:mb-5 inline-flex">
               <Apple className="w-3.5 h-3.5" />
               <span className="section-label-text">Fiche patient</span>
             </span>
             <h2
-              className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] mb-3 sm:mb-4 text-foreground"
+              className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-[-0.03em] mb-2 sm:mb-3 text-foreground"
               style={{ fontFamily: "var(--font-heading)" }}
             >
               Conseils Alimentation
             </h2>
-            <p className="text-muted text-lg sm:text-xl mt-4">
+            <p className="text-muted text-base sm:text-lg mt-4">
               Bien manger pour protéger mon cœur et mes artères
             </p>
           </AnimateIn>
@@ -447,16 +447,16 @@ export default async function HomePage() {
       </section>
 
       {/* ── Documents à télécharger ── */}
-      <section className="py-14 sm:py-24 lg:py-32 bg-white">
+      <section className="py-8 sm:py-12 lg:py-14 bg-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <div id="documents" className="scroll-mt-24" aria-hidden="true" />
-          <AnimateIn className="mb-8 sm:mb-12">
+          <AnimateIn className="mb-5 sm:mb-8">
             <span className="section-label mb-4 sm:mb-5 inline-flex">
               <FileText className="w-3.5 h-3.5" />
               <span className="section-label-text">Documents à télécharger</span>
             </span>
             <h2
-              className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] mb-3 sm:mb-4 text-foreground"
+              className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-[-0.03em] mb-2 sm:mb-3 text-foreground"
               style={{ fontFamily: "var(--font-heading)" }}
             >
               Fiches d&apos;informations et de consentement
@@ -498,21 +498,21 @@ export default async function HomePage() {
       </section>
 
       {/* ── Équipe ── */}
-      <section className="py-14 sm:py-24 lg:py-32" style={{ background: "#EEF4FF" }}>
+      <section className="py-8 sm:py-12 lg:py-14" style={{ background: "#EEF4FF" }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div id="equipe" className="scroll-mt-24" aria-hidden="true" />
-          <AnimateIn className="mb-8 sm:mb-14">
+          <AnimateIn className="mb-5 sm:mb-8">
             <span className="section-label mb-4 sm:mb-5 inline-flex" title={teamSection.kicker}>
               <Users className="w-3.5 h-3.5" />
               <span className="section-label-text">{teamSection.kicker}</span>
             </span>
             <h2
-              className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] mb-3 sm:mb-4 text-foreground"
+              className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-[-0.03em] mb-2 sm:mb-3 text-foreground"
               style={{ fontFamily: "var(--font-heading)" }}
             >
               {teamSection.title}
             </h2>
-            <p className="text-muted text-lg sm:text-xl max-w-lg">
+            <p className="text-muted text-base sm:text-lg max-w-lg">
               {teamSection.subtitle}
             </p>
           </AnimateIn>
@@ -535,7 +535,7 @@ export default async function HomePage() {
                     className="rounded-2xl overflow-hidden border bg-white transition-shadow duration-200 hover:shadow-[0_8px_28px_rgba(15,23,42,0.08)] h-full flex flex-col"
                     style={{ borderColor: "rgba(15,23,42,0.08)" }}
                   >
-                    <div className="relative h-56 sm:h-72 w-full bg-surface flex items-center justify-center">
+                    <div className="relative h-40 sm:h-52 w-full bg-surface flex items-center justify-center">
                       {doctor.photoUrl ? (
                         <Image
                           src={doctor.photoUrl}
@@ -602,7 +602,7 @@ export default async function HomePage() {
 
 
       {/* ── Disclaimer ── */}
-      <section className="py-10 sm:py-16 bg-white">
+      <section className="py-6 sm:py-10 bg-white">
         <div className="max-w-2xl mx-auto px-4 sm:px-6">
           <AnimateIn>
             <div
