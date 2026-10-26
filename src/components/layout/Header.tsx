@@ -10,6 +10,7 @@ const navLinks = [
   { hash: "accueil", label: "Accueil" },
   { hash: "interventions", label: "Interventions" },
   { hash: "preparation", label: "Vous préparer" },
+  { hash: "alimentation", label: "Conseils alimentation" },
   { hash: "documents", label: "Documents à télécharger" },
   { hash: "equipe", label: "Équipe" },
   { hash: "contact", label: "Contact" },

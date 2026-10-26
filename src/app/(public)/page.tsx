@@ -150,40 +150,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Plateau technique ── */}
-      <section className="py-6 sm:py-10 bg-white">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6">
-          <AnimateIn>
-            <div
-              className="relative rounded-2xl overflow-hidden border"
-              style={{ borderColor: "rgba(15,23,42,0.08)" }}
-            >
-              <div className="relative w-full aspect-[16/9] sm:aspect-[21/9]">
-                <Image
-                  src="/images/plateau-technique.jpg"
-                  alt="Salle de cardiologie interventionnelle équipée d'un système d'imagerie de pointe"
-                  fill
-                  quality={85}
-                  sizes="(max-width: 1024px) 100vw, 1024px"
-                  className="object-cover object-[50%_62%]"
-                />
-              </div>
-              <div className="p-5 sm:p-6" style={{ background: "#F8FAFF" }}>
-                <p
-                  className="text-base font-semibold text-foreground"
-                  style={{ fontFamily: "var(--font-heading)" }}
-                >
-                  Un plateau technique moderne et sécurisé
-                </p>
-                <p className="text-sm mt-1" style={{ color: "#475569" }}>
-                  Nos interventions se déroulent dans des salles équipées des dernières technologies d&apos;imagerie, au service de votre sécurité.
-                </p>
-              </div>
-            </div>
-          </AnimateIn>
-        </div>
-      </section>
-
       {/* ── Interventions ── */}
       <section className="py-8 sm:py-12 lg:py-14 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
