@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import { Users, ArrowRight, Phone, Mail, BookOpen, MapPin, Heart, Lock, Shield, UserRound, ClipboardList, FileText, Download, Apple, Check } from "lucide-react";
+import { Users, ArrowRight, Phone, Mail, BookOpen, MapPin, Heart, Lock, Shield, UserRound, ClipboardList, FileText, Download, Apple, Check, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import InterventionCard from "@/components/ui/InterventionCard";
@@ -318,7 +318,16 @@ export default async function HomePage() {
             </p>
           </AnimateIn>
 
-          <div className="space-y-10">
+          <details className="group rounded-2xl border bg-white" style={{ borderColor: "rgba(15,23,42,0.08)" }}>
+            <summary
+              className="flex cursor-pointer list-none items-center gap-3 rounded-2xl p-4 sm:p-5 text-base sm:text-lg font-semibold text-foreground [&::-webkit-details-marker]:hidden"
+              style={{ background: "#F8FAFF", minHeight: "44px" }}
+            >
+              <span className="flex-1 group-open:hidden">Lire la fiche</span>
+              <span className="hidden flex-1 group-open:inline">Masquer la fiche</span>
+              <ChevronDown className="w-5 h-5 shrink-0 transition-transform group-open:rotate-180" style={{ color: "#0369A1" }} aria-hidden="true" />
+            </summary>
+            <div className="space-y-10 p-4 sm:p-6">
             <AnimateIn>
               <h3 className="text-xl font-semibold text-foreground mb-3" style={{ fontFamily: "var(--font-heading)" }}>
                 L&apos;essentiel
@@ -422,7 +431,8 @@ export default async function HomePage() {
                 Source : recommandations de la Société européenne de cardiologie 2021 sur la prévention cardiovasculaire (Eur Heart J 2021;42:3227-3337).
               </p>
             </AnimateIn>
-          </div>
+            </div>
+          </details>
         </div>
       </section>
 
