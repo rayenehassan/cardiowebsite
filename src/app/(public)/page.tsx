@@ -536,7 +536,7 @@ export default async function HomePage() {
                   ? "grid-cols-1 sm:grid-cols-2 max-w-3xl mx-auto"
                   : doctors.length === 4
                   ? "grid-cols-1 sm:grid-cols-2 max-w-4xl mx-auto"
-                  : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                  : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-4xl mx-auto"
               }`}
             >
               {doctors.map((doctor, i) => (
@@ -545,7 +545,7 @@ export default async function HomePage() {
                     className="rounded-2xl overflow-hidden border bg-white transition-shadow duration-200 hover:shadow-[0_8px_28px_rgba(15,23,42,0.08)] h-full flex flex-col"
                     style={{ borderColor: "rgba(15,23,42,0.08)" }}
                   >
-                    <div className="relative h-40 sm:h-52 w-full bg-surface flex items-center justify-center">
+                    <div className="relative h-44 sm:h-48 w-full bg-surface flex items-center justify-center">
                       {doctor.photoUrl ? (
                         <Image
                           src={doctor.photoUrl}
@@ -553,21 +553,20 @@ export default async function HomePage() {
                           fill
                           quality={85}
                           sizes="(max-width: 640px) 100vw, 33vw"
-                          className="object-cover"
-                          style={{ objectPosition: "50% 25%" }}
+                          className="object-contain"
                         />
                       ) : (
                         <UserRound className="w-16 h-16 text-muted" aria-hidden="true" />
                       )}
                     </div>
-                    <div className="p-5 sm:p-6 flex-1">
+                    <div className="p-3 sm:p-4 flex-1">
                       <h3
-                        className="font-semibold text-xl text-foreground mb-1"
+                        className="font-semibold text-lg text-foreground mb-0.5"
                         style={{ fontFamily: "var(--font-heading)" }}
                       >
                         {doctor.name}
                       </h3>
-                      <p className="text-base text-muted mb-4">{doctor.subtitle}</p>
+                      <p className="text-sm text-muted mb-2">{doctor.subtitle}</p>
                       <div className="space-y-1">
                         {doctor.phone && (
                           <a
