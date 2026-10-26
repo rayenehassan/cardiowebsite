@@ -187,13 +187,23 @@ export default async function HomePage() {
           </AnimateIn>
 
           {interventions.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {interventions.map((intervention, i) => (
-                <AnimateIn key={intervention.id} delay={i * 75} className="h-full">
-                  <InterventionCard intervention={intervention} index={i} />
-                </AnimateIn>
-              ))}
-            </div>
+            <details className="group rounded-2xl border bg-white" style={{ borderColor: "rgba(15,23,42,0.08)" }}>
+              <summary
+                className="flex cursor-pointer list-none items-center gap-3 rounded-2xl p-4 sm:p-5 text-base sm:text-lg font-semibold text-foreground [&::-webkit-details-marker]:hidden"
+                style={{ background: "#F8FAFF", minHeight: "44px" }}
+              >
+                <span className="flex-1 group-open:hidden">Voir les examens</span>
+                <span className="hidden flex-1 group-open:inline">Masquer les examens</span>
+                <ChevronDown className="w-5 h-5 shrink-0 transition-transform group-open:rotate-180" style={{ color: "#0369A1" }} aria-hidden="true" />
+              </summary>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4 sm:p-6">
+                {interventions.map((intervention, i) => (
+                  <AnimateIn key={intervention.id} delay={i * 75} className="h-full">
+                    <InterventionCard intervention={intervention} index={i} />
+                  </AnimateIn>
+                ))}
+              </div>
+            </details>
           ) : (
             <AnimateIn>
               <div
