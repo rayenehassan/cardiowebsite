@@ -98,7 +98,7 @@ export default async function HomePage() {
       {/* ── Hero ── */}
       <section id="accueil" className="relative min-h-[60svh] flex items-center mesh-bg overflow-hidden">
 <div className="relative w-full max-w-[1440px] mx-auto px-5 sm:px-8 py-8 sm:py-14">
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,700px)] lg:justify-center items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,700px)_380px] gap-8 lg:gap-16 lg:justify-center items-center">
 
             {/* ── Colonne gauche : texte ── */}
             <div>
@@ -134,6 +134,19 @@ export default async function HomePage() {
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
+            </div>
+
+            {/* ── Colonne droite : image ── */}
+            <div className="anim-fade-up delay-400 order-first lg:order-none mx-auto w-full max-w-[220px] sm:max-w-[300px] lg:max-w-[380px]">
+              <Image
+                src="/images/salle-coronarographie.webp"
+                alt="Salle de coronarographie avec arceau de radiologie et écrans de contrôle"
+                width={1264}
+                height={1264}
+                priority
+                sizes="(max-width: 640px) 220px, (max-width: 1024px) 300px, 380px"
+                className="w-full h-auto rounded-2xl shadow-[0_12px_40px_rgba(15,23,42,0.15)]"
+              />
             </div>
 
           </div>
