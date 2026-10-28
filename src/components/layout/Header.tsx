@@ -11,6 +11,7 @@ const navLinks = [
   { hash: "interventions", label: "Interventions" },
   { hash: "preparation", label: "Vous préparer" },
   { hash: "alimentation", label: "Conseils alimentation" },
+  { hash: "readaptation", label: "Réadaptation" },
   { hash: "documents", label: "Documents à télécharger" },
   { hash: "equipe", label: "Équipe" },
   { hash: "contact", label: "Contact" },
@@ -107,7 +108,7 @@ export default function Header({ brand }: Props) {
             {/* Right cluster: nav (desktop) / burger (mobile) */}
             <div className="flex items-center gap-2 sm:gap-3">
               {/* Desktop nav */}
-              <nav className="hidden lg:flex items-center gap-1">
+              <nav className="hidden xl:flex items-center gap-1">
                 {navLinks.map(({ hash, label }) => (
                   <Link
                     key={hash}
@@ -129,7 +130,7 @@ export default function Header({ brand }: Props) {
 
               {/* Mobile toggle */}
               <button
-                className="lg:hidden p-3 rounded-lg transition-colors hover:bg-white/10"
+                className="xl:hidden p-3 rounded-lg transition-colors hover:bg-white/10"
                 onClick={() => setMenuOpen(!menuOpen)}
                 aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
                 aria-expanded={menuOpen}
@@ -142,7 +143,7 @@ export default function Header({ brand }: Props) {
 
           {menuOpen && (
             <nav
-              className="lg:hidden pb-3 pt-2 flex flex-col gap-1 border-t"
+              className="xl:hidden pb-3 pt-2 flex flex-col gap-1 border-t"
               style={{ borderColor: "rgba(255,255,255,0.1)" }}
             >
               {navLinks.map(({ hash, label }) => (

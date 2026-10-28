@@ -6,6 +6,7 @@ import Image from "next/image";
 import InterventionCard from "@/components/ui/InterventionCard";
 import InterventionSearch from "@/components/ui/InterventionSearch";
 import AnimateIn from "@/components/ui/AnimateIn";
+import CardiacRehabSection from "@/components/ui/CardiacRehabSection";
 import { getPublishedInterventions } from "@/lib/interventions";
 import { getPublicSiteContent } from "@/lib/site-content";
 import { getPublicDoctors } from "@/lib/doctors";
@@ -421,6 +422,9 @@ export default async function HomePage() {
           </details>
         </div>
       </section>
+
+      {/* ── Réadaptation cardiaque ── */}
+      <CardiacRehabSection />
 
       {/* ── Documents à télécharger ── */}
       <section className="py-8 sm:py-12 lg:py-14 bg-white">
