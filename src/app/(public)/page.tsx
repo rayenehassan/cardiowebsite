@@ -4,7 +4,6 @@ import { Users, ArrowRight, Phone, Mail, BookOpen, MapPin, Heart, Lock, Shield, 
 import Link from "next/link";
 import Image from "next/image";
 import InterventionCard from "@/components/ui/InterventionCard";
-import InterventionSearch from "@/components/ui/InterventionSearch";
 import AnimateIn from "@/components/ui/AnimateIn";
 import CardiacRehabSection from "@/components/ui/CardiacRehabSection";
 import { getPublishedInterventions } from "@/lib/interventions";
@@ -99,7 +98,7 @@ export default async function HomePage() {
       {/* ── Hero ── */}
       <section id="accueil" className="relative min-h-[60svh] flex items-center mesh-bg overflow-hidden">
 <div className="relative w-full max-w-[1440px] mx-auto px-5 sm:px-8 py-8 sm:py-14">
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,700px)_460px] gap-10 lg:gap-16 lg:justify-center items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,700px)] lg:justify-center items-center">
 
             {/* ── Colonne gauche : texte ── */}
             <div>
@@ -135,16 +134,6 @@ export default async function HomePage() {
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
-
-              {/* ── Recherche mobile ── */}
-              <div className="lg:hidden mt-6 anim-fade-up delay-400">
-                <InterventionSearch interventions={interventions} />
-              </div>
-            </div>
-
-            {/* ── Colonne droite : recherche desktop ── */}
-            <div className="anim-fade-up delay-400 hidden lg:block">
-              <InterventionSearch interventions={interventions} />
             </div>
 
           </div>
