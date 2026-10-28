@@ -75,9 +75,9 @@ export default function Header({ brand }: Props) {
     <header className="sticky top-0 z-50">
       <div
         className="border-b"
-        style={{ background: "#0F172A", borderColor: "rgba(255,255,255,0.08)" }}
+        style={{ background: "#0369A1", borderColor: "rgba(255,255,255,0.18)" }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="w-full px-4 sm:px-6">
           <div className="flex items-center justify-between gap-4 min-h-[64px]">
             {/* Logo */}
             <Link href="/" onClick={handleLogoClick} className="flex items-center gap-2.5 py-2 min-w-0 flex-shrink">
