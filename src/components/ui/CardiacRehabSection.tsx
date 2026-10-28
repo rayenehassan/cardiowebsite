@@ -155,7 +155,7 @@ export default function CardiacRehabSection() {
 
         <details className="group rounded-2xl border bg-white" style={{ borderColor: "rgba(15,23,42,0.08)" }}>
           <summary
-            className="flex cursor-pointer list-none items-center gap-3 rounded-2xl p-4 sm:p-5 text-base sm:text-lg font-semibold text-red-700 [&::-webkit-details-marker]:hidden"
+            className="flex cursor-pointer list-none items-center gap-3 rounded-2xl p-4 sm:p-5 text-base sm:text-lg font-bold uppercase text-red-700 [&::-webkit-details-marker]:hidden"
             style={{ background: "#F8FAFF", minHeight: "44px" }}
           >
             <span className="flex-1 group-open:hidden">Lire la fiche</span>
